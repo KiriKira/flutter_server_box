@@ -1,4 +1,4 @@
-package tech.lolli.toolbox
+package tech.kirikira.kiribox
 
 import android.app.*
 import android.content.Intent
@@ -17,13 +17,13 @@ class ForegroundService : Service() {
         @Volatile
         var isRunning: Boolean = false
 
-        const val ACTION_STOP_SERVICE = "tech.lolli.toolbox.ACTION_STOP_SERVICE"
+        const val ACTION_STOP_SERVICE = "tech.kirikira.kiribox.ACTION_STOP_SERVICE"
     }
     private val chanId = "ForegroundServiceChannel"
     private val NOTIFICATION_ID = 1000
     private val ACTION_STOP_FOREGROUND = "ACTION_STOP_FOREGROUND"
-    private val ACTION_UPDATE_SESSIONS = "tech.lolli.toolbox.ACTION_UPDATE_SESSIONS"
-    private val ACTION_DISCONNECT_SESSION = "tech.lolli.toolbox.ACTION_DISCONNECT_SESSION"
+    private val ACTION_UPDATE_SESSIONS get() = "${packageName}.ACTION_UPDATE_SESSIONS"
+    private val ACTION_DISCONNECT_SESSION get() = "${packageName}.ACTION_DISCONNECT_SESSION"
 
     private var isFgStarted = false
     private val postedIds = mutableSetOf<Int>()
@@ -64,9 +64,9 @@ class ForegroundService : Service() {
             // taken down yet, and it used to take the early exit — killing the
             // service without ever telling Flutter to disconnect anything.
             if (intent?.action == ACTION_STOP_FOREGROUND) {
-                val stopAllIntent = Intent("tech.lolli.toolbox.STOP_ALL_CONNECTIONS")
+                val stopAllIntent = Intent("${packageName}.STOP_ALL_CONNECTIONS")
                     .setPackage(packageName)
-                sendBroadcast(stopAllIntent, "tech.lolli.toolbox.permission.INTERNAL_BROADCAST")
+                sendBroadcast(stopAllIntent, "${packageName}.permission.INTERNAL_BROADCAST")
                 stopForegroundService()
                 return START_NOT_STICKY
             }

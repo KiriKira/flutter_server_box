@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.linux
+package tech.kirikira.kiribox.linux
 
 import android.content.Context
 import android.database.Cursor
@@ -13,7 +13,7 @@ import android.system.ErrnoException
 import android.system.Os
 import android.system.OsConstants
 import android.webkit.MimeTypeMap
-import tech.lolli.toolbox.R
+import tech.kirikira.kiribox.R
 import java.io.File
 import java.io.FileNotFoundException
 

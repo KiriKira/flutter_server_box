@@ -7,7 +7,7 @@ import subprocess
 import time
 import xml.etree.ElementTree as ET
 
-PACKAGE = 'tech.lolli.toolbox.debug'
+PACKAGE = 'tech.kirikira.kiribox.debug'
 
 
 def adb(*args, data=None, required=True):
@@ -86,7 +86,7 @@ def main():
         raise TimeoutError('Wireless debugging Settings did not expose a pairing endpoint')
     write('pair.json', json.dumps(pairing).encode())
     wait('paired')
-    adb('shell', 'am', 'start', '-n', PACKAGE + '/tech.lolli.toolbox.MainActivity')
+    adb('shell', 'am', 'start', '-n', PACKAGE + '/tech.kirikira.kiribox.MainActivity')
     write('resumed', b'resumed')
     print('Real Android Wireless debugging paired using the app native ADB client.')
 

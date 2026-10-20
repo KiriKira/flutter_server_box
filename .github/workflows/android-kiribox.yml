@@ -7,6 +7,10 @@ on:
         description: Publish the signed APKs as a GitHub Release after both builds succeed
         type: boolean
         default: false
+      release_revision:
+        description: Optional release tag suffix for a corrected build of the same app version
+        type: string
+        default: ''
       run_adb_tests:
         description: Run the optional KVM Android Wireless ADB integration test
         type: boolean
@@ -68,10 +72,17 @@ jobs:
           ndk="$(tr -d '[:space:]' < android/ndk-version.txt)"
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-$sdk" "build-tools;$tools" "ndk;$ndk"
           echo "APKSIGNER=$ANDROID_HOME/build-tools/$tools/apksigner" >> "$GITHUB_ENV"
+          echo "AAPT2=$ANDROID_HOME/build-tools/$tools/aapt2" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
           echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
       - name: Build unsigned release
         run: bash scripts/release/build-fdroid.sh ${{ matrix.abi }}
+      - name: Verify the compiled Android package name
+        env:
+          UNSIGNED_FILENAME: ${{ matrix.filename }}
+        run: |
+          version="$(sed -n 's/^version: //p' pubspec.yaml | cut -d+ -f1)"
+          bash scripts/release/verify-kiribox-apk.sh "build/app/outputs/apk/release/$UNSIGNED_FILENAME" "$version"
       - name: Sign with the fixed release identity
         env:
           KIRIBOX_KEYSTORE_BASE64: ${{ secrets.KIRIBOX_KEYSTORE_BASE64 }}
@@ -129,6 +140,7 @@ jobs:
       - name: Verify release attachments
         env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_REVISION: ${{ inputs.release_revision }}
         run: |
           set -euo pipefail
           version="$(sed -n 's/^version: //p' pubspec.yaml | cut -d+ -f1)"
@@ -140,18 +152,26 @@ jobs:
           cmp android/kiribox-signing-sha256.txt dist/CERTIFICATE-SHA256.txt
           tools="$(tr -d '[:space:]' < android/build-tools-version.txt)"
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$tools"
+          export AAPT2="$ANDROID_HOME/build-tools/$tools/aapt2"
           for apk in dist/*.apk; do
+            bash scripts/release/verify-kiribox-apk.sh "$apk" "$version"
             "$ANDROID_HOME/build-tools/$tools/apksigner" verify --print-certs "$apk" > "$RUNNER_TEMP/certificate.txt"
             actual="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/certificate.txt" | head -1)"
             test "$actual" = "$(tr -d '[:space:]' < android/kiribox-signing-sha256.txt)"
           done
           (cd dist && sha256sum kiribox-*.apk > SHA256SUMS.txt)
           # Refuse to repoint an existing tag or silently replace a release.
-          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" --silent 2>/dev/null; then
+          release_tag="v$version"
+          if [[ -n "$RELEASE_REVISION" ]]; then
+            [[ "$RELEASE_REVISION" =~ ^[a-zA-Z0-9][a-zA-Z0-9._-]*$ ]]
+            release_tag="$release_tag-$RELEASE_REVISION"
+          fi
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$release_tag" --silent 2>/dev/null; then
             echo '::error::Release tag already exists; inspect it before publishing again'
             exit 1
           fi
           echo "KIRIBOX_RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+          echo "KIRIBOX_RELEASE_TAG=$release_tag" >> "$GITHUB_ENV"
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -172,10 +192,10 @@ jobs:
               printf '%s\n' '- 本次未运行 ADB 模拟器测试。'
             fi
             printf '\n签名证书 SHA-256：`%s`\n' "$(cat android/kiribox-signing-sha256.txt)"
-            printf '\nAndroid 安装 ID 保留为 `tech.lolli.toolbox`；KiriBox 独立签名不能覆盖不同签名的官方安装。\n'
+            printf '\nAndroid 安装包 ID：`tech.kirikira.kiribox`。已从编译后的 APK manifest 验证，可与原版 ServerBox 独立安装。\n'
           } > "$RUNNER_TEMP/release-notes.md"
-          gh release create "v$version" dist/*.apk dist/SHA256SUMS.txt dist/CERTIFICATE-SHA256.txt \
-            --target "$RELEASE_COMMIT" --title "KiriBox v$version" \
+          gh release create "$KIRIBOX_RELEASE_TAG" dist/*.apk dist/SHA256SUMS.txt dist/CERTIFICATE-SHA256.txt \
+            --target "$RELEASE_COMMIT" --title "KiriBox $KIRIBOX_RELEASE_TAG" \
             --notes-file "$RUNNER_TEMP/release-notes.md" --latest
 
   adb-emulator:

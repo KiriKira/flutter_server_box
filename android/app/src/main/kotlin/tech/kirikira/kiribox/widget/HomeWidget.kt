@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.widget
+package tech.kirikira.kiribox.widget
 
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONException
-import tech.lolli.toolbox.R
+import tech.kirikira.kiribox.R
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap

@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.adb
+package tech.kirikira.kiribox.adb
 
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertEquals

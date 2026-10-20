@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.linux
+package tech.kirikira.kiribox.linux
 
 /**
  * Paths inside a Linux rootfs, resolved the way the guest resolves them.

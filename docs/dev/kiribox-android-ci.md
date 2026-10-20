@@ -2,15 +2,19 @@
 
 `.github/workflows/android-kiribox.yml` builds ARM64 and x86-64 release APKs by
 manual dispatch. Tests are disabled unless `run_adb_tests` is selected. The display name and artifact name are
-KiriBox. The existing application ID is `tech.lolli.toolbox`, which does not
-contain `serverbox`, and is retained. A new signing identity cannot upgrade an
-installation signed by the original publisher.
+KiriBox. Both the Android application ID and native namespace are
+`tech.kirikira.kiribox`, allowing installation alongside the original ServerBox.
+Shared Flutter platform-channel names remain compatible across platforms.
 
 Select `publish_release` to publish both signed APKs, checksums, and certificate
 fingerprint after successful builds. Publication runs only from `main`, verifies
 both APK signatures, and refuses an existing version tag. Update the app version
 to the latest upstream stable release before dispatching. The legacy upstream
 multi-platform tag workflow does not publish automatically in this fork.
+For a corrected build of the same app version, `release_revision` adds a suffix
+to the release tag without moving a published tag. CI reads the compiled APK
+manifest and requires the actual install ID `tech.kirikira.kiribox` and the
+expected version before signing and again before publishing.
 
 ## Persistent signing
 

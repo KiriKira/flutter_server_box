@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.adb
+package tech.kirikira.kiribox.adb
 
 import android.app.Notification
 import android.app.NotificationChannel

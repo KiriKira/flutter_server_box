@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.widget
+package tech.kirikira.kiribox.widget
 
 import android.content.Context
 import android.net.Uri

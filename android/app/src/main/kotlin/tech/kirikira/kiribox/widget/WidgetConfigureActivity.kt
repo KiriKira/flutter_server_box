@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.widget
+package tech.kirikira.kiribox.widget
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
@@ -12,7 +12,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.TextView
-import tech.lolli.toolbox.R
+import tech.kirikira.kiribox.R
 
 /**
  * What a widget shows: which server, and which metric leads.

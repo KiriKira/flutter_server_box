@@ -7,6 +7,7 @@ abstract final class Miscs {
   /// Editor max allowed size is 1mb
   static const editorMaxSize = 1024 * 1024;
 
+  // Shared Flutter channel ABI, independent of Android's applicationId.
   static const pkgName = 'tech.lolli.toolbox';
 
   /// Name of the backup file, local and remote.

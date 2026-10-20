@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.widget
+package tech.kirikira.kiribox.widget
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -7,7 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Typeface
-import tech.lolli.toolbox.R
+import tech.kirikira.kiribox.R
 import kotlin.math.max
 import kotlin.math.min
 

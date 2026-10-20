@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.adb
+package tech.kirikira.kiribox.adb
 
 import java.net.InetSocketAddress
 import java.net.Socket

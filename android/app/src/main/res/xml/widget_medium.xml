@@ -10,7 +10,7 @@
     android:targetCellHeight="2"
     android:updatePeriodMillis="1800000"
     android:initialLayout="@layout/home_widget"
-    android:configure="tech.lolli.toolbox.widget.WidgetConfigureActivity"
+    android:configure="tech.kirikira.kiribox.widget.WidgetConfigureActivity"
     android:resizeMode="none"
     android:widgetCategory="home_screen">
 </appwidget-provider>

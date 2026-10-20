@@ -1,4 +1,4 @@
-package tech.lolli.toolbox
+package tech.kirikira.kiribox
 
 import android.app.ActivityManager
 import android.app.ApplicationExitInfo
@@ -18,16 +18,16 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.appwidget.AppWidgetManager
-import tech.lolli.toolbox.linux.LinuxDocumentsProvider
-import tech.lolli.toolbox.widget.HomeWidget
-import tech.lolli.toolbox.widget.WidgetStore
+import tech.kirikira.kiribox.linux.LinuxDocumentsProvider
+import tech.kirikira.kiribox.widget.HomeWidget
+import tech.kirikira.kiribox.widget.WidgetStore
 
 class MainActivity: FlutterFragmentActivity() {
     private lateinit var channel: MethodChannel
-    private val ACTION_UPDATE_SESSIONS = "tech.lolli.toolbox.ACTION_UPDATE_SESSIONS"
-    private val ACTION_DISCONNECT_SESSION = "tech.lolli.toolbox.ACTION_DISCONNECT_SESSION"
-    private val ACTION_STOP_ALL_CONNECTIONS = "tech.lolli.toolbox.STOP_ALL_CONNECTIONS"
-    private val INTERNAL_BROADCAST_PERMISSION = "tech.lolli.toolbox.permission.INTERNAL_BROADCAST"
+    private val ACTION_UPDATE_SESSIONS get() = "${packageName}.ACTION_UPDATE_SESSIONS"
+    private val ACTION_DISCONNECT_SESSION get() = "${packageName}.ACTION_DISCONNECT_SESSION"
+    private val ACTION_STOP_ALL_CONNECTIONS get() = "${packageName}.STOP_ALL_CONNECTIONS"
+    private val INTERNAL_BROADCAST_PERMISSION get() = "${packageName}.permission.INTERNAL_BROADCAST"
     private var stopAllReceiver: BroadcastReceiver? = null
     private var disableImpeller = false
     private var ownsFlutterEngine = false
@@ -158,7 +158,7 @@ class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
-        tech.lolli.toolbox.adb.AdbBridge(applicationContext, binaryMessenger) {
+        tech.kirikira.kiribox.adb.AdbBridge(applicationContext, binaryMessenger) {
             requestNotificationPermissionOnce()
             notificationsAllowed()
         }

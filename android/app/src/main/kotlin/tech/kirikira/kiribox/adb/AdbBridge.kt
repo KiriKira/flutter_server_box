@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.adb
+package tech.kirikira.kiribox.adb
 
 import android.content.Context
 import android.content.Intent

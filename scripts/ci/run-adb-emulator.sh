@@ -46,5 +46,5 @@ wait "$test_pid" || result=$?
 test_pid=''
 cat build/adb-e2e/flutter-test.log
 if [[ "$result" != 0 ]]; then exit "$result"; fi
-adb shell run-as tech.lolli.toolbox.debug cat files/kiribox-adb-passed | tee build/adb-e2e/result.txt
-adb exec-out run-as tech.lolli.toolbox.debug cat files/kiribox-adb-screenshot.png > build/adb-e2e/adb-screenshot.png
+adb shell run-as tech.kirikira.kiribox.debug cat files/kiribox-adb-passed | tee build/adb-e2e/result.txt
+adb exec-out run-as tech.kirikira.kiribox.debug cat files/kiribox-adb-screenshot.png > build/adb-e2e/adb-screenshot.png

@@ -1,4 +1,4 @@
-package tech.lolli.toolbox
+package tech.kirikira.kiribox
 
 import android.content.Context
 import android.content.SharedPreferences

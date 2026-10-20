@@ -1,4 +1,4 @@
-package tech.lolli.toolbox.linux
+package tech.kirikira.kiribox.linux
 
 import org.junit.After
 import org.junit.Assert.assertEquals

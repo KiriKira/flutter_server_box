@@ -26,9 +26,9 @@
          the device — and its one action disconnects every SSH session. Signature
          level, so only a build signed with this key can send it. -->
     <permission
-        android:name="tech.lolli.toolbox.permission.INTERNAL_BROADCAST"
+        android:name="${applicationId}.permission.INTERNAL_BROADCAST"
         android:protectionLevel="signature" />
-    <uses-permission android:name="tech.lolli.toolbox.permission.INTERNAL_BROADCAST" />
+    <uses-permission android:name="${applicationId}.permission.INTERNAL_BROADCAST" />
 
     <!-- The database is encrypted with a random key held by Android's
          device-bound secure storage. Auto Backup can restore the database on
@@ -152,7 +152,7 @@
             android:label="@string/widget_small_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="tech.lolli.toolbox.UPDATE_WIDGET" />
+                <action android:name="${applicationId}.UPDATE_WIDGET" />
                 <action android:name="miui.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
@@ -166,7 +166,7 @@
             android:label="@string/widget_medium_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="tech.lolli.toolbox.UPDATE_WIDGET" />
+                <action android:name="${applicationId}.UPDATE_WIDGET" />
                 <action android:name="miui.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
