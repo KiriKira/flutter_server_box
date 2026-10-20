@@ -3,6 +3,10 @@ name: KiriBox Android
 on:
   workflow_dispatch:
     inputs:
+      publish_release:
+        description: Publish the signed APKs as a GitHub Release after both builds succeed
+        type: boolean
+        default: false
       run_adb_tests:
         description: Run the optional KVM Android Wireless ADB integration test
         type: boolean
@@ -100,6 +104,79 @@ jobs:
       - name: Signing result
         run: |
           echo 'Release APK signed with the fixed KiriBox identity and verified against the committed certificate pin.' >> "$GITHUB_STEP_SUMMARY"
+
+  release:
+    name: Publish signed KiriBox release
+    needs: [apk, adb-emulator]
+    if: >-
+      always() && inputs.publish_release && github.ref == 'refs/heads/main'
+      && needs.apk.result == 'success'
+      && (needs['adb-emulator'].result == 'skipped' || needs['adb-emulator'].result == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Download signed APKs from this run
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          pattern: kiribox-signed-*
+          path: dist
+          merge-multiple: true
+      - name: Verify release attachments
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^version: //p' pubspec.yaml | cut -d+ -f1)"
+          [[ "$version" =~ ^1\.0\.[0-9]+$ ]]
+          for abi in arm64 amd64; do
+            test -f "dist/kiribox-$version-$abi.apk"
+          done
+          test "$(find dist -maxdepth 1 -name '*.apk' | wc -l)" -eq 2
+          cmp android/kiribox-signing-sha256.txt dist/CERTIFICATE-SHA256.txt
+          tools="$(tr -d '[:space:]' < android/build-tools-version.txt)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "build-tools;$tools"
+          for apk in dist/*.apk; do
+            "$ANDROID_HOME/build-tools/$tools/apksigner" verify --print-certs "$apk" > "$RUNNER_TEMP/certificate.txt"
+            actual="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' "$RUNNER_TEMP/certificate.txt" | head -1)"
+            test "$actual" = "$(tr -d '[:space:]' < android/kiribox-signing-sha256.txt)"
+          done
+          (cd dist && sha256sum kiribox-*.apk > SHA256SUMS.txt)
+          # Refuse to repoint an existing tag or silently replace a release.
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$version" --silent 2>/dev/null; then
+            echo '::error::Release tag already exists; inspect it before publishing again'
+            exit 1
+          fi
+          echo "KIRIBOX_RELEASE_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          RAN_ADB_TESTS: ${{ inputs.run_adb_tests }}
+        run: |
+          set -euo pipefail
+          version="$KIRIBOX_RELEASE_VERSION"
+          {
+            printf 'KiriBox %s，版本编号对齐上游 ServerBox v%s，基于本仓库当前 ADB 实现构建。\n\n' "$version" "$version"
+            printf '%s\n' '- 支持 Wireless ADB、本机配对、Android 状态和可选 root 增强。' \
+              '- 提供 ADB 终端、APK 安装、应用管理、文件传输、日志和截图。' \
+              '- 本地 AI agent 可通过 ADB 管理手机。' \
+              '- 附件包含 ARM64 和 x86-64 APK，均使用同一持久化签名。'
+            if [[ "$RAN_ADB_TESTS" == true ]]; then
+              printf '%s\n' '- ADB 模拟器测试已通过。'
+            else
+              printf '%s\n' '- 本次未运行 ADB 模拟器测试。'
+            fi
+            printf '\n签名证书 SHA-256：`%s`\n' "$(cat android/kiribox-signing-sha256.txt)"
+            printf '\nAndroid 安装 ID 保留为 `tech.lolli.toolbox`；KiriBox 独立签名不能覆盖不同签名的官方安装。\n'
+          } > "$RUNNER_TEMP/release-notes.md"
+          gh release create "v$version" dist/*.apk dist/SHA256SUMS.txt dist/CERTIFICATE-SHA256.txt \
+            --target "$RELEASE_COMMIT" --title "KiriBox v$version" \
+            --notes-file "$RUNNER_TEMP/release-notes.md" --latest
 
   adb-emulator:
     name: Wireless ADB on KVM Android

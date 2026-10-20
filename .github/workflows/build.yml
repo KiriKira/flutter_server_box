@@ -33,6 +33,9 @@ env:
 
 jobs:
   reproducibilityCheck:
+    # This fork publishes Android releases through android-kiribox.yml.
+    # Keep legacy multi-platform tag releases on the upstream repository.
+    if: github.repository == 'lollipopkit/flutter_server_box' || github.event_name == 'workflow_dispatch'
     # Static build-input validation. The independent byte-for-byte Android
     # builds live in android-reproducible.yml, run by hand.
     name: Build input checks

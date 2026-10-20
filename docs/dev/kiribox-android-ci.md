@@ -6,6 +6,12 @@ KiriBox. The existing application ID is `tech.lolli.toolbox`, which does not
 contain `serverbox`, and is retained. A new signing identity cannot upgrade an
 installation signed by the original publisher.
 
+Select `publish_release` to publish both signed APKs, checksums, and certificate
+fingerprint after successful builds. Publication runs only from `main`, verifies
+both APK signatures, and refuses an existing version tag. Update the app version
+to the latest upstream stable release before dispatching. The legacy upstream
+multi-platform tag workflow does not publish automatically in this fork.
+
 ## Persistent signing
 
 The release identity is generated once and stored outside the git checkout.

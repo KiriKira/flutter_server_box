@@ -98,6 +98,11 @@ android {
     ndkVersion pinnedNdkVersion
 
     packaging {
+        resources {
+            // The BouncyCastle modules each ship their license/notice. Keep
+            // all notices while resolving their duplicate archive paths.
+            merges += ['META-INF/LICENSE.md', 'META-INF/NOTICE.md']
+        }
         jniLibs {
             // Extracted rather than mapped out of the APK. A helper binary can
             // only be executed as a file, and with minSdk >= 23 nothing is
