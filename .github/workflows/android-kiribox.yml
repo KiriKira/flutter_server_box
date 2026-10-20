@@ -45,6 +45,8 @@ jobs:
           ndk="$(tr -d '[:space:]' < android/ndk-version.txt)"
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-$sdk" "build-tools;$tools" "ndk;$ndk"
           echo "APKSIGNER=$ANDROID_HOME/build-tools/$tools/apksigner" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
       - name: Build unsigned release
         run: bash scripts/release/build-fdroid.sh ${{ matrix.abi }}
       - name: Detect persistent signing
@@ -134,6 +136,12 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
+          sudo udevadm settle
+          if [[ ! -e /dev/kvm ]]; then
+            sudo modprobe kvm_intel || sudo modprobe kvm_amd
+          fi
+          sudo chmod a+rw /dev/kvm
+          ls -l /dev/kvm
           test -r /dev/kvm && test -w /dev/kvm
       - name: Install pinned Android tools
         run: |
@@ -141,11 +149,13 @@ jobs:
           tools="$(tr -d '[:space:]' < android/build-tools-version.txt)"
           ndk="$(tr -d '[:space:]' < android/ndk-version.txt)"
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-$sdk" "build-tools;$tools" "ndk;$ndk"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/$ndk" >> "$GITHUB_ENV"
       - run: flutter pub get --enforce-lockfile
       - name: Build ADB integration app
         run: flutter build apk --debug --target-platform android-x64 --target integration_test/adb_device_test.dart --dart-define=KIRIBOX_ADB_E2E=true
       - name: Run real Wireless debugging pairing and device operations
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 35
           target: google_apis
