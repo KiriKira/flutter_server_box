@@ -62,8 +62,9 @@ pub fn parse_status(raw: &str) -> Value {
     let mut sections = HashMap::<String, String>::new();
     let mut key: Option<String> = None;
     for line in raw.lines() {
-        if let Some(name) = line.strip_prefix("__SB_ADB_").and_then(|s| s.strip_suffix("__")) {
-            if STATUS.iter().any(|(k, _)| *k == name) { key = Some(name.to_owned()); continue; }
+        if let Some(name) = line.strip_prefix("__SB_ADB_").and_then(|s| s.strip_suffix("__"))
+            && STATUS.iter().any(|(k, _)| *k == name) {
+            key = Some(name.to_owned()); continue;
         }
         if let Some(key) = &key { sections.entry(key.clone()).or_default().push_str(&format!("{line}\n")); }
     }

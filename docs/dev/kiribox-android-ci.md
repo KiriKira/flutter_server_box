@@ -1,7 +1,7 @@
 # KiriBox Android builds
 
-`.github/workflows/android-kiribox.yml` builds ARM64 and x86-64 release APKs on
-pushes to `main` or a manual dispatch. The display name and artifact name are
+`.github/workflows/android-kiribox.yml` builds ARM64 and x86-64 release APKs by
+manual dispatch. Tests are disabled unless `run_adb_tests` is selected. The display name and artifact name are
 KiriBox. The existing application ID is `tech.lolli.toolbox`, which does not
 contain `serverbox`, and is retained. A new signing identity cannot upgrade an
 installation signed by the original publisher.
@@ -35,8 +35,8 @@ script uploads these four repository secrets through stdin:
 Retain an offline backup of the private directory. Never upload it as an Actions
 artifact or commit it. The signing script restores the key only into a private
 temporary directory and deletes that copy on exit. APKs ship with a certificate
-fingerprint and file checksums. Missing secrets produce explicitly unsigned
-validation artifacts, and the run summary says no signed APK was produced.
+fingerprint and file checksums. Missing secrets fail before any expensive build;
+the workflow never publishes a debug-signed substitute for a release.
 
 Forks may need Actions enabled at the repository's Actions page before the first
 run. The current connected GitHub integration can push repository contents but
