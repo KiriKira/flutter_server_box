@@ -56,31 +56,25 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
   });
 
   Future<void> _pair() async {
-    final host = TextEditingController(text: _host.text);
-    final port = TextEditingController();
+    final host = _host.text.trim();
+    final address = TextEditingController(text: '${host.contains(':') ? '[$host]' : host}:');
     final code = TextEditingController();
     var submitted = false;
     final fields = await context.showRoundDialog<(String, int, String)>(
       title: l10n.adbPair,
       child: StatefulBuilder(builder: (dialogContext, setDialogState) {
-        final p = int.tryParse(port.text.trim());
-        final validHost = host.text.trim().isNotEmpty;
-        final validPort = p != null && p >= 1 && p <= 65535;
+        final endpoint = _pairEndpoint(address.text);
         final validCode = RegExp(r'^\d{6}$').hasMatch(code.text.trim());
         void submit() {
           setDialogState(() => submitted = true);
-          if (!validHost || !validPort || !validCode) return;
-          dialogContext.popDialog((host.text.trim(), p, code.text.trim()));
+          if (endpoint == null || !validCode) return;
+          dialogContext.popDialog((endpoint.$1, endpoint.$2, code.text.trim()));
         }
         return SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
           Padding(padding: const EdgeInsets.all(8), child: Text(l10n.adbPairTip, style: UIs.text12Grey)),
-          Input(controller: host, type: TextInputType.url, label: l10n.adbHost,
-            icon: BoxIcons.bx_server, suggestion: false,
-            errorText: submitted && !validHost ? l10n.adbHostRequired : null,
-            onChanged: (_) => setDialogState(() {})),
-          Input(controller: port, type: TextInputType.number, label: l10n.adbPairPort,
-            icon: Bootstrap.number_123, suggestion: false,
-            errorText: submitted && !validPort ? l10n.adbPortInvalid : null,
+          Input(controller: address, type: TextInputType.url, label: l10n.adbPairAddress,
+            hint: '192.168.1.100:37123', icon: BoxIcons.bx_server, suggestion: false,
+            errorText: submitted && endpoint == null ? l10n.adbPairAddressInvalid : null,
             onChanged: (_) => setDialogState(() {})),
           Input(controller: code, type: TextInputType.number, label: l10n.adbCode,
             icon: Icons.pin_outlined, obscureText: true, maxLength: 6, suggestion: false,
@@ -92,13 +86,14 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
         ]));
       }),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) { host.dispose(); port.dispose(); code.dispose(); });
+    WidgetsBinding.instance.addPostFrameCallback((_) { address.dispose(); code.dispose(); });
     if (fields == null || !mounted) return;
     await _run(() async {
       await AdbService.pair(widget.id, fields.$1, fields.$2, fields.$3);
       if (!mounted) return;
       if (_host.text.trim() != fields.$1) _port.text = '0';
       _host.text = fields.$1;
+      _tls = true;
       _guid = null;
       widget.onChanged(_value);
       setState(() => _message = l10n.adbPaired);
@@ -106,6 +101,8 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
   }
 
   Future<void> _localPair() => _run(() async {
+    _tls = true;
+    _changed();
     await AdbService.channel.invokeMethod<void>('startLocalPairing');
     _pairTimer?.cancel();
     _pairTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
@@ -136,23 +133,21 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
     ListTile(leading: const Icon(Icons.wifi), title: Text(l10n.adbWireless),
       trailing: SwitchX(value: _tls, onChanged: _busy ? null : (v) { setState(() => _tls = v); _changed(); }),
     ).cardx,
-    if (_tls) ...[
-      ListTile(
-        leading: const Icon(Icons.pin_outlined), title: Text(l10n.adbPair),
-        subtitle: Text(l10n.adbPairTip, style: UIs.text12Grey),
-        trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _pair,
-      ).cardx,
-      if (_local && Platform.isAndroid) ListTile(
-        leading: const Icon(Icons.notifications_outlined), title: Text(l10n.adbLocalPair),
-        subtitle: Text(l10n.adbPairWait, style: UIs.text12Grey),
-        trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _localPair,
-      ).cardx,
-    ],
     Input(controller: _host, enabled: !_busy && !_local, onChanged: (_) => _changed(),
       label: l10n.adbHost, icon: BoxIcons.bx_server, type: TextInputType.url,
       hint: '192.168.1.100', suggestion: false),
     Input(controller: _port, enabled: !_busy, type: TextInputType.number, onChanged: (_) => _changed(),
       label: l10n.adbPort, icon: Bootstrap.number_123, suggestion: false),
+    ListTile(
+      leading: const Icon(Icons.link), title: Text(l10n.adbPairDevice),
+      subtitle: Text(l10n.adbPair, style: UIs.text12Grey),
+      trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _pair,
+    ).cardx,
+    if (_local && Platform.isAndroid) ListTile(
+      leading: const Icon(Icons.notifications_outlined), title: Text(l10n.adbLocalPair),
+      subtitle: Text(l10n.adbPairWait, style: UIs.text12Grey),
+      trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _localPair,
+    ).cardx,
     Padding(padding: const EdgeInsets.all(8), child: Text(l10n.adbTip, style: UIs.text12Grey)),
     Wrap(spacing: 8, runSpacing: 4, children: [
       if (_tls && Platform.isAndroid) Btn.text(onTap: _busy ? null : () => _run(() async {
@@ -166,4 +161,17 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
     if (_busy) const LinearProgressIndicator(),
     if (_message case final message?) Padding(padding: const EdgeInsets.all(8), child: SelectableText(message)),
   ]);
+}
+
+(String, int)? _pairEndpoint(String address) {
+  try {
+    final uri = Uri.parse('adb://${address.trim()}');
+    if (uri.host.isEmpty || !uri.hasPort || uri.port < 1 || uri.port > 65535 ||
+        uri.userInfo.isNotEmpty || uri.path.isNotEmpty || uri.hasQuery || uri.hasFragment) {
+      return null;
+    }
+    return (uri.host, uri.port);
+  } on FormatException {
+    return null;
+  }
 }

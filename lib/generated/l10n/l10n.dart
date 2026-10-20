@@ -10269,10 +10269,28 @@ abstract class AppLocalizations {
   /// **'Pair with code'**
   String get adbPair;
 
+  /// No description provided for @adbPairDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair device'**
+  String get adbPairDevice;
+
+  /// No description provided for @adbPairAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing address:port'**
+  String get adbPairAddress;
+
+  /// No description provided for @adbPairAddressInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the address and port from the pairing dialog, for example 192.168.1.100:37123'**
+  String get adbPairAddressInvalid;
+
   /// No description provided for @adbPairTip.
   ///
   /// In en, this message translates to:
-  /// **'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter the address, pairing port and six-digit code from that dialog.'**
+  /// **'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter that dialog\'s address:port and six-digit code. Its pairing port differs from the connection port above.'**
   String get adbPairTip;
 
   /// No description provided for @adbPaired.
@@ -10280,18 +10298,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Paired. Enter the connection port from the main Wireless debugging page, or discover the connection service, then test the connection.'**
   String get adbPaired;
-
-  /// No description provided for @adbHostRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a device address'**
-  String get adbHostRequired;
-
-  /// No description provided for @adbPortInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter a port between 1 and 65535'**
-  String get adbPortInvalid;
 
   /// No description provided for @adbCodeInvalid.
   ///

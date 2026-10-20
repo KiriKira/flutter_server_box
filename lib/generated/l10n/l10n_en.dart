@@ -5997,18 +5997,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adbPair => 'Pair with code';
 
   @override
+  String get adbPairDevice => 'Pair device';
+
+  @override
+  String get adbPairAddress => 'Pairing address:port';
+
+  @override
+  String get adbPairAddressInvalid =>
+      'Enter the address and port from the pairing dialog, for example 192.168.1.100:37123';
+
+  @override
   String get adbPairTip =>
-      'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter the address, pairing port and six-digit code from that dialog.';
+      'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter that dialog\'s address:port and six-digit code. Its pairing port differs from the connection port above.';
 
   @override
   String get adbPaired =>
       'Paired. Enter the connection port from the main Wireless debugging page, or discover the connection service, then test the connection.';
-
-  @override
-  String get adbHostRequired => 'Enter a device address';
-
-  @override
-  String get adbPortInvalid => 'Enter a port between 1 and 65535';
 
   @override
   String get adbCodeInvalid => 'Enter the six-digit pairing code';

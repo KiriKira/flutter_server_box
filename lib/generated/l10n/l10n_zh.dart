@@ -5622,17 +5622,20 @@ class AppLocalizationsZh extends AppLocalizations {
   String get adbPair => '使用配对码配对';
 
   @override
+  String get adbPairDevice => '配对设备';
+
+  @override
+  String get adbPairAddress => '配对地址：端口';
+
+  @override
+  String get adbPairAddressInvalid => '请输入配对窗口中的地址和端口，例如 192.168.1.100:37123';
+
+  @override
   String get adbPairTip =>
-      '在目标手机打开：开发者选项 → 无线调试 → 使用配对码配对设备，然后填写该窗口中的地址、配对端口和六位配对码。';
+      '在目标手机打开：开发者选项 → 无线调试 → 使用配对码配对设备。填写该窗口中的地址：端口和六位配对码；配对端口不是上面的连接端口。';
 
   @override
   String get adbPaired => '配对成功。请填写无线调试主页面的连接端口，或发现连接服务，再测试连接。';
-
-  @override
-  String get adbHostRequired => '请输入设备地址';
-
-  @override
-  String get adbPortInvalid => '请输入 1–65535 之间的端口';
 
   @override
   String get adbCodeInvalid => '请输入六位数字配对码';
