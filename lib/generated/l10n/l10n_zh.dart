@@ -5619,7 +5619,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get adbPort => '连接端口';
 
   @override
-  String get adbPair => '输入配对码';
+  String get adbPair => '使用配对码配对';
+
+  @override
+  String get adbPairTip =>
+      '在目标手机打开：开发者选项 → 无线调试 → 使用配对码配对设备，然后填写该窗口中的地址、配对端口和六位配对码。';
+
+  @override
+  String get adbPaired => '配对成功。请填写无线调试主页面的连接端口，或发现连接服务，再测试连接。';
+
+  @override
+  String get adbHostRequired => '请输入设备地址';
+
+  @override
+  String get adbPortInvalid => '请输入 1–65535 之间的端口';
+
+  @override
+  String get adbCodeInvalid => '请输入六位数字配对码';
 
   @override
   String get adbPairPort => '配对端口';
@@ -5628,7 +5644,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get adbCode => '六位配对码';
 
   @override
-  String get adbDiscover => '发现设备';
+  String get adbDiscover => '发现连接服务';
 
   @override
   String get adbLocalPair => '通过通知栏配对本机';
@@ -5682,7 +5698,8 @@ class AppLocalizationsZh extends AppLocalizations {
   String get adbUnsupported => 'ADB 需要 Android 客户端，或已安装 platform-tools 的桌面客户端。';
 
   @override
-  String get adbPairWait => '请在通知栏输入配对码，然后返回此处。';
+  String get adbPairWait =>
+      '在系统设置中打开无线调试 → 使用配对码配对设备，将显示的六位配对码填入 KiriBox 通知栏，然后返回此处。';
 
   @override
   String get adbRootTip => '目标手机可能弹出 root 授权请求。基础监控无需 root。';

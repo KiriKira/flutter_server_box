@@ -6045,13 +6045,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get adbPair => 'Pair with code';
 
   @override
+  String get adbPairTip =>
+      'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter the address, pairing port and six-digit code from that dialog.';
+
+  @override
+  String get adbPaired =>
+      'Paired. Enter the connection port from the main Wireless debugging page, or discover the connection service, then test the connection.';
+
+  @override
+  String get adbHostRequired => 'Enter a device address';
+
+  @override
+  String get adbPortInvalid => 'Enter a port between 1 and 65535';
+
+  @override
+  String get adbCodeInvalid => 'Enter the six-digit pairing code';
+
+  @override
   String get adbPairPort => 'Pairing port';
 
   @override
   String get adbCode => 'Six-digit pairing code';
 
   @override
-  String get adbDiscover => 'Discover devices';
+  String get adbDiscover => 'Discover connection services';
 
   @override
   String get adbLocalPair => 'Pair this device from notification';
@@ -6108,7 +6125,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get adbPairWait =>
-      'Enter the pairing code in the notification, then return here.';
+      'In system settings, open Wireless debugging → Pair device with pairing code. Enter the displayed six-digit code in the KiriBox notification, then return here.';
 
   @override
   String get adbRootTip =>

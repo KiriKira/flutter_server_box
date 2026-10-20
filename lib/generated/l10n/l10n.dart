@@ -10269,6 +10269,36 @@ abstract class AppLocalizations {
   /// **'Pair with code'**
   String get adbPair;
 
+  /// No description provided for @adbPairTip.
+  ///
+  /// In en, this message translates to:
+  /// **'On the target phone, open Developer options → Wireless debugging → Pair device with pairing code. Enter the address, pairing port and six-digit code from that dialog.'**
+  String get adbPairTip;
+
+  /// No description provided for @adbPaired.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired. Enter the connection port from the main Wireless debugging page, or discover the connection service, then test the connection.'**
+  String get adbPaired;
+
+  /// No description provided for @adbHostRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a device address'**
+  String get adbHostRequired;
+
+  /// No description provided for @adbPortInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a port between 1 and 65535'**
+  String get adbPortInvalid;
+
+  /// No description provided for @adbCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the six-digit pairing code'**
+  String get adbCodeInvalid;
+
   /// No description provided for @adbPairPort.
   ///
   /// In en, this message translates to:
@@ -10284,7 +10314,7 @@ abstract class AppLocalizations {
   /// No description provided for @adbDiscover.
   ///
   /// In en, this message translates to:
-  /// **'Discover devices'**
+  /// **'Discover connection services'**
   String get adbDiscover;
 
   /// No description provided for @adbLocalPair.
@@ -10392,7 +10422,7 @@ abstract class AppLocalizations {
   /// No description provided for @adbPairWait.
   ///
   /// In en, this message translates to:
-  /// **'Enter the pairing code in the notification, then return here.'**
+  /// **'In system settings, open Wireless debugging → Pair device with pairing code. Enter the displayed six-digit code in the KiriBox notification, then return here.'**
   String get adbPairWait;
 
   /// No description provided for @adbRootTip.

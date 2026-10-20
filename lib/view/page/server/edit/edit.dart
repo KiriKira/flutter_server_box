@@ -418,7 +418,9 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage>
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           for (final method in _methodOrder)
-                            if (method != _Method.adb || _useAdb.value || spi?.adb != null)
+                            if (_useAdb.value
+                                ? method == _Method.adb
+                                : method != _Method.adb || spi?.adb != null)
                             _buildMethodSection(method, switch (method) {
                               _Method.adb => AdbConnectionFields(id: _serverId, value: _adb, onChanged: (value) => _adb = value),
                               _Method.monitorHttp => _buildMonitorHttpFields(),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:fl_lib/fl_lib.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:server_box/core/adb/adb_shell.dart';
 import 'package:server_box/core/adb/adb_transport.dart';
@@ -58,27 +59,49 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
     final host = TextEditingController(text: _host.text);
     final port = TextEditingController();
     final code = TextEditingController();
+    var submitted = false;
     final fields = await context.showRoundDialog<(String, int, String)>(
       title: l10n.adbPair,
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        TextField(controller: host, decoration: InputDecoration(labelText: l10n.adbHost)),
-        TextField(controller: port, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: l10n.adbPairPort)),
-        TextField(controller: code, obscureText: true, keyboardType: TextInputType.number, maxLength: 6,
-          decoration: InputDecoration(labelText: l10n.adbCode)),
-      ]),
-      actions: [Btn.cancel(), Btn.ok(onTap: () {
-        final p = int.tryParse(port.text);
-        if (p == null || p < 1 || p > 65535 || !RegExp(r'^\d{6}$').hasMatch(code.text)) return;
-        context.popDialog((host.text.trim(), p, code.text));
-      })],
+      child: StatefulBuilder(builder: (dialogContext, setDialogState) {
+        final p = int.tryParse(port.text.trim());
+        final validHost = host.text.trim().isNotEmpty;
+        final validPort = p != null && p >= 1 && p <= 65535;
+        final validCode = RegExp(r'^\d{6}$').hasMatch(code.text.trim());
+        void submit() {
+          setDialogState(() => submitted = true);
+          if (!validHost || !validPort || !validCode) return;
+          dialogContext.popDialog((host.text.trim(), p, code.text.trim()));
+        }
+        return SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Padding(padding: const EdgeInsets.all(8), child: Text(l10n.adbPairTip, style: UIs.text12Grey)),
+          Input(controller: host, type: TextInputType.url, label: l10n.adbHost,
+            icon: BoxIcons.bx_server, suggestion: false,
+            errorText: submitted && !validHost ? l10n.adbHostRequired : null,
+            onChanged: (_) => setDialogState(() {})),
+          Input(controller: port, type: TextInputType.number, label: l10n.adbPairPort,
+            icon: Bootstrap.number_123, suggestion: false,
+            errorText: submitted && !validPort ? l10n.adbPortInvalid : null,
+            onChanged: (_) => setDialogState(() {})),
+          Input(controller: code, type: TextInputType.number, label: l10n.adbCode,
+            icon: Icons.pin_outlined, obscureText: true, maxLength: 6, suggestion: false,
+            errorText: submitted && !validCode ? l10n.adbCodeInvalid : null,
+            onChanged: (_) => setDialogState(() {}), onSubmitted: (_) => submit()),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            Btn.cancel(), Btn.text(text: l10n.adbPair, onTap: submit),
+          ]),
+        ]));
+      }),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) { host.dispose(); port.dispose(); code.dispose(); });
     if (fields == null || !mounted) return;
     await _run(() async {
       await AdbService.pair(widget.id, fields.$1, fields.$2, fields.$3);
+      if (!mounted) return;
+      if (_host.text.trim() != fields.$1) _port.text = '0';
+      _host.text = fields.$1;
       _guid = null;
       widget.onChanged(_value);
-      if (mounted) setState(() => _message = l10n.adbConnected);
+      setState(() => _message = l10n.adbPaired);
     });
   }
 
@@ -104,24 +127,39 @@ class _AdbConnectionFieldsState extends State<AdbConnectionFields> {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
     if (!AdbService.supported) Text(l10n.adbUnsupported),
-    if (Platform.isAndroid || _local) SwitchListTile(
-      title: Text(l10n.adbLocal), value: _local, onChanged: _busy ? null : (v) {
+    if (Platform.isAndroid || _local) ListTile(
+      leading: const Icon(Icons.phone_android), title: Text(l10n.adbLocal),
+      trailing: SwitchX(value: _local, onChanged: _busy ? null : (v) {
         setState(() { _local = v; if (v) { _host.text = '127.0.0.1'; _port.text = '0'; } }); _changed();
       }),
-    SwitchListTile(title: Text(l10n.adbWireless), value: _tls, onChanged: _busy ? null : (v) { setState(() => _tls = v); _changed(); }),
-    TextField(controller: _host, enabled: !_busy && !_local, onChanged: (_) => _changed(),
-      decoration: InputDecoration(labelText: l10n.adbHost)),
-    TextField(controller: _port, enabled: !_busy, keyboardType: TextInputType.number, onChanged: (_) => _changed(),
-      decoration: InputDecoration(labelText: l10n.adbPort)),
+    ).cardx,
+    ListTile(leading: const Icon(Icons.wifi), title: Text(l10n.adbWireless),
+      trailing: SwitchX(value: _tls, onChanged: _busy ? null : (v) { setState(() => _tls = v); _changed(); }),
+    ).cardx,
+    if (_tls) ...[
+      ListTile(
+        leading: const Icon(Icons.pin_outlined), title: Text(l10n.adbPair),
+        subtitle: Text(l10n.adbPairTip, style: UIs.text12Grey),
+        trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _pair,
+      ).cardx,
+      if (_local && Platform.isAndroid) ListTile(
+        leading: const Icon(Icons.notifications_outlined), title: Text(l10n.adbLocalPair),
+        subtitle: Text(l10n.adbPairWait, style: UIs.text12Grey),
+        trailing: const Icon(Icons.chevron_right), onTap: _busy ? null : _localPair,
+      ).cardx,
+    ],
+    Input(controller: _host, enabled: !_busy && !_local, onChanged: (_) => _changed(),
+      label: l10n.adbHost, icon: BoxIcons.bx_server, type: TextInputType.url,
+      hint: '192.168.1.100', suggestion: false),
+    Input(controller: _port, enabled: !_busy, type: TextInputType.number, onChanged: (_) => _changed(),
+      label: l10n.adbPort, icon: Bootstrap.number_123, suggestion: false),
     Padding(padding: const EdgeInsets.all(8), child: Text(l10n.adbTip, style: UIs.text12Grey)),
     Wrap(spacing: 8, runSpacing: 4, children: [
-      if (_tls) TextButton(onPressed: _busy ? null : _pair, child: Text(l10n.adbPair)),
-      if (_tls && _local && Platform.isAndroid) TextButton(onPressed: _busy ? null : _localPair, child: Text(l10n.adbLocalPair)),
-      if (_tls && Platform.isAndroid) TextButton(onPressed: _busy ? null : () => _run(() async {
+      if (_tls && Platform.isAndroid) Btn.text(onTap: _busy ? null : () => _run(() async {
         final found = await AdbService.discover(local: _local);
         if (mounted) setState(() => _found = found);
-      }), child: Text(l10n.adbDiscover)),
-      TextButton(onPressed: _busy ? null : _test, child: Text(l10n.adbTest)),
+      }), text: l10n.adbDiscover),
+      Btn.text(onTap: _busy ? null : _test, text: l10n.adbTest),
     ]),
     for (final device in _found) ListTile(title: Text('${device['name']}'), subtitle: Text('${device['host']}:${device['port']}'),
       onTap: () { setState(() { _host.text = '${device['host']}'; _port.text = '${device['port']}'; _found = const []; }); _changed(); }),

@@ -3,7 +3,9 @@ title: Android over ADB
 description: Pair, monitor and manage an Android phone with Wireless ADB
 ---
 
-Enable **ADB** under a device's connection methods. Wireless debugging (TLS)
+Enable **ADB** under **Add / Edit server → Connection**. The ADB section appears
+below the connection methods, with **Pair with code** above the address and
+connection port fields. Wireless debugging (TLS)
 requires an Android 11+ target. Android clients include the ADB client;
 Windows, Linux and macOS clients require `adb` from Android platform-tools on
 PATH. Active ADB connections use the Android shell environment, independently
@@ -12,8 +14,9 @@ of any saved SSH or Monitor configuration.
 ## Pairing
 
 For another phone, enable Wireless debugging in its developer options and open
-**Pair device with pairing code**. Enter its address, pairing port and six-digit
-code in ServerBox. Set the **connection port** from the main Wireless debugging
+**Pair device with pairing code**. Tap **Pair with code** in KiriBox and enter its
+address, pairing port and six-digit code. QR pairing is not supported.
+After pairing, set the **connection port** from the main Wireless debugging
 screen; it is different from the pairing port. Test the connection before saving.
 Android clients can discover advertised connection endpoints.
 
