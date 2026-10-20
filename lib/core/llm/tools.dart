@@ -92,6 +92,7 @@ final class ServerAgentTool extends ToolFunc {
     'run_shell_command' => l10n.agentToolShell,
     'read_file' => l10n.agentToolReadFile,
     'write_file' => l10n.agentToolWriteFile,
+    'android_device' => l10n.adbApps,
     'ssh_connect' => l10n.agentToolSshConnect,
     'ssh_disconnect' => l10n.agentToolSshDisconnect,
     _ => BuildData.name,

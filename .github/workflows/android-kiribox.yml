@@ -1,0 +1,164 @@
+name: KiriBox Android
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kiribox-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: APK (${{ matrix.abi }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - abi: arm64
+            filename: app-arm64-v8a-release-unsigned.apk
+          - abi: amd64
+            filename: app-x86_64-release-unsigned.apk
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: recursive
+          lfs: true
+          persist-credentials: false
+      - uses: ./.github/actions/setup-flutter
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: zulu
+          java-version: '21'
+      - name: Install pinned Android tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="$(tr -d '[:space:]' < android/compile-sdk-version.txt)"
+          tools="$(tr -d '[:space:]' < android/build-tools-version.txt)"
+          ndk="$(tr -d '[:space:]' < android/ndk-version.txt)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-$sdk" "build-tools;$tools" "ndk;$ndk"
+          echo "APKSIGNER=$ANDROID_HOME/build-tools/$tools/apksigner" >> "$GITHUB_ENV"
+      - name: Build unsigned release
+        run: bash scripts/release/build-fdroid.sh ${{ matrix.abi }}
+      - name: Detect persistent signing
+        id: signing
+        env:
+          KEYSTORE: ${{ secrets.KIRIBOX_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.KIRIBOX_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KIRIBOX_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KIRIBOX_KEY_PASSWORD }}
+        run: |
+          if [[ -n "$KEYSTORE" && -n "$STORE_PASSWORD" && -n "$KEY_ALIAS" && -n "$KEY_PASSWORD" ]]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::KiriBox signing secrets are missing. Only unsigned validation artifacts will be uploaded.'
+          fi
+      - name: Sign with the fixed release identity
+        if: steps.signing.outputs.available == 'true'
+        env:
+          KIRIBOX_KEYSTORE_BASE64: ${{ secrets.KIRIBOX_KEYSTORE_BASE64 }}
+          KIRIBOX_KEYSTORE_PASSWORD: ${{ secrets.KIRIBOX_KEYSTORE_PASSWORD }}
+          KIRIBOX_KEY_ALIAS: ${{ secrets.KIRIBOX_KEY_ALIAS }}
+          KIRIBOX_KEY_PASSWORD: ${{ secrets.KIRIBOX_KEY_PASSWORD }}
+          ABI: ${{ matrix.abi }}
+          UNSIGNED_FILENAME: ${{ matrix.filename }}
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^version: //p' pubspec.yaml | cut -d+ -f1)"
+          bash scripts/release/sign-kiribox-apk.sh \
+            "build/app/outputs/apk/release/$UNSIGNED_FILENAME" "dist/kiribox-$version-$ABI.apk"
+          cp android/kiribox-signing-sha256.txt dist/CERTIFICATE-SHA256.txt
+          (cd dist && sha256sum kiribox-*.apk > SHA256SUMS.txt)
+      - name: Upload signed APK
+        if: steps.signing.outputs.available == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: kiribox-signed-${{ matrix.abi }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 90
+      - name: Upload unsigned input for validation
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: kiribox-unsigned-${{ matrix.abi }}
+          path: build/app/outputs/apk/release/${{ matrix.filename }}
+          if-no-files-found: error
+          retention-days: 7
+      - name: Signing result
+        if: always()
+        env:
+          AVAILABLE: ${{ steps.signing.outputs.available }}
+        run: |
+          if [[ "$AVAILABLE" == true ]]; then
+            echo 'Persistent signing configured; see the signing step for verification.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '**Unsigned validation only. Configure the four KIRIBOX signing secrets to obtain an installable release APK.**' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  adb-emulator:
+    name: Wireless ADB on KVM Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: recursive
+          lfs: true
+          persist-credentials: false
+      - uses: ./.github/actions/setup-flutter
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6
+        with:
+          distribution: zulu
+          java-version: '21'
+      - name: Probe supplied SSH address from the runner
+        run: |
+          python3 - <<'PY'
+          import socket
+          try:
+              with socket.create_connection(('18.118.132.34', 22), timeout=10) as connection:
+                  connection.settimeout(5)
+                  print('SSH TCP reachable:', connection.recv(256).decode(errors='replace').strip())
+          except OSError as error:
+              print('SSH unavailable from this runner:', type(error).__name__, str(error))
+          PY
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Install pinned Android tools
+        run: |
+          sdk="$(tr -d '[:space:]' < android/compile-sdk-version.txt)"
+          tools="$(tr -d '[:space:]' < android/build-tools-version.txt)"
+          ndk="$(tr -d '[:space:]' < android/ndk-version.txt)"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-$sdk" "build-tools;$tools" "ndk;$ndk"
+      - run: flutter pub get --enforce-lockfile
+      - name: Build ADB integration app
+        run: flutter build apk --debug --target-platform android-x64 --target integration_test/adb_device_test.dart --dart-define=KIRIBOX_ADB_E2E=true
+      - name: Run real Wireless debugging pairing and device operations
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash scripts/ci/run-adb-emulator.sh
+      - name: Upload emulator evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: kiribox-adb-emulator-evidence
+          path: build/adb-e2e/
+          if-no-files-found: warn
+          retention-days: 14

@@ -104,7 +104,7 @@ abstract class ServerShare with _$ServerShare {
   }
 
   /// Bumped when the shape changes in a way an older reader would get wrong.
-  static const formatVer = 1;
+  static const formatVer = 2;
 
   /// Packs [spi] and whatever key it points at.
   ///
@@ -116,7 +116,7 @@ abstract class ServerShare with _$ServerShare {
     if (key != null) keys.add(key);
 
     return ServerShare(
-      version: formatVer,
+      version: spi.adb != null ? formatVer : 1,
       spi: _portable(spi, keptKey: key),
       keys: keys,
       pve: Stores.pve.fetch(spi.id),

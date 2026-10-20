@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fl_lib/fl_lib.dart';
 import 'package:fl_pi_llm_ui/fl_pi_llm_ui.dart' show LlmStores;
+import 'package:server_box/data/model/server/adb_credential.dart';
 import 'package:server_box/data/model/server/bmc_cfg.dart';
 import 'package:server_box/data/model/server/custom.dart';
 import 'package:server_box/data/model/server/geo.dart';
@@ -190,6 +191,14 @@ class ServerStore extends EntityStore<Spi> {
       sshEnabled: (row['ssh_enabled'] as int? ?? 1) == 1,
       monitorEnabled: (row['monitor_enabled'] as int? ?? 1) == 1,
       local: (row['is_local'] as int? ?? 0) == 1,
+      adbEnabled: (row['adb_enabled'] as int? ?? 0) == 1,
+      adb: row['adb_host'] == null ? null : AdbCredential(
+        host: row['adb_host'] as String,
+        port: row['adb_port'] as int? ?? 0,
+        localDevice: (row['adb_local'] as int? ?? 0) == 1,
+        tls: (row['adb_tls'] as int? ?? 1) == 1,
+        deviceGuid: row['adb_guid'] as String?,
+      ),
       monitorHttp: monitorAddr == null
           ? null
           : MonitorHttpCredential(
@@ -339,6 +348,7 @@ class ServerStore extends EntityStore<Spi> {
       'geo_lat',
       'geo_lon',
       'disk_counts_network',
+      'adb_host', 'adb_port', 'adb_local', 'adb_tls', 'adb_enabled', 'adb_guid',
     ];
     upsert(columns, [
       item.id,
@@ -388,6 +398,8 @@ class ServerStore extends EntityStore<Spi> {
       custom?.geo?.lat,
       custom?.geo?.lon,
       (custom?.diskCountsNetwork ?? false) ? 1 : 0,
+      item.adb?.host, item.adb?.port, item.adb?.localDevice == true ? 1 : 0,
+      item.adb?.tls != false ? 1 : 0, item.adbEnabled ? 1 : 0, item.adb?.deviceGuid,
     ]);
 
     // Replaced wholesale rather than diffed: the record arrives as one object,
@@ -642,10 +654,12 @@ class ServerStore extends EntityStore<Spi> {
   /// transaction: a chat keeps its terminal by the server's id.
   void _rescopeTerminalChats(String from, String to) {
     final chats = LlmStores.chat;
-    for (final trashed in const [false, true]) {
-      for (final meta in chats.all(scope: 'terminal:$from', trashed: trashed)) {
-        if (!chats.set(meta.id, {...meta.toJson(), 'scope': 'terminal:$to'})) {
-          throw StateError('Moving chat ${meta.id} to server $to failed');
+    for (final suffix in const ['', '/adb']) {
+      for (final trashed in const [false, true]) {
+        for (final meta in chats.all(scope: 'terminal:$from$suffix', trashed: trashed)) {
+          if (!chats.set(meta.id, {...meta.toJson(), 'scope': 'terminal:$to$suffix'})) {
+            throw StateError('Moving chat ${meta.id} to server $to failed');
+          }
         }
       }
     }

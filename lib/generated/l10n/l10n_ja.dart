@@ -5707,4 +5707,113 @@ class AppLocalizationsJa extends AppLocalizations {
   @override
   String get reconnectEndsShell =>
       '再アタッチできる tmux セッションがないため、再接続するとこのシェルと、その中でまだ実行中のものが終了し、画面上の出力も消去されます。';
+
+  @override
+  String get adbLocal => 'Manage this Android device';
+
+  @override
+  String get adbWireless => 'Wireless debugging (TLS)';
+
+  @override
+  String get adbHost => 'Device address';
+
+  @override
+  String get adbPort => 'Connection port';
+
+  @override
+  String get adbPair => 'Pair with code';
+
+  @override
+  String get adbPairPort => 'Pairing port';
+
+  @override
+  String get adbCode => 'Six-digit pairing code';
+
+  @override
+  String get adbDiscover => 'Discover devices';
+
+  @override
+  String get adbLocalPair => 'Pair this device from notification';
+
+  @override
+  String get adbTip =>
+      'Enable Wireless debugging in Developer options. Pairing and connection ports are different. Use 0 for automatic local discovery.';
+
+  @override
+  String get adbTest => 'Test connection';
+
+  @override
+  String get adbApps => 'Android tools';
+
+  @override
+  String get adbInstall => 'Install APK';
+
+  @override
+  String get adbRoot => 'Request root enhancement';
+
+  @override
+  String get adbRootAllowed => 'Root enhancement enabled';
+
+  @override
+  String get adbRootDenied => 'Root unavailable or permission denied';
+
+  @override
+  String get adbLogcat => 'Read recent logcat';
+
+  @override
+  String get adbScreenshot => 'Save screenshot';
+
+  @override
+  String get adbReboot => 'Reboot device';
+
+  @override
+  String get adbLaunch => 'Launch';
+
+  @override
+  String get adbStop => 'Force stop';
+
+  @override
+  String get adbUninstall => 'Uninstall';
+
+  @override
+  String get adbClear => 'Clear app data';
+
+  @override
+  String get adbFiles => 'Device files';
+
+  @override
+  String get adbUnsupported =>
+      'ADB requires Android or a desktop with platform-tools installed.';
+
+  @override
+  String get adbPairWait =>
+      'Enter the pairing code in the notification, then return here.';
+
+  @override
+  String get adbRootTip =>
+      'The target phone may show a root request. Basic monitoring works without root.';
+
+  @override
+  String get adbConnected => 'ADB connected';
+
+  @override
+  String get adbDevice => 'Android device';
+
+  @override
+  String get adbUpload => 'Upload file';
+
+  @override
+  String get adbDownload => 'Download';
+
+  @override
+  String get adbConfirm => 'Run this action on the displayed Android device?';
+
+  @override
+  String get adbTemperature => 'Battery temperature';
+
+  @override
+  String get adbIdentity => 'Execution identity';
+
+  @override
+  String get adbRootDisable => 'Disable root enhancement';
 }

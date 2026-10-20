@@ -87,6 +87,7 @@ abstract interface class ServerCapabilities {
     MonitorRemoteAccess? granted,
   }) {
     return switch (credential) {
+      ServerConnectCredentialAdb() => const AdbCapabilities(),
       ServerConnectCredentialSsh() => const SshCapabilities(),
       ServerConnectCredentialMonitorHttp() => MonitorHttpCapabilities(
         granted ?? MonitorRemoteAccess.none,
@@ -126,6 +127,7 @@ abstract interface class ServerCapabilities {
     Spi spi, {
     MonitorRemoteAccess? granted,
   }) {
+    if (spi.adbOn != null) return const AdbCapabilities();
     final primary = of(
       ServerConnectCredential.fromSpi(spi),
       granted: granted,
@@ -356,4 +358,17 @@ class LocalCapabilities implements ServerCapabilities {
   /// Nothing to connect, so nothing to wait for before a command runs.
   @override
   bool get persistentSession => false;
+}
+
+/// ADB has shell services, but no SSH subsystem or generic TCP relay.
+class AdbCapabilities implements ServerCapabilities {
+  const AdbCapabilities();
+  @override bool get shell => true;
+  @override bool get terminal => true;
+  @override bool get byteStream => false;
+  @override bool get tcpRelay => false;
+  @override bool get remoteListen => false;
+  @override bool get files => true;
+  @override bool get storedHistory => false;
+  @override bool get persistentSession => true;
 }

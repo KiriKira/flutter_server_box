@@ -158,6 +158,10 @@ class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
+        tech.lolli.toolbox.adb.AdbBridge(applicationContext, binaryMessenger) {
+            requestNotificationPermissionOnce()
+            notificationsAllowed()
+        }
 
         channel = MethodChannel(binaryMessenger, "tech.lolli.toolbox/main_chan")
         channel.setMethodCallHandler { method, result ->

@@ -56,6 +56,8 @@ app.*.map.json
 
 /android/app/fjy.androidstudio.key
 /android/app/app.key
+# Fork release identities stay outside source control.
+*.p12
 /release
 test.dart
 

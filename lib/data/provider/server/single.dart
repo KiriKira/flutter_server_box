@@ -6,6 +6,8 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/scheduler.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:server_box/core/adb/adb_shell.dart';
+import 'package:server_box/core/adb/adb_transport.dart';
 import 'package:server_box/core/extension/ssh_client.dart';
 import 'package:server_box/core/utils/local_exec.dart';
 import 'package:server_box/core/utils/local_server.dart';
@@ -35,6 +37,7 @@ import 'package:server_box/data/model/server/status_history.dart';
 import 'package:server_box/data/model/server/system.dart';
 import 'package:server_box/data/model/server/temp.dart';
 import 'package:server_box/data/model/server/try_limiter.dart';
+import 'package:server_box/data/provider/server/adb_source.dart';
 import 'package:server_box/data/provider/server/all.dart';
 import 'package:server_box/data/provider/server/data_source.dart';
 import 'package:server_box/data/provider/server/monitor_http_source.dart';
@@ -43,6 +46,7 @@ import 'package:server_box/data/res/status.dart';
 import 'package:server_box/data/res/store.dart';
 import 'package:server_box/data/ssh/persistent_shell.dart';
 import 'package:server_box/data/ssh/session_manager.dart';
+import 'package:server_box/src/rust/api/android.dart' as android_ffi;
 import 'package:server_box/src/rust/api/script.dart' as ffi;
 
 part 'single.g.dart';
@@ -142,6 +146,7 @@ abstract class ServerState with _$ServerState {
 @Riverpod(keepAlive: true)
 class ServerNotifier extends _$ServerNotifier {
   PersistentShell? _persistentShell;
+  bool _adbSessionRegistered = false;
   bool _usePersistentShellForStatus = true;
   int _operationGeneration = 0;
 
@@ -187,7 +192,11 @@ class ServerNotifier extends _$ServerNotifier {
       // [_isRefreshCurrent] — which compares this before reading `state`,
       // and reading `state` after disposal throws.
       _operationGeneration++;
+      _adbSessionRegistered = false;
       unawaited(_disposePersistentShell());
+      AdbService.configure(serverId, null);
+      AdbService.disconnect(serverId);
+      TermSessionManager.remove('adb:$serverId');
       _source?.close();
       try {
         _client?.close();
@@ -206,6 +215,7 @@ class ServerNotifier extends _$ServerNotifier {
 
     final serverNotifier = ref.read(serversProvider);
     final spi = serverNotifier.servers[serverId];
+    AdbService.configure(serverId, spi?.adbOn);
     if (spi == null) {
       // The server is gone — deleted, or removed by a sync pull — while this
       // notifier was still alive and something was still watching it. Riverpod
@@ -309,6 +319,7 @@ class ServerNotifier extends _$ServerNotifier {
       // ten series every refresh would buy nothing.
       history: source.history,
     );
+    status.android = source.android;
     status.amd = source.amd?.toList();
     status.diskUsage = source.diskUsage;
     status.osId = source.osId;
@@ -355,6 +366,7 @@ class ServerNotifier extends _$ServerNotifier {
   /// [ServersNotifier.updateServer] then declined to reconnect, because by its
   /// own reckoning nothing had happened that called for one.
   void updateSpi(Spi spi) {
+    AdbService.configure(spi.id, spi.adbOn);
     final old = state.spi;
     final reconnect = spi.shouldReconnect(old);
     // What was written to the machine and what was read back from it. Both are
@@ -398,6 +410,10 @@ class ServerNotifier extends _$ServerNotifier {
       return;
     }
 
+    _adbSessionRegistered = false;
+    AdbService.disconnect(state.spi.id);
+    _source?.close();
+    _source = null;
     _operationGeneration++;
     unawaited(_disposePersistentShell());
     state.client?.close();
@@ -436,6 +452,11 @@ class ServerNotifier extends _$ServerNotifier {
 
   // Close connection
   void closeConnection() {
+    _adbSessionRegistered = false;
+    AdbService.disconnect(state.spi.id);
+    _source?.close();
+    _source = null;
+    TermSessionManager.remove('adb:${state.spi.id}');
     _operationGeneration++;
     unawaited(_disposePersistentShell());
     state.client?.close();
@@ -521,6 +542,8 @@ class ServerNotifier extends _$ServerNotifier {
     required int operation,
   }) async {
     switch (ServerConnectCredential.fromSpi(state.spi)) {
+      case ServerConnectCredentialAdb():
+        await _getDataAdb(operation);
       case ServerConnectCredentialSsh():
         // Connecting is inseparable from fetching here (auth prompts, script
         // install, session bookkeeping), so the SSH path drives the state
@@ -542,6 +565,10 @@ class ServerNotifier extends _$ServerNotifier {
   /// notifier — so the SSH and local paths construct one per refresh instead.
   ServerDataSource _resolveSource(ServerConnectCredential credential) {
     switch (credential) {
+      case ServerConnectCredentialAdb():
+        final existing = _source;
+        if (existing is AdbDataSource && AdbService.isCurrent(existing.exec.connection)) return existing;
+        throw StateError('ADB must connect before reading status');
       case ServerConnectCredentialSsh() || ServerConnectCredentialLocal():
         return ScriptDataSource(
           spi: state.spi,
@@ -558,6 +585,66 @@ class ServerNotifier extends _$ServerNotifier {
         existing?.close();
         return _source = MonitorHttpDataSource(credential);
     }
+  }
+
+  Future<void> _getDataAdb(int operation) async {
+    final spi = state.spi;
+    if (!TryLimiter.canTry(spi.id)) return;
+    if (state.conn != ServerConn.finished) updateConnection(ServerConn.connecting);
+    try {
+      final exec = await ensureExec();
+      if (!_isRefreshCurrent(operation, spi)) return;
+      if (exec is! AdbExec) throw StateError('Expected ADB connection');
+      final existing = _source;
+      final source = existing is AdbDataSource && identical(existing.exec.connection, exec.connection)
+          ? existing : AdbDataSource(exec);
+      _source = source;
+      final status = await source.fetchStatus(_copyStatus(state.status, err: null, setErr: true));
+      if (!_isRefreshCurrent(operation, spi)) return;
+      updateStatus(status, latencyMs: source.lastRequestMs);
+      updateConnection(ServerConn.finished);
+      TryLimiter.reset(spi.id);
+      final sessionId = 'adb:${spi.id}';
+      if (!_adbSessionRegistered) {
+        _adbSessionRegistered = true;
+        TermSessionManager.add(
+        id: sessionId, title: spi.name, subtitle: spi.displayAddr,
+        startTimeMs: DateTime.now().millisecondsSinceEpoch,
+        disconnect: () => closeConnection(),
+      );
+        TermSessionManager.setActive(sessionId, hasTerminal: false);
+      }
+      TermSessionManager.updateStatus(sessionId, TermSessionStatus.connected);
+    } catch (e) {
+      if (!_isRefreshCurrent(operation, spi)) return;
+      _adbSessionRegistered = false;
+      AdbService.disconnect(spi.id);
+      TermSessionManager.remove('adb:${spi.id}');
+      _source = null;
+      TryLimiter.inc(spi.id);
+      _setFailedState(_copyStatus(state.status, err: AdbErr(message: e.toString()), setErr: true));
+    }
+  }
+
+  void disableAdbRoot() {
+    final source = _source;
+    if (source is AdbDataSource) source.rootGranted = false;
+    unawaited(refresh(interactive: true));
+  }
+
+  Future<bool> requestAdbRoot() async {
+    final exec = await ensureExec();
+    if (exec is! AdbExec) return false;
+    final cancel = Completer<void>();
+    final timer = Timer(const Duration(seconds: 20), cancel.complete);
+    final ExecResult result;
+    try {
+      result = await exec.run(android_ffi.androidCommand(action: 'root_probe', argument: '', root: false), cancel: cancel.future);
+    } finally { timer.cancel(); }
+    final allowed = result.succeeded && !result.outputIncomplete;
+    final source = _source ??= AdbDataSource(exec);
+    if (source is AdbDataSource && identical(source.exec.connection, exec.connection)) source.rootGranted = allowed;
+    return allowed;
   }
 
   /// Status polling via a `monitor` instance's HTTP API instead of SSH+shell
@@ -966,6 +1053,9 @@ class ServerNotifier extends _$ServerNotifier {
     VoidCallback? onSshDial,
   }) async {
     switch (credential) {
+      case ServerConnectCredentialAdb(:final spi):
+        final connection = await AdbService.connect(spi.id, spi.adbOn!);
+        return AdbExec(connection);
       case ServerConnectCredentialSsh():
         // Connecting *is* the probe here, and it always happens.
         return SshExec(
@@ -995,6 +1085,7 @@ class ServerNotifier extends _$ServerNotifier {
 
   bool isExecCurrent(ServerExec exec, Spi spi) {
     if (state.spi != spi) return false;
+    if (exec is AdbExec) return AdbService.isCurrent(exec.connection);
     if (exec is SshExec) {
       return identical(state.client, exec.client) && !exec.client.isClosed;
     }

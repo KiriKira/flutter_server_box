@@ -3,16 +3,19 @@ part of 'edit.dart';
 /// One of the two ways into a server, as the connection list draws it.
 enum _Method {
   monitorHttp,
-  ssh;
+  ssh,
+  adb;
 
   IconData get icon => switch (this) {
     _Method.monitorHttp => MingCute.web_line,
     _Method.ssh => Icons.terminal,
+    _Method.adb => Icons.android,
   };
 
   String get label => switch (this) {
     _Method.monitorHttp => 'Monitor HTTP',
     _Method.ssh => 'SSH',
+    _Method.adb => 'ADB',
   };
 }
 
@@ -29,18 +32,20 @@ extension _Widgets on _ServerEditPageState {
 
   /// The order the two methods are dialled in, first to last.
   List<_Method> get _methodOrder => _preferMonitorHttp.value
-      ? const [_Method.monitorHttp, _Method.ssh]
-      : const [_Method.ssh, _Method.monitorHttp];
+      ? const [_Method.monitorHttp, _Method.ssh, _Method.adb]
+      : const [_Method.ssh, _Method.monitorHttp, _Method.adb];
 
   bool _methodOn(_Method method) => switch (method) {
     _Method.monitorHttp => _useMonitorHttp.value,
     _Method.ssh => _useSsh.value,
+    _Method.adb => _useAdb.value,
   };
 
   /// The address below an enabled connection method.
   String _methodSummary(_Method method) {
     if (!_methodOn(method)) return '';
     return switch (method) {
+      _Method.adb => _adb.localDevice ? l10n.adbLocal : _adb.host,
       _Method.monitorHttp => _monitorAddrCtrl.text.selfNotEmptyOrNull ?? '',
       _Method.ssh => [
         if (_ipController.text.trim().isNotEmpty)
@@ -65,6 +70,7 @@ extension _Widgets on _ServerEditPageState {
   Widget _buildConnectionGroup({required bool otherIsLocal}) {
     return ListenableBuilder(
       listenable: Listenable.merge([
+        _useAdb,
         _useSsh,
         _useMonitorHttp,
         _preferMonitorHttp,
@@ -111,8 +117,9 @@ extension _Widgets on _ServerEditPageState {
               // the row: the default listener wraps the whole tile, which on a
               // row carrying a switch means a long press anywhere picks it up.
               buildDefaultDragHandles: false,
-              onReorderItem: (_, _) =>
-                  _preferMonitorHttp.value = !_preferMonitorHttp.value,
+              onReorderItem: (from, to) {
+                if (from < 2 && to < 2) _preferMonitorHttp.value = !_preferMonitorHttp.value;
+              },
               children: [
                 for (final (at, method) in order.indexed)
                   _buildMethodRow(method, at: at, live: live),
@@ -238,9 +245,18 @@ extension _Widgets on _ServerEditPageState {
                 const SizedBox(width: 9),
                 SwitchX(
                   value: on,
-                  onChanged: (val) => switch (method) {
-                    _Method.monitorHttp => _useMonitorHttp.value = val,
-                    _Method.ssh => _useSsh.value = val,
+                  onChanged: (val) {
+                    switch (method) {
+                      case _Method.adb:
+                        _useAdb.value = val;
+                        if (val) { _useSsh.value = false; _useMonitorHttp.value = false; }
+                      case _Method.monitorHttp:
+                        _useMonitorHttp.value = val;
+                        if (val) _useAdb.value = false;
+                      case _Method.ssh:
+                        _useSsh.value = val;
+                        if (val) _useAdb.value = false;
+                    }
                   },
                 ),
               ],
@@ -259,6 +275,7 @@ extension _Widgets on _ServerEditPageState {
   Widget _buildMethodSection(_Method method, Widget fields) {
     return ListenableBuilder(
       listenable: Listenable.merge([
+        _useAdb,
         _useSsh,
         _useMonitorHttp,
         _preferMonitorHttp,
@@ -267,6 +284,7 @@ extension _Widgets on _ServerEditPageState {
         final title = switch (method) {
           _Method.monitorHttp => l10n.monitorAgent,
           _Method.ssh => 'SSH',
+          _Method.adb => 'ADB',
         };
         return Column(
           mainAxisSize: MainAxisSize.min,

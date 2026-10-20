@@ -17,6 +17,9 @@ import 'package:server_box/data/model/server/system.dart';
 import 'package:server_box/data/model/server/temp.dart';
 
 class ServerStatus {
+  /// Android-specific readings; null for other device platforms.
+  Map<String, dynamic>? android;
+
   Cpus cpu;
   Memory mem;
   Swap swap;

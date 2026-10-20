@@ -2,6 +2,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io'; content { includeGroup 'com.github.MuntashirAkon'; includeGroup 'com.github.MuntashirAkon.spake2-java' } }
     }
 }
 
@@ -16,11 +17,11 @@ subprojects { subproject ->
     subproject.afterEvaluate {
       android.buildTypes.matching { it.name == 'profile' }.all { buildType ->
         buildType.applicationIdSuffix = ".profile"
-        buildTypes.profile.resValue 'string', 'app_name', 'SrvBxP'
+        buildTypes.profile.resValue 'string', 'app_name', 'KiriBox P'
       }
       android.buildTypes.matching { it.name == 'debug' }.all { buildType ->
         buildType.applicationIdSuffix = ".debug"
-        buildTypes.debug.resValue 'string', 'app_name', 'SrvBxD'
+        buildTypes.debug.resValue 'string', 'app_name', 'KiriBox D'
       }
     }
   }

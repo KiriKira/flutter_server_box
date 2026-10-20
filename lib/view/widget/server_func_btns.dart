@@ -17,6 +17,7 @@ import 'package:server_box/data/provider/app/session_requests.dart';
 import 'package:server_box/data/provider/server/single.dart';
 import 'package:server_box/data/provider/snippet.dart';
 import 'package:server_box/data/res/store.dart';
+import 'package:server_box/view/page/adb/tools.dart';
 import 'package:server_box/view/page/container/container.dart';
 import 'package:server_box/view/page/firewall/firewall.dart';
 import 'package:server_box/view/page/iperf.dart';
@@ -83,7 +84,10 @@ class ServerFuncBar extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: SizedBox(
                 height: kFuncBarHeight,
-                child: ServerFuncBtns(spi: spi, btns: btns),
+                child: spi.adbOn == null ? ServerFuncBtns(spi: spi, btns: btns) : Row(mainAxisSize: MainAxisSize.min, children: [
+                  Flexible(child: ServerFuncBtns(spi: spi, btns: btns)),
+                  IconButton(onPressed: () => AdbToolsPage.open(context, spi), icon: const Icon(Icons.android), tooltip: l10n.adbApps),
+                ]),
               ),
             ),
           ),
@@ -402,6 +406,7 @@ List<ServerFuncEntry> serverFuncBtnsFor(
   Spi spi,
   MonitorRemoteAccess? granted,
 ) {
+  if (spi.adbOn != null) return [(btn: ServerFuncBtn.terminal, available: true, reason: null), (btn: ServerFuncBtn.files, available: true, reason: null)];
   final ordered = () {
     try {
       final vals = <ServerFuncBtn>[];
@@ -452,6 +457,10 @@ void runServerFunc(
 ) async {
     switch (value) {
       case ServerFuncBtn.files:
+        if (spi.adbOn != null) {
+          Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AdbFilesPage(spi: spi)));
+          return;
+        }
         // Only the SFTP backend needs a connection opened first. A server
         // whose files come from its agent's API has none to open, and asking
         // for one fails on a host whose sshd this app cannot reach — which is

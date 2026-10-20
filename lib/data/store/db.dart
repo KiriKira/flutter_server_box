@@ -209,6 +209,13 @@ class Servers extends Table with SyncMeta {
   BoolColumn get diskCountsNetwork =>
       boolean().withDefault(const Constant(false))();
 
+  TextColumn get adbHost => text().nullable()();
+  IntColumn get adbPort => integer().nullable()();
+  BoolColumn get adbLocal => boolean().withDefault(const Constant(false))();
+  BoolColumn get adbTls => boolean().withDefault(const Constant(true))();
+  BoolColumn get adbEnabled => boolean().withDefault(const Constant(false))();
+  TextColumn get adbGuid => text().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 
@@ -223,7 +230,7 @@ class Servers extends Table with SyncMeta {
     // [preferredTransport] saying which is tried first. What stays is that a
     // server has to be reachable *somehow*; a row with neither is not a
     // server, it is a name.
-    'CHECK (ssh_ip IS NOT NULL OR monitor_addr IS NOT NULL OR is_local = 1)',
+    'CHECK (ssh_ip IS NOT NULL OR monitor_addr IS NOT NULL OR is_local = 1 OR adb_host IS NOT NULL)',
     'CHECK (ssh_port IS NULL OR ssh_port BETWEEN 1 AND 65535)',
   ];
 }

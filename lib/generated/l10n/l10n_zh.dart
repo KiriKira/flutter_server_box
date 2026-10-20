@@ -5605,6 +5605,111 @@ class AppLocalizationsZh extends AppLocalizations {
   @override
   String get reconnectEndsShell =>
       '没有可以重新接入的 tmux 会话，重新连接会结束当前 shell 及其中仍在运行的程序，并清除屏幕上的输出。';
+
+  @override
+  String get adbLocal => '通过 ADB 管理本机';
+
+  @override
+  String get adbWireless => '无线调试（TLS）';
+
+  @override
+  String get adbHost => '设备地址';
+
+  @override
+  String get adbPort => '连接端口';
+
+  @override
+  String get adbPair => '输入配对码';
+
+  @override
+  String get adbPairPort => '配对端口';
+
+  @override
+  String get adbCode => '六位配对码';
+
+  @override
+  String get adbDiscover => '发现设备';
+
+  @override
+  String get adbLocalPair => '通过通知栏配对本机';
+
+  @override
+  String get adbTip => '在开发者选项中开启无线调试。配对端口与连接端口不同；本机连接端口填 0 可自动发现。';
+
+  @override
+  String get adbTest => '测试连接';
+
+  @override
+  String get adbApps => 'Android 工具';
+
+  @override
+  String get adbInstall => '安装 APK';
+
+  @override
+  String get adbRoot => '申请 root 增强';
+
+  @override
+  String get adbRootAllowed => '已启用 root 增强';
+
+  @override
+  String get adbRootDenied => '无 root 或授权被拒绝';
+
+  @override
+  String get adbLogcat => '读取最近的 logcat';
+
+  @override
+  String get adbScreenshot => '保存截图';
+
+  @override
+  String get adbReboot => '重启设备';
+
+  @override
+  String get adbLaunch => '启动';
+
+  @override
+  String get adbStop => '强制停止';
+
+  @override
+  String get adbUninstall => '卸载';
+
+  @override
+  String get adbClear => '清除应用数据';
+
+  @override
+  String get adbFiles => '设备文件';
+
+  @override
+  String get adbUnsupported => 'ADB 需要 Android 客户端，或已安装 platform-tools 的桌面客户端。';
+
+  @override
+  String get adbPairWait => '请在通知栏输入配对码，然后返回此处。';
+
+  @override
+  String get adbRootTip => '目标手机可能弹出 root 授权请求。基础监控无需 root。';
+
+  @override
+  String get adbConnected => 'ADB 已连接';
+
+  @override
+  String get adbDevice => 'Android 设备';
+
+  @override
+  String get adbUpload => '上传文件';
+
+  @override
+  String get adbDownload => '下载';
+
+  @override
+  String get adbConfirm => '要在当前显示的 Android 设备上执行此操作吗？';
+
+  @override
+  String get adbTemperature => '电池温度';
+
+  @override
+  String get adbIdentity => '执行身份';
+
+  @override
+  String get adbRootDisable => '停用 root 增强';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

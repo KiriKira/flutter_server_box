@@ -425,6 +425,7 @@ class ServersNotifier extends _$ServersNotifier {
   Future<void> _clearServerData(String id) async {
     await ref.read(portForwardProvider(id).notifier).clear();
     await AgentChats.clearScope(AgentScope.terminal(id));
+    await AgentChats.clearScope(AgentScope.terminal('$id/adb'));
     await Stores.connectionStats.clearServerStats(id);
     Stores.selfAddr.forget(id);
   }

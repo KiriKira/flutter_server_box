@@ -8,6 +8,9 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:fl_lib/fl_lib.dart' hide Provider;
 import 'package:meta/meta.dart';
 import 'package:riverpod/riverpod.dart';
+import 'package:server_box/core/adb/adb_files.dart';
+import 'package:server_box/core/adb/adb_operations.dart';
+import 'package:server_box/core/adb/adb_shell.dart';
 import 'package:server_box/core/extension/context/locale.dart';
 import 'package:server_box/core/utils/adhoc_ssh_prompt.dart';
 import 'package:server_box/core/utils/local_exec.dart';
@@ -315,6 +318,23 @@ const globalAgentToolDefinitions = <AskAiToolDefinition>[
     },
   ),
   AskAiToolDefinition(
+    name: 'android_device',
+    description: 'Manage a configured Android phone over ADB. Uses its exact server_id. '
+        'Install accepts a local APK file path supplied by the user; other app operations accept a package name. '
+        'Root requests are shown by the target phone root manager. Pairing codes stay in the app pairing UI.',
+    parameters: {
+      'type': 'object', 'additionalProperties': false,
+      'required': ['server_id', 'action', 'argument', 'description', 'safe_to_run', 'destructive'],
+      'properties': {
+        'server_id': {'type': 'string'},
+        'action': {'type': 'string', 'enum': ['apps', 'app_info', 'install', 'launch', 'stop', 'uninstall', 'clear', 'logcat', 'screenshot', 'request_root', 'reboot']},
+        'argument': {'type': 'string', 'description': 'Package name, local APK path for install, or empty string.'},
+        'description': {'type': 'string'},
+        'safe_to_run': {'type': 'boolean'}, 'destructive': {'type': 'boolean'},
+      },
+    },
+  ),
+  AskAiToolDefinition(
     name: 'ssh_connect',
     description:
         'Open an SSH connection to a host that is not configured in the app, '
@@ -469,6 +489,9 @@ String buildGlobalAgentInstructions({
     )
     ..writeln(
       'A host that is not in that list is not out of reach. Do not ask the user to add it first — call ssh_connect with its address and work through the session_id it returns.',
+    )
+    ..writeln(
+      'Android (ADB) devices run commands as the target phone shell, not the app local shell. Use Android commands and android_device tools; do not assume apt, systemd, Docker, sudo or unrestricted /proc access. Use su only after a root request. Never ask for pairing codes in conversation; use the app connection editor. Distinguish the app local device from a local ADB device.',
     )
     ..writeln(
       'Name a configured server by its exact ID from the list, never by name, which is descriptive and may not be unique. Name an ad-hoc connection by its session_id. Give a shell or file tool one or the other, never both, and use an empty string for the unused identifier. Never use JSON null for tool arguments.',
@@ -790,7 +813,7 @@ class GlobalAgentToolService {
             id: id,
             name: spi.name,
             connection: _ref.read(serverProvider(id)).conn.name,
-            system: _ref.read(serverProvider(id)).status.system.name,
+            system: spi.adbOn != null ? 'Android (ADB)' : _ref.read(serverProvider(id)).status.system.name,
           ),
     ];
   }
@@ -823,6 +846,7 @@ class GlobalAgentToolService {
         'run_shell_command' => await _runShell(proposal, watch, cancel),
         'read_file' => await _readFile(proposal, watch),
         'write_file' => await _writeFile(proposal, watch),
+        'android_device' => await _androidDevice(proposal, watch, cancel),
         'ssh_connect' => await _sshConnect(proposal, watch),
         'ssh_disconnect' => _sshDisconnect(proposal, watch),
         'serverbox' => await _runServerBox(proposal, watch),
@@ -833,6 +857,42 @@ class GlobalAgentToolService {
     } finally {
       watch.stop();
     }
+  }
+
+  Future<AgentToolExecutionResult> _androidDevice(
+    AskAiCommand proposal, Stopwatch watch, Future<void>? cancel,
+  ) async {
+    final handle = await _shellFor(proposal);
+    _requireCurrent(handle);
+    final exec = handle.exec;
+    if (exec is! AdbExec) throw StateError('Select a configured ADB device');
+    final ops = AdbOperations(exec.connection);
+    final action = proposal.action;
+    final argument = proposal.argumentString('argument') ?? '';
+    final Object? data;
+    if (action == 'apps') {
+      data = await ops.apps();
+    } else if (action == 'install') {
+      data = await ops.install(File(argument), cancel: cancel);
+    } else if (action == 'request_root') {
+      final id = handle.serverId;
+      if (id == null) throw StateError('Root needs a configured phone');
+      data = {'root_granted': await _ref.read(serverProvider(id).notifier).requestAdbRoot()};
+    } else if (action == 'screenshot') {
+      final bytes = await ops.screenshot(cancel: cancel);
+      final file = File('${Directory.systemTemp.path}/serverbox-android-${DateTime.now().microsecondsSinceEpoch}.png');
+      await file.writeAsBytes(bytes);
+      data = {'path': file.path, 'bytes': bytes.length};
+    } else {
+      const allowed = {'app_info', 'launch', 'stop', 'uninstall', 'clear', 'logcat', 'reboot'};
+      if (!allowed.contains(action)) throw const FormatException('Unsupported Android action');
+      final result = await ops.action(action!, argument: argument, cancel: cancel);
+      final output = result.combined;
+      data = output.length > _maxReadBytes ? output.substring(0, _maxReadBytes) : output;
+    }
+    _requireCurrent(handle);
+    return AgentToolExecutionResult(toolName: proposal.toolName, serverId: handle.serverId,
+      summary: 'Android $action completed', succeeded: true, duration: watch.elapsed, data: data);
   }
 
   /// Opens the shell a tool call is about.
@@ -946,7 +1006,7 @@ class GlobalAgentToolService {
     final state = _server(serverId);
     final spi = state.spi;
     final existing = state.client;
-    if (existing != null && !existing.isClosed) {
+    if (spi.adbOn == null && existing != null && !existing.isClosed) {
       return (
         exec: SshExec(
           existing,
@@ -1121,13 +1181,13 @@ class GlobalAgentToolService {
     final path = proposal.path;
     if (path == null) throw const FormatException('path is required');
     if (exec is LocalExec) return _readLocalFile(proposal, watch, path, exec);
-    if (client == null) throw _noSftp;
+    if (client == null && exec is! AdbExec) throw _noSftp;
     // Through the backend rather than through `client.sftp()` directly, which
     // is what this used to do: a server told to move its files over `scp` has
     // no SFTP subsystem to open, and the tool would be the one part of the app
     // that still insisted on one.
-    final backend = await openSshFileBackend(
-      client,
+    final backend = exec is AdbExec ? AdbFileBackend(exec.connection) : await openSshFileBackend(
+      client!,
       transport: handle.fileTransport,
       timeout: _sftpTimeout,
     );
@@ -1410,14 +1470,14 @@ class GlobalAgentToolService {
     if (exec is LocalExec) {
       return _writeLocalFile(proposal, watch, path, bytes, exec);
     }
-    if (client == null) throw _noSftp;
+    if (client == null && exec is! AdbExec) throw _noSftp;
     if (bytes.length > _maxWriteBytes) {
       throw StateError(
         'File content exceeds the $_maxWriteBytes byte Agent limit.',
       );
     }
-    final backend = await openSshFileBackend(
-      client,
+    final backend = exec is AdbExec ? AdbFileBackend(exec.connection) : await openSshFileBackend(
+      client!,
       transport: handle.fileTransport,
       timeout: _sftpTimeout,
     );
@@ -1765,7 +1825,8 @@ class GlobalAgentToolService {
       'id': state.spi.id,
       'name': state.spi.name,
       'connection': state.conn.name,
-      'system': status.system.name,
+      'system': state.spi.adbOn != null ? 'android' : status.system.name,
+      if (status.android != null) 'android': status.android,
       'cpu_used_percent': cpuUsedPercent,
       'memory_used_percent': memoryUsedPercent,
       'network': {

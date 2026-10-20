@@ -331,3 +331,11 @@ class VirtErr extends Err<VirtErrType> {
     _ => null,
   };
 }
+
+enum AdbErrType { connection }
+
+class AdbErr extends Err<AdbErrType> {
+  const AdbErr({super.message}) : super(type: AdbErrType.connection);
+  @override
+  String? get solution => l10n.adbTip;
+}

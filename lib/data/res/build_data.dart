@@ -2,6 +2,6 @@
 // ignore_for_file: prefer_single_quotes
 
 abstract class BuildData {
-  static const String name = "ServerBox";
+  static const String name = "KiriBox";
   static const int build = 1787;
 }

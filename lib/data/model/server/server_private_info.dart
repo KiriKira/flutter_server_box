@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:fl_lib/fl_lib.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:server_box/data/model/app/error.dart';
+import 'package:server_box/data/model/server/adb_credential.dart';
 import 'package:server_box/data/model/server/bmc_cfg.dart';
 import 'package:server_box/data/model/server/custom.dart';
 import 'package:server_box/data/model/server/monitor_http_credential.dart';
@@ -35,6 +36,7 @@ enum SpiValidationError {
 enum ServerTransport {
   ssh,
   monitorHttp,
+  adb,
 
   /// This device, with no connection at all — see [Spi.local]. Never stored
   /// as a preference: a local server has nothing to order.
@@ -79,6 +81,10 @@ abstract class Spi with _$Spi {
     /// Reach this server via a `monitor` instance's HTTP API. A peer of
     /// [ssh]; a server may carry either one, or both.
     MonitorHttpCredential? monitorHttp,
+
+    /// Wireless ADB. Its private host key stays on this client.
+    AdbCredential? adb,
+    @Default(false) bool adbEnabled,
 
     /// Whether [ssh] is dialled at all.
     ///
@@ -238,6 +244,8 @@ extension Spix on Spi {
   MonitorHttpCredential? get monitorOn =>
       monitorEnabled && !local ? monitor : null;
 
+  AdbCredential? get adbOn => adbEnabled && !local ? adb : null;
+
   SpiValidationError? validate() {
     // Nothing is dialled, so nothing about the parked configuration can be in
     // conflict.
@@ -247,8 +255,9 @@ extension Spix on Spi {
     // among them is not a reason to refuse the record — and the fields it
     // would name are not on screen to be corrected. Switching SSH back on is
     // a save of its own, and this refuses it then.
+    if (adbOn != null) return adbOn!.isValid ? null : SpiValidationError.noConnectionMethod;
     final s = sshOn;
-    if (s == null && monitorOn == null) {
+    if (s == null && monitorOn == null && adbOn == null) {
       // Both switched off is a server that cannot be connected, and the form
       // says so while it is being edited — but it is not a record worth
       // keeping, so the save is what refuses it. A server is a way in.
@@ -275,6 +284,7 @@ extension Spix on Spi {
   /// configuration, and finally to the opaque [Spi.id].
   String get displayAddr {
     if (local) return 'localhost';
+    if (adbOn case final a?) return a.localDevice ? 'ADB · localhost' : 'ADB · ${a.host}:${a.port}';
     final s = ssh;
     // A tunneled server has no address of its own — showing `user@:22` would
     // be noise, and showing `127.0.0.1` would be wrong on every such server
@@ -295,6 +305,7 @@ extension Spix on Spi {
   /// lose its terminal.
   ServerTransport get transport {
     if (local) return ServerTransport.local;
+    if (adbOn != null) return ServerTransport.adb;
     final hasSsh = sshOn != null;
     final hasMonitor = monitorOn != null;
     if (!hasMonitor) return ServerTransport.ssh;
@@ -304,7 +315,7 @@ extension Spix on Spi {
 
   /// The other way in, when there is one.
   ServerTransport? get fallbackTransport {
-    if (sshOn == null || monitorOn == null) return null;
+    if (adbOn != null || sshOn == null || monitorOn == null) return null;
     return transport == ServerTransport.ssh
         ? ServerTransport.monitorHttp
         : ServerTransport.ssh;
@@ -341,7 +352,8 @@ extension Spix on Spi {
   /// the SSH credentials answered true for any two monitor-only servers. The
   /// one local server has neither, and is the same as itself.
   bool isSameAs(Spi other) {
-    if (local != other.local) return false;
+    if (local != other.local || adbOn != other.adbOn) return false;
+    if (adbOn != null) return true;
     final a = ssh, b = other.ssh;
     if (a != null || b != null) return a != null && a.isSameAs(b);
     return monitorHttp?.addr == other.monitorHttp?.addr;
@@ -359,6 +371,7 @@ extension Spix on Spi {
     return !isSameAs(old) ||
         ssh?.alterUrl != old.ssh?.alterUrl ||
         monitorHttp != old.monitorHttp ||
+        adb != old.adb ||
         // Which transport leads decides where the status poll goes and which
         // connection `ensureExec` opens, so changing it has to tear down what
         // the old answer built.

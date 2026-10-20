@@ -11,6 +11,7 @@ import 'package:server_box/data/model/server/server_private_info.dart';
 import 'package:server_box/data/model/server/system.dart';
 import 'package:server_box/data/provider/server/single.dart';
 import 'package:server_box/data/res/store.dart';
+import 'package:server_box/view/page/adb/tools.dart';
 import 'package:server_box/view/page/storage/file_browser.dart';
 import 'package:server_box/view/page/storage/sftp.dart';
 import 'package:server_box/view/page/storage/show_transfers.dart';
@@ -56,6 +57,7 @@ class ServerFilePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(serverProvider(args.spi.id));
+    if (state.spi.adbOn != null) return AdbFilesPage(spi: state.spi);
 
     if (args.spi.local && state.capabilities.files) {
       return _LocalServerFilePage(args: args);

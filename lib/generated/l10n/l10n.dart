@@ -10238,6 +10238,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'There is no tmux session to re-attach, so reconnecting ends this shell and anything still running in it, and clears its output from the screen.'**
   String get reconnectEndsShell;
+
+  /// No description provided for @adbLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage this Android device'**
+  String get adbLocal;
+
+  /// No description provided for @adbWireless.
+  ///
+  /// In en, this message translates to:
+  /// **'Wireless debugging (TLS)'**
+  String get adbWireless;
+
+  /// No description provided for @adbHost.
+  ///
+  /// In en, this message translates to:
+  /// **'Device address'**
+  String get adbHost;
+
+  /// No description provided for @adbPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection port'**
+  String get adbPort;
+
+  /// No description provided for @adbPair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with code'**
+  String get adbPair;
+
+  /// No description provided for @adbPairPort.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing port'**
+  String get adbPairPort;
+
+  /// No description provided for @adbCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Six-digit pairing code'**
+  String get adbCode;
+
+  /// No description provided for @adbDiscover.
+  ///
+  /// In en, this message translates to:
+  /// **'Discover devices'**
+  String get adbDiscover;
+
+  /// No description provided for @adbLocalPair.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair this device from notification'**
+  String get adbLocalPair;
+
+  /// No description provided for @adbTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Wireless debugging in Developer options. Pairing and connection ports are different. Use 0 for automatic local discovery.'**
+  String get adbTip;
+
+  /// No description provided for @adbTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Test connection'**
+  String get adbTest;
+
+  /// No description provided for @adbApps.
+  ///
+  /// In en, this message translates to:
+  /// **'Android tools'**
+  String get adbApps;
+
+  /// No description provided for @adbInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Install APK'**
+  String get adbInstall;
+
+  /// No description provided for @adbRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Request root enhancement'**
+  String get adbRoot;
+
+  /// No description provided for @adbRootAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Root enhancement enabled'**
+  String get adbRootAllowed;
+
+  /// No description provided for @adbRootDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Root unavailable or permission denied'**
+  String get adbRootDenied;
+
+  /// No description provided for @adbLogcat.
+  ///
+  /// In en, this message translates to:
+  /// **'Read recent logcat'**
+  String get adbLogcat;
+
+  /// No description provided for @adbScreenshot.
+  ///
+  /// In en, this message translates to:
+  /// **'Save screenshot'**
+  String get adbScreenshot;
+
+  /// No description provided for @adbReboot.
+  ///
+  /// In en, this message translates to:
+  /// **'Reboot device'**
+  String get adbReboot;
+
+  /// No description provided for @adbLaunch.
+  ///
+  /// In en, this message translates to:
+  /// **'Launch'**
+  String get adbLaunch;
+
+  /// No description provided for @adbStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Force stop'**
+  String get adbStop;
+
+  /// No description provided for @adbUninstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Uninstall'**
+  String get adbUninstall;
+
+  /// No description provided for @adbClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear app data'**
+  String get adbClear;
+
+  /// No description provided for @adbFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Device files'**
+  String get adbFiles;
+
+  /// No description provided for @adbUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'ADB requires Android or a desktop with platform-tools installed.'**
+  String get adbUnsupported;
+
+  /// No description provided for @adbPairWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the pairing code in the notification, then return here.'**
+  String get adbPairWait;
+
+  /// No description provided for @adbRootTip.
+  ///
+  /// In en, this message translates to:
+  /// **'The target phone may show a root request. Basic monitoring works without root.'**
+  String get adbRootTip;
+
+  /// No description provided for @adbConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'ADB connected'**
+  String get adbConnected;
+
+  /// No description provided for @adbDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Android device'**
+  String get adbDevice;
+
+  /// No description provided for @adbUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload file'**
+  String get adbUpload;
+
+  /// No description provided for @adbDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get adbDownload;
+
+  /// No description provided for @adbConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Run this action on the displayed Android device?'**
+  String get adbConfirm;
+
+  /// No description provided for @adbTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery temperature'**
+  String get adbTemperature;
+
+  /// No description provided for @adbIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Execution identity'**
+  String get adbIdentity;
+
+  /// No description provided for @adbRootDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable root enhancement'**
+  String get adbRootDisable;
 }
 
 class _AppLocalizationsDelegate

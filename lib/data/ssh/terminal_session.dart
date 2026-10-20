@@ -7,6 +7,8 @@ import 'package:dartssh2/dartssh2.dart';
 import 'package:fl_lib/fl_lib.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:server_box/core/adb/adb_shell.dart';
+import 'package:server_box/core/adb/adb_transport.dart';
 import 'package:server_box/core/app_navigator.dart';
 import 'package:server_box/core/diag.dart';
 import 'package:server_box/core/utils/ish_shell.dart';
@@ -194,6 +196,7 @@ class TerminalSession {
   /// having to know which it got.
   void adopt(SSHClient? client, {MonitorRemoteAccess? granted}) {
     if (_backend != null) return;
+    if (spi?.adbOn != null) return;
     // A console is opened for itself, by [connect]: nobody else holds one.
     if (source is ConsoleSource) return;
     // Nothing to adopt on this device: there is no connection anybody else
@@ -287,6 +290,10 @@ class TerminalSession {
         data: {'session': session},
       );
       return install(LocalShellBackend());
+    }
+
+    if (server.adbOn case final adb?) {
+      return install(AdbShellBackend(await AdbService.connect(server.id, adb)));
     }
 
     var currentGrant = granted;

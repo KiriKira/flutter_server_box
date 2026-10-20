@@ -219,7 +219,9 @@ enum ServerFuncBtn {
   /// Asked of the capabilities rather than of the transport, and asked per
   /// entry rather than once for all of them: these three needs are genuinely
   /// different, and a server reached over its monitor agent meets two of them.
-  bool availableWith(ServerCapabilities caps) => switch (this) {
+  bool availableWith(ServerCapabilities caps) => caps is AdbCapabilities
+      ? this == terminal || this == files
+      : switch (this) {
     // All three end in the terminal — snippets and iperf hand it a command to
     // start with, and nothing else.
     terminal || snippet || iperf => caps.terminal,

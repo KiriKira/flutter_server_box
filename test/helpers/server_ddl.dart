@@ -40,6 +40,7 @@ const diskCountsNetworkColumn =
 /// `server` as it was before v33: today's table less `disk_counts_network`,
 /// asserted to have been found.
 String serverDdlBeforeDiskCountsNetwork(String fresh) {
+  fresh = serverDdlBeforeAdb(fresh);
   expect(fresh, contains(diskCountsNetworkColumn));
   return fresh.replaceFirst(diskCountsNetworkColumn, '');
 }
@@ -55,4 +56,20 @@ void replaceServerTable(String ddl) {
   db.execute(ddl);
   db.execute('PRAGMA legacy_alter_table = OFF;');
   db.execute('PRAGMA foreign_keys = ON;');
+}
+
+/// v33 DDL, before ADB became an additional connection method.
+String serverDdlBeforeAdb(String fresh) {
+  if (!fresh.contains('"adb_host"')) return fresh;
+  for (final column in const [
+    '"adb_host" TEXT NULL, ', '"adb_port" INTEGER NULL, ',
+    '"adb_local" INTEGER NOT NULL DEFAULT 0 CHECK ("adb_local" IN (0, 1)), ',
+    '"adb_tls" INTEGER NOT NULL DEFAULT 1 CHECK ("adb_tls" IN (0, 1)), ',
+    '"adb_enabled" INTEGER NOT NULL DEFAULT 0 CHECK ("adb_enabled" IN (0, 1)), ',
+    '"adb_guid" TEXT NULL, ',
+  ]) {
+    expect(fresh, contains(column));
+    fresh = fresh.replaceFirst(column, '');
+  }
+  return fresh.replaceFirst(' OR adb_host IS NOT NULL)', ')');
 }

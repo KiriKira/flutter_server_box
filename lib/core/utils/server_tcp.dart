@@ -269,6 +269,8 @@ class ServerTcpDialer {
       );
     }
     switch (credential) {
+      case ServerConnectCredentialAdb():
+        throw UnsupportedError('ADB does not provide TCP relay');
       case ServerConnectCredentialSsh():
         return null;
       case ServerConnectCredentialMonitorHttp():
@@ -301,6 +303,8 @@ class ServerTcpDialer {
     int port,
   ) async {
     switch (credential) {
+      case ServerConnectCredentialAdb():
+        throw UnsupportedError('ADB does not provide TCP relay');
       case ServerConnectCredentialSsh():
         final ssh = await _ssh();
         return _opened(ssh.forward(host, port));
@@ -327,6 +331,8 @@ class ServerTcpDialer {
     final Future<void> done;
     void Function()? release;
     switch (credential) {
+      case ServerConnectCredentialAdb():
+        throw UnsupportedError('ADB does not provide TCP relay');
       case ServerConnectCredentialSsh():
         final ssh = await _ssh();
         dial = () => _opened(ssh.forward(host, port));
@@ -460,6 +466,7 @@ class ServerTcpDialer {
         ServerConnectCredentialSsh() => ServerTransport.ssh,
         ServerConnectCredentialMonitorHttp() => ServerTransport.monitorHttp,
         ServerConnectCredentialLocal() => ServerTransport.local,
+        ServerConnectCredentialAdb() => ServerTransport.adb,
       };
 }
 

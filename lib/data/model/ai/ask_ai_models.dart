@@ -100,7 +100,7 @@ class AskAiCommand {
   }) {
     final command = switch (name) {
       'read_file' || 'write_file' => args['path'],
-      'serverbox' => args['action'],
+      'serverbox' || 'android_device' => args['action'],
       'ssh_connect' => args['host'],
       'ssh_disconnect' => args['session_id'],
       _ => args['command'],
@@ -201,6 +201,7 @@ class AskAiCommand {
   String get displayValue => switch (toolName) {
     'read_file' || 'write_file' => path ?? command,
     'serverbox' => action ?? command,
+    'android_device' => '${action ?? command} ${argumentString('argument') ?? ''}'.trim(),
     'ssh_connect' => _sshTarget ?? command,
     'ssh_disconnect' => sessionId ?? command,
     _ => command,
@@ -225,6 +226,11 @@ class AskAiCommand {
     // there afterwards.
     'ssh_connect' => AskAiCommandRisk.destructive,
     'ssh_disconnect' => AskAiCommandRisk.caution,
+    'android_device' => switch (action) {
+      'apps' || 'app_info' || 'logcat' => AskAiCommandRisk.readOnly,
+      'uninstall' || 'clear' || 'reboot' => AskAiCommandRisk.destructive,
+      _ => AskAiCommandRisk.caution,
+    },
     'serverbox' => switch (action) {
       'list_servers' || 'get_status' => AskAiCommandRisk.readOnly,
       _ => AskAiCommandRisk.caution,
@@ -242,6 +248,7 @@ class AskAiCommand {
     'run_shell_command',
     'read_file',
     'write_file',
+    'android_device',
   };
 
   /// What the app asks about, decided by two readers that answer separately.
@@ -311,6 +318,7 @@ class AskAiCommand {
     );
 
     final destructivePatterns = <RegExp>[
+      RegExp(r'\b(pm|cmd\s+package)\s+(clear|uninstall|disable(?:-user)?|hide)\b'),
       RegExp(r'(^|[;&|]\s*)(sudo\s+)?rm\s'),
       RegExp(r'(^|[;&|]\s*)(sudo\s+)?(shred|wipefs|mkfs(\.[a-z0-9]+)?)\b'),
       RegExp(r'(^|[;&|]\s*)(sudo\s+)?dd\s+.*\bof='),
@@ -331,6 +339,7 @@ class AskAiCommand {
     }
 
     final mutatingPatterns = <RegExp>[
+      RegExp(r'\b(settings\s+(put|delete)|pm\s+(install|grant|revoke|enable)|am\s+(start|force-stop)|su\b)'),
       RegExp(r'(^|[^<])>>?\s*[^&]'),
       RegExp(
         r'\|\s*(sudo\s+)?(sh|bash|zsh|fish|python\d*|perl|ruby|node|pwsh|powershell|cmd)\b',

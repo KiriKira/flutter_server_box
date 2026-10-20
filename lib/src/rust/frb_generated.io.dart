@@ -3,3442 +3,1763 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/android.dart';
+import 'api/backup.dart';
+import 'api/bench.dart';
+import 'api/bmc.dart';
+import 'api/container.dart';
+import 'api/create.dart';
+import 'api/cron.dart';
+import 'api/desktop.dart';
+import 'api/file.dart';
+import 'api/files.dart';
+import 'api/firewall.dart';
+import 'api/hardware.dart';
+import 'api/iperf.dart';
+import 'api/parser.dart';
+import 'api/proc.dart';
+import 'api/protocol.dart';
+import 'api/pve.dart';
+import 'api/remote_desktop.dart';
+import 'api/resource.dart';
+import 'api/script.dart';
+import 'api/service.dart';
+import 'api/snippet.dart';
+import 'api/ssh_asym.dart';
+import 'api/ssh_crypto.dart';
+import 'api/tmux.dart';
+import 'api/users.dart';
+import 'api/virt.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:ffi' as ffi;
-
+import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_io.dart';
-import 'package:server_box/src/rust/api/backup.dart';
-import 'package:server_box/src/rust/api/bench.dart';
-import 'package:server_box/src/rust/api/bmc.dart';
-import 'package:server_box/src/rust/api/container.dart';
-import 'package:server_box/src/rust/api/create.dart';
-import 'package:server_box/src/rust/api/cron.dart';
-import 'package:server_box/src/rust/api/desktop.dart';
-import 'package:server_box/src/rust/api/file.dart';
-import 'package:server_box/src/rust/api/files.dart';
-import 'package:server_box/src/rust/api/firewall.dart';
-import 'package:server_box/src/rust/api/hardware.dart';
-import 'package:server_box/src/rust/api/iperf.dart';
-import 'package:server_box/src/rust/api/parser.dart';
-import 'package:server_box/src/rust/api/proc.dart';
-import 'package:server_box/src/rust/api/protocol.dart';
-import 'package:server_box/src/rust/api/pve.dart';
-import 'package:server_box/src/rust/api/remote_desktop.dart';
-import 'package:server_box/src/rust/api/resource.dart';
-import 'package:server_box/src/rust/api/script.dart';
-import 'package:server_box/src/rust/api/service.dart';
-import 'package:server_box/src/rust/api/snippet.dart';
-import 'package:server_box/src/rust/api/ssh_asym.dart';
-import 'package:server_box/src/rust/api/ssh_crypto.dart';
-import 'package:server_box/src/rust/api/tmux.dart';
-import 'package:server_box/src/rust/api/users.dart';
-import 'package:server_box/src/rust/api/virt.dart';
-import 'package:server_box/src/rust/frb_generated.dart';
-
-abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
-  RustLibApiImplPlatform({
-    required super.handler,
-    required super.wire,
-    required super.generalizedFrbRustBinding,
-    required super.portManager,
-  });
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_BmcClientPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_LibvirtRatesPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_PowerWatchPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_PveConsoleChannelPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_PveSessionPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_RemoteDesktopSessionHandlePtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_SshBlockCipherPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr;
-
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_SshMacPtr => wire
-      ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr;
-
-  @protected
-  BmcClient
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    dynamic raw,
-  );
-
-  @protected
-  LibvirtRates
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    dynamic raw,
-  );
-
-  @protected
-  PowerWatch
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    dynamic raw,
-  );
-
-  @protected
-  PveConsoleChannel
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    dynamic raw,
-  );
-
-  @protected
-  PveSession
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    dynamic raw,
-  );
-
-  @protected
-  RemoteDesktopSessionHandle
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    dynamic raw,
-  );
-
-  @protected
-  SshBlockCipher
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    dynamic raw,
-  );
-
-  @protected
-  SshMac
-  dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    dynamic raw,
-  );
-
-  @protected
-  LibvirtRates
-  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    dynamic raw,
-  );
-
-  @protected
-  PowerWatch
-  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    dynamic raw,
-  );
-
-  @protected
-  SshBlockCipher
-  dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    dynamic raw,
-  );
-
-  @protected
-  BmcClient
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    dynamic raw,
-  );
-
-  @protected
-  PveConsoleChannel
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    dynamic raw,
-  );
-
-  @protected
-  PveSession
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    dynamic raw,
-  );
-
-  @protected
-  RemoteDesktopSessionHandle
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    dynamic raw,
-  );
-
-  @protected
-  SshBlockCipher
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    dynamic raw,
-  );
-
-  @protected
-  SshMac
-  dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    dynamic raw,
-  );
-
-  @protected
-  Map<String, String> dco_decode_Map_String_String_None(dynamic raw);
-
-  @protected
-  Map<String, List<FirewalldPort>>
-  dco_decode_Map_String_list_firewalld_port_None(dynamic raw);
-
-  @protected
-  Map<UfwChain, UfwPolicy> dco_decode_Map_ufw_chain_ufw_policy_None(
-    dynamic raw,
-  );
-
-  @protected
-  BmcClient
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    dynamic raw,
-  );
-
-  @protected
-  LibvirtRates
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    dynamic raw,
-  );
-
-  @protected
-  PowerWatch
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    dynamic raw,
-  );
-
-  @protected
-  PveConsoleChannel
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    dynamic raw,
-  );
-
-  @protected
-  PveSession
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    dynamic raw,
-  );
-
-  @protected
-  RemoteDesktopSessionHandle
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    dynamic raw,
-  );
-
-  @protected
-  SshBlockCipher
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    dynamic raw,
-  );
-
-  @protected
-  SshMac
-  dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    dynamic raw,
-  );
-
-  @protected
-  String dco_decode_String(dynamic raw);
-
-  @protected
-  BenchPoll dco_decode_bench_poll(dynamic raw);
-
-  @protected
-  BmcError dco_decode_bmc_error(dynamic raw);
-
-  @protected
-  BmcOutcome dco_decode_bmc_outcome(dynamic raw);
-
-  @protected
-  BmcReading dco_decode_bmc_reading(dynamic raw);
-
-  @protected
-  BmcSensors dco_decode_bmc_sensors(dynamic raw);
-
-  @protected
-  BmcSnapshot dco_decode_bmc_snapshot(dynamic raw);
-
-  @protected
-  bool dco_decode_bool(dynamic raw);
-
-  @protected
-  bool dco_decode_box_autoadd_bool(dynamic raw);
 
-  @protected
-  CertInfo dco_decode_box_autoadd_cert_info(dynamic raw);
 
-  @protected
-  ContainerDiskUsageItem dco_decode_box_autoadd_container_disk_usage_item(
-    dynamic raw,
-  );
 
-  @protected
-  ContainerStatsItem dco_decode_box_autoadd_container_stats_item(dynamic raw);
 
-  @protected
-  CronScheduleFields dco_decode_box_autoadd_cron_schedule_fields(dynamic raw);
+                abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
+                  RustLibApiImplPlatform({
+                    required super.handler,
+                    required super.wire,
+                    required super.generalizedFrbRustBinding,
+                    required super.portManager,
+                  });
 
-  @protected
-  CronServerClock dco_decode_box_autoadd_cron_server_clock(dynamic raw);
+                  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_BmcClientPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr;
 
-  @protected
-  CronWall dco_decode_box_autoadd_cron_wall(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_LibvirtRatesPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr;
 
-  @protected
-  double dco_decode_box_autoadd_f_64(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PowerWatchPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr;
 
-  @protected
-  FirewallAccess dco_decode_box_autoadd_firewall_access(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PveConsoleChannelPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr;
 
-  @protected
-  FirewallKind dco_decode_box_autoadd_firewall_kind(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_PveSessionPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr;
 
-  @protected
-  FirewallProbeResult dco_decode_box_autoadd_firewall_probe_result(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_RemoteDesktopSessionHandlePtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr;
 
-  @protected
-  FirewalldChange dco_decode_box_autoadd_firewalld_change(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SshBlockCipherPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr;
 
-  @protected
-  FirewalldPort dco_decode_box_autoadd_firewalld_port(dynamic raw);
+CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SshMacPtr => wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr;
 
-  @protected
-  FirewalldSnapshot dco_decode_box_autoadd_firewalld_snapshot(dynamic raw);
 
-  @protected
-  int dco_decode_box_autoadd_i_32(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
+                  @protected BmcClient dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(dynamic raw);
 
-  @protected
-  LibvirtPoolRef dco_decode_box_autoadd_libvirt_pool_ref(dynamic raw);
+@protected LibvirtRates dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(dynamic raw);
 
-  @protected
-  Plan dco_decode_box_autoadd_plan(dynamic raw);
+@protected PowerWatch dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(dynamic raw);
 
-  @protected
-  PveConsoleTicket dco_decode_box_autoadd_pve_console_ticket(dynamic raw);
+@protected PveConsoleChannel dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(dynamic raw);
 
-  @protected
-  PveGuestRef dco_decode_box_autoadd_pve_guest_ref(dynamic raw);
+@protected PveSession dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(dynamic raw);
 
-  @protected
-  PveLogin dco_decode_box_autoadd_pve_login(dynamic raw);
+@protected RemoteDesktopSessionHandle dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(dynamic raw);
 
-  @protected
-  PveTiming dco_decode_box_autoadd_pve_timing(dynamic raw);
+@protected SshBlockCipher dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(dynamic raw);
 
-  @protected
-  RdpSessionParams dco_decode_box_autoadd_rdp_session_params(dynamic raw);
+@protected SshMac dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(dynamic raw);
 
-  @protected
-  RedfishChassis dco_decode_box_autoadd_redfish_chassis(dynamic raw);
+@protected LibvirtRates dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(dynamic raw);
 
-  @protected
-  RedfishSystem dco_decode_box_autoadd_redfish_system(dynamic raw);
+@protected PowerWatch dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(dynamic raw);
 
-  @protected
-  RedfishTopology dco_decode_box_autoadd_redfish_topology(dynamic raw);
+@protected SshBlockCipher dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(dynamic raw);
 
-  @protected
-  RemoteDesktopEvent dco_decode_box_autoadd_remote_desktop_event(dynamic raw);
+@protected BmcClient dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(dynamic raw);
 
-  @protected
-  ResetRequest dco_decode_box_autoadd_reset_request(dynamic raw);
+@protected PveConsoleChannel dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(dynamic raw);
 
-  @protected
-  SnapshotNameIssue dco_decode_box_autoadd_snapshot_name_issue(dynamic raw);
+@protected PveSession dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(dynamic raw);
 
-  @protected
-  int dco_decode_box_autoadd_u_16(dynamic raw);
+@protected RemoteDesktopSessionHandle dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(dynamic raw);
 
-  @protected
-  int dco_decode_box_autoadd_u_32(dynamic raw);
+@protected SshBlockCipher dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(dynamic raw);
 
-  @protected
-  BigInt dco_decode_box_autoadd_u_64(dynamic raw);
+@protected SshMac dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(dynamic raw);
 
-  @protected
-  UfwChange dco_decode_box_autoadd_ufw_change(dynamic raw);
+@protected Map<String, String> dco_decode_Map_String_String_None(dynamic raw);
 
-  @protected
-  UfwDraftIssue dco_decode_box_autoadd_ufw_draft_issue(dynamic raw);
+@protected Map<String, List<FirewalldPort>> dco_decode_Map_String_list_firewalld_port_None(dynamic raw);
 
-  @protected
-  UfwLog dco_decode_box_autoadd_ufw_log(dynamic raw);
+@protected Map<UfwChain, UfwPolicy> dco_decode_Map_ufw_chain_ufw_policy_None(dynamic raw);
 
-  @protected
-  UfwLogLevel dco_decode_box_autoadd_ufw_log_level(dynamic raw);
+@protected BmcClient dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(dynamic raw);
 
-  @protected
-  UfwRuleDraft dco_decode_box_autoadd_ufw_rule_draft(dynamic raw);
+@protected LibvirtRates dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(dynamic raw);
 
-  @protected
-  UfwSnapshot dco_decode_box_autoadd_ufw_snapshot(dynamic raw);
+@protected PowerWatch dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(dynamic raw);
 
-  @protected
-  VncSessionParams dco_decode_box_autoadd_vnc_session_params(dynamic raw);
+@protected PveConsoleChannel dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(dynamic raw);
 
-  @protected
-  CertInfo dco_decode_box_cert_info(dynamic raw);
+@protected PveSession dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(dynamic raw);
 
-  @protected
-  CappedRead dco_decode_capped_read(dynamic raw);
+@protected RemoteDesktopSessionHandle dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(dynamic raw);
 
-  @protected
-  CertInfo dco_decode_cert_info(dynamic raw);
+@protected SshBlockCipher dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(dynamic raw);
 
-  @protected
-  ChangeError dco_decode_change_error(dynamic raw);
+@protected SshMac dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(dynamic raw);
 
-  @protected
-  CommandSpec dco_decode_command_spec(dynamic raw);
+@protected String dco_decode_String(dynamic raw);
 
-  @protected
-  ContainerDiskUsageItem dco_decode_container_disk_usage_item(dynamic raw);
+@protected BenchPoll dco_decode_bench_poll(dynamic raw);
 
-  @protected
-  ContainerImageItem dco_decode_container_image_item(dynamic raw);
+@protected BmcError dco_decode_bmc_error(dynamic raw);
 
-  @protected
-  ContainerItem dco_decode_container_item(dynamic raw);
+@protected BmcOutcome dco_decode_bmc_outcome(dynamic raw);
 
-  @protected
-  ContainerStatsItem dco_decode_container_stats_item(dynamic raw);
+@protected BmcReading dco_decode_bmc_reading(dynamic raw);
 
-  @protected
-  CronDocumentData dco_decode_cron_document_data(dynamic raw);
+@protected BmcSensors dco_decode_bmc_sensors(dynamic raw);
 
-  @protected
-  CronEditError dco_decode_cron_edit_error(dynamic raw);
+@protected BmcSnapshot dco_decode_bmc_snapshot(dynamic raw);
 
-  @protected
-  CronFfiError dco_decode_cron_ffi_error(dynamic raw);
+@protected bool dco_decode_bool(dynamic raw);
 
-  @protected
-  CronJobLine dco_decode_cron_job_line(dynamic raw);
+@protected bool dco_decode_box_autoadd_bool(dynamic raw);
 
-  @protected
-  CronListing dco_decode_cron_listing(dynamic raw);
+@protected CertInfo dco_decode_box_autoadd_cert_info(dynamic raw);
 
-  @protected
-  CronScheduleFields dco_decode_cron_schedule_fields(dynamic raw);
+@protected ContainerDiskUsageItem dco_decode_box_autoadd_container_disk_usage_item(dynamic raw);
 
-  @protected
-  CronServerClock dco_decode_cron_server_clock(dynamic raw);
+@protected ContainerStatsItem dco_decode_box_autoadd_container_stats_item(dynamic raw);
 
-  @protected
-  CronWall dco_decode_cron_wall(dynamic raw);
+@protected CronScheduleFields dco_decode_box_autoadd_cron_schedule_fields(dynamic raw);
 
-  @protected
-  CustomCmd dco_decode_custom_cmd(dynamic raw);
+@protected CronServerClock dco_decode_box_autoadd_cron_server_clock(dynamic raw);
 
-  @protected
-  EcdsaSignature dco_decode_ecdsa_signature(dynamic raw);
+@protected CronWall dco_decode_box_autoadd_cron_wall(dynamic raw);
 
-  @protected
-  Effect dco_decode_effect(dynamic raw);
+@protected double dco_decode_box_autoadd_f_64(dynamic raw);
 
-  @protected
-  double dco_decode_f_64(dynamic raw);
+@protected FirewallAccess dco_decode_box_autoadd_firewall_access(dynamic raw);
 
-  @protected
-  FilesStatMarkers dco_decode_files_stat_markers(dynamic raw);
+@protected FirewallKind dco_decode_box_autoadd_firewall_kind(dynamic raw);
 
-  @protected
-  FirewallAccess dco_decode_firewall_access(dynamic raw);
+@protected FirewallProbeResult dco_decode_box_autoadd_firewall_probe_result(dynamic raw);
 
-  @protected
-  FirewallAccessVia dco_decode_firewall_access_via(dynamic raw);
+@protected FirewalldChange dco_decode_box_autoadd_firewalld_change(dynamic raw);
 
-  @protected
-  FirewallKind dco_decode_firewall_kind(dynamic raw);
+@protected FirewalldPort dco_decode_box_autoadd_firewalld_port(dynamic raw);
 
-  @protected
-  FirewallProbeResult dco_decode_firewall_probe_result(dynamic raw);
+@protected FirewalldSnapshot dco_decode_box_autoadd_firewalld_snapshot(dynamic raw);
 
-  @protected
-  FirewallReach dco_decode_firewall_reach(dynamic raw);
+@protected int dco_decode_box_autoadd_i_32(dynamic raw);
 
-  @protected
-  FirewalldChange dco_decode_firewalld_change(dynamic raw);
+@protected PlatformInt64 dco_decode_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  FirewalldInputIssue dco_decode_firewalld_input_issue(dynamic raw);
+@protected LibvirtPoolRef dco_decode_box_autoadd_libvirt_pool_ref(dynamic raw);
 
-  @protected
-  FirewalldItem dco_decode_firewalld_item(dynamic raw);
+@protected Plan dco_decode_box_autoadd_plan(dynamic raw);
 
-  @protected
-  FirewalldPolicy dco_decode_firewalld_policy(dynamic raw);
+@protected PveConsoleTicket dco_decode_box_autoadd_pve_console_ticket(dynamic raw);
 
-  @protected
-  FirewalldPort dco_decode_firewalld_port(dynamic raw);
+@protected PveGuestRef dco_decode_box_autoadd_pve_guest_ref(dynamic raw);
 
-  @protected
-  FirewalldRichRule dco_decode_firewalld_rich_rule(dynamic raw);
+@protected PveLogin dco_decode_box_autoadd_pve_login(dynamic raw);
 
-  @protected
-  FirewalldSnapshot dco_decode_firewalld_snapshot(dynamic raw);
+@protected PveTiming dco_decode_box_autoadd_pve_timing(dynamic raw);
 
-  @protected
-  FirewalldTarget dco_decode_firewalld_target(dynamic raw);
+@protected RdpSessionParams dco_decode_box_autoadd_rdp_session_params(dynamic raw);
 
-  @protected
-  FirewalldZone dco_decode_firewalld_zone(dynamic raw);
+@protected RedfishChassis dco_decode_box_autoadd_redfish_chassis(dynamic raw);
 
-  @protected
-  int dco_decode_i_16(dynamic raw);
+@protected RedfishSystem dco_decode_box_autoadd_redfish_system(dynamic raw);
 
-  @protected
-  int dco_decode_i_32(dynamic raw);
+@protected RedfishTopology dco_decode_box_autoadd_redfish_topology(dynamic raw);
 
-  @protected
-  PlatformInt64 dco_decode_i_64(dynamic raw);
+@protected RemoteDesktopEvent dco_decode_box_autoadd_remote_desktop_event(dynamic raw);
 
-  @protected
-  LibvirtPoolRef dco_decode_libvirt_pool_ref(dynamic raw);
+@protected ResetRequest dco_decode_box_autoadd_reset_request(dynamic raw);
 
-  @protected
-  List<String> dco_decode_list_String(dynamic raw);
+@protected SnapshotNameIssue dco_decode_box_autoadd_snapshot_name_issue(dynamic raw);
 
-  @protected
-  List<BmcReading> dco_decode_list_bmc_reading(dynamic raw);
+@protected int dco_decode_box_autoadd_u_16(dynamic raw);
 
-  @protected
-  List<CommandSpec> dco_decode_list_command_spec(dynamic raw);
+@protected int dco_decode_box_autoadd_u_32(dynamic raw);
 
-  @protected
-  List<ContainerImageItem> dco_decode_list_container_image_item(dynamic raw);
+@protected BigInt dco_decode_box_autoadd_u_64(dynamic raw);
 
-  @protected
-  List<ContainerItem> dco_decode_list_container_item(dynamic raw);
+@protected UfwChange dco_decode_box_autoadd_ufw_change(dynamic raw);
 
-  @protected
-  List<CronJobLine> dco_decode_list_cron_job_line(dynamic raw);
+@protected UfwDraftIssue dco_decode_box_autoadd_ufw_draft_issue(dynamic raw);
 
-  @protected
-  List<CustomCmd> dco_decode_list_custom_cmd(dynamic raw);
+@protected UfwLog dco_decode_box_autoadd_ufw_log(dynamic raw);
 
-  @protected
-  List<Effect> dco_decode_list_effect(dynamic raw);
+@protected UfwLogLevel dco_decode_box_autoadd_ufw_log_level(dynamic raw);
 
-  @protected
-  List<FirewallAccess> dco_decode_list_firewall_access(dynamic raw);
+@protected UfwRuleDraft dco_decode_box_autoadd_ufw_rule_draft(dynamic raw);
 
-  @protected
-  List<FirewalldPolicy> dco_decode_list_firewalld_policy(dynamic raw);
+@protected UfwSnapshot dco_decode_box_autoadd_ufw_snapshot(dynamic raw);
 
-  @protected
-  List<FirewalldPort> dco_decode_list_firewalld_port(dynamic raw);
+@protected VncSessionParams dco_decode_box_autoadd_vnc_session_params(dynamic raw);
 
-  @protected
-  List<FirewalldRichRule> dco_decode_list_firewalld_rich_rule(dynamic raw);
+@protected CertInfo dco_decode_box_cert_info(dynamic raw);
 
-  @protected
-  List<FirewalldZone> dco_decode_list_firewalld_zone(dynamic raw);
+@protected CappedRead dco_decode_capped_read(dynamic raw);
 
-  @protected
-  List<LibvirtPoolRef> dco_decode_list_libvirt_pool_ref(dynamic raw);
+@protected CertInfo dco_decode_cert_info(dynamic raw);
 
-  @protected
-  List<PlanNote> dco_decode_list_plan_note(dynamic raw);
+@protected ChangeError dco_decode_change_error(dynamic raw);
 
-  @protected
-  Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
+@protected CommandSpec dco_decode_command_spec(dynamic raw);
 
-  @protected
-  Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
+@protected ContainerDiskUsageItem dco_decode_container_disk_usage_item(dynamic raw);
 
-  @protected
-  List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
+@protected ContainerImageItem dco_decode_container_image_item(dynamic raw);
 
-  @protected
-  Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
+@protected ContainerItem dco_decode_container_item(dynamic raw);
 
-  @protected
-  List<PveHeader> dco_decode_list_pve_header(dynamic raw);
+@protected ContainerStatsItem dco_decode_container_stats_item(dynamic raw);
 
-  @protected
-  List<(String, List<FirewalldPort>)>
-  dco_decode_list_record_string_list_firewalld_port(dynamic raw);
+@protected CronDocumentData dco_decode_cron_document_data(dynamic raw);
 
-  @protected
-  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
+@protected CronEditError dco_decode_cron_edit_error(dynamic raw);
 
-  @protected
-  List<(UfwChain, UfwPolicy)> dco_decode_list_record_ufw_chain_ufw_policy(
-    dynamic raw,
-  );
+@protected CronFfiError dco_decode_cron_ffi_error(dynamic raw);
 
-  @protected
-  List<ScriptSegment> dco_decode_list_script_segment(dynamic raw);
+@protected CronJobLine dco_decode_cron_job_line(dynamic raw);
 
-  @protected
-  List<ServiceCommand> dco_decode_list_service_command(dynamic raw);
+@protected CronListing dco_decode_cron_listing(dynamic raw);
 
-  @protected
-  List<ServiceCommandOutput> dco_decode_list_service_command_output(
-    dynamic raw,
-  );
+@protected CronScheduleFields dco_decode_cron_schedule_fields(dynamic raw);
 
-  @protected
-  List<ShellFileRecord> dco_decode_list_shell_file_record(dynamic raw);
+@protected CronServerClock dco_decode_cron_server_clock(dynamic raw);
 
-  @protected
-  List<TmuxSessionItem> dco_decode_list_tmux_session_item(dynamic raw);
+@protected CronWall dco_decode_cron_wall(dynamic raw);
 
-  @protected
-  List<TmuxWindowItem> dco_decode_list_tmux_window_item(dynamic raw);
+@protected CustomCmd dco_decode_custom_cmd(dynamic raw);
 
-  @protected
-  List<UfwApp> dco_decode_list_ufw_app(dynamic raw);
+@protected EcdsaSignature dco_decode_ecdsa_signature(dynamic raw);
 
-  @protected
-  List<UfwAppPort> dco_decode_list_ufw_app_port(dynamic raw);
+@protected Effect dco_decode_effect(dynamic raw);
 
-  @protected
-  List<UfwRule> dco_decode_list_ufw_rule(dynamic raw);
+@protected double dco_decode_f_64(dynamic raw);
 
-  @protected
-  List<VirtActionKind> dco_decode_list_virt_action_kind(dynamic raw);
+@protected FilesStatMarkers dco_decode_files_stat_markers(dynamic raw);
 
-  @protected
-  List<VirtOverlay> dco_decode_list_virt_overlay(dynamic raw);
+@protected FirewallAccess dco_decode_firewall_access(dynamic raw);
 
-  @protected
-  String? dco_decode_opt_String(dynamic raw);
+@protected FirewallAccessVia dco_decode_firewall_access_via(dynamic raw);
 
-  @protected
-  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+@protected FirewallKind dco_decode_firewall_kind(dynamic raw);
 
-  @protected
-  CertInfo? dco_decode_opt_box_autoadd_cert_info(dynamic raw);
+@protected FirewallProbeResult dco_decode_firewall_probe_result(dynamic raw);
 
-  @protected
-  ContainerDiskUsageItem? dco_decode_opt_box_autoadd_container_disk_usage_item(
-    dynamic raw,
-  );
+@protected FirewallReach dco_decode_firewall_reach(dynamic raw);
 
-  @protected
-  ContainerStatsItem? dco_decode_opt_box_autoadd_container_stats_item(
-    dynamic raw,
-  );
+@protected FirewalldChange dco_decode_firewalld_change(dynamic raw);
 
-  @protected
-  CronScheduleFields? dco_decode_opt_box_autoadd_cron_schedule_fields(
-    dynamic raw,
-  );
+@protected FirewalldInputIssue dco_decode_firewalld_input_issue(dynamic raw);
 
-  @protected
-  CronServerClock? dco_decode_opt_box_autoadd_cron_server_clock(dynamic raw);
+@protected FirewalldItem dco_decode_firewalld_item(dynamic raw);
 
-  @protected
-  CronWall? dco_decode_opt_box_autoadd_cron_wall(dynamic raw);
+@protected FirewalldPolicy dco_decode_firewalld_policy(dynamic raw);
 
-  @protected
-  double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
+@protected FirewalldPort dco_decode_firewalld_port(dynamic raw);
 
-  @protected
-  FirewallAccess? dco_decode_opt_box_autoadd_firewall_access(dynamic raw);
+@protected FirewalldRichRule dco_decode_firewalld_rich_rule(dynamic raw);
 
-  @protected
-  FirewallKind? dco_decode_opt_box_autoadd_firewall_kind(dynamic raw);
+@protected FirewalldSnapshot dco_decode_firewalld_snapshot(dynamic raw);
 
-  @protected
-  int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
+@protected FirewalldTarget dco_decode_firewalld_target(dynamic raw);
 
-  @protected
-  PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
+@protected FirewalldZone dco_decode_firewalld_zone(dynamic raw);
 
-  @protected
-  RedfishChassis? dco_decode_opt_box_autoadd_redfish_chassis(dynamic raw);
+@protected int dco_decode_i_16(dynamic raw);
 
-  @protected
-  RedfishSystem? dco_decode_opt_box_autoadd_redfish_system(dynamic raw);
+@protected int dco_decode_i_32(dynamic raw);
 
-  @protected
-  RedfishTopology? dco_decode_opt_box_autoadd_redfish_topology(dynamic raw);
+@protected PlatformInt64 dco_decode_i_64(dynamic raw);
 
-  @protected
-  RemoteDesktopEvent? dco_decode_opt_box_autoadd_remote_desktop_event(
-    dynamic raw,
-  );
+@protected LibvirtPoolRef dco_decode_libvirt_pool_ref(dynamic raw);
 
-  @protected
-  ResetRequest? dco_decode_opt_box_autoadd_reset_request(dynamic raw);
+@protected List<String> dco_decode_list_String(dynamic raw);
 
-  @protected
-  SnapshotNameIssue? dco_decode_opt_box_autoadd_snapshot_name_issue(
-    dynamic raw,
-  );
+@protected List<BmcReading> dco_decode_list_bmc_reading(dynamic raw);
 
-  @protected
-  int? dco_decode_opt_box_autoadd_u_16(dynamic raw);
+@protected List<CommandSpec> dco_decode_list_command_spec(dynamic raw);
 
-  @protected
-  int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
+@protected List<ContainerImageItem> dco_decode_list_container_image_item(dynamic raw);
 
-  @protected
-  BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
+@protected List<ContainerItem> dco_decode_list_container_item(dynamic raw);
 
-  @protected
-  UfwDraftIssue? dco_decode_opt_box_autoadd_ufw_draft_issue(dynamic raw);
+@protected List<CronJobLine> dco_decode_list_cron_job_line(dynamic raw);
 
-  @protected
-  UfwLog? dco_decode_opt_box_autoadd_ufw_log(dynamic raw);
+@protected List<CustomCmd> dco_decode_list_custom_cmd(dynamic raw);
 
-  @protected
-  UfwLogLevel? dco_decode_opt_box_autoadd_ufw_log_level(dynamic raw);
+@protected List<Effect> dco_decode_list_effect(dynamic raw);
 
-  @protected
-  CertInfo? dco_decode_opt_box_cert_info(dynamic raw);
+@protected List<FirewallAccess> dco_decode_list_firewall_access(dynamic raw);
 
-  @protected
-  List<String>? dco_decode_opt_list_String(dynamic raw);
+@protected List<FirewalldPolicy> dco_decode_list_firewalld_policy(dynamic raw);
 
-  @protected
-  List<CustomCmd>? dco_decode_opt_list_custom_cmd(dynamic raw);
+@protected List<FirewalldPort> dco_decode_list_firewalld_port(dynamic raw);
 
-  @protected
-  List<FirewalldZone>? dco_decode_opt_list_firewalld_zone(dynamic raw);
+@protected List<FirewalldRichRule> dco_decode_list_firewalld_rich_rule(dynamic raw);
 
-  @protected
-  Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+@protected List<FirewalldZone> dco_decode_list_firewalld_zone(dynamic raw);
 
-  @protected
-  List<VirtActionKind>? dco_decode_opt_list_virt_action_kind(dynamic raw);
+@protected List<LibvirtPoolRef> dco_decode_list_libvirt_pool_ref(dynamic raw);
 
-  @protected
-  Plan dco_decode_plan(dynamic raw);
+@protected List<PlanNote> dco_decode_list_plan_note(dynamic raw);
 
-  @protected
-  PlanNote dco_decode_plan_note(dynamic raw);
+@protected Int32List dco_decode_list_prim_i_32_strict(dynamic raw);
 
-  @protected
-  PowerIntent dco_decode_power_intent(dynamic raw);
+@protected Uint32List dco_decode_list_prim_u_32_strict(dynamic raw);
 
-  @protected
-  PowerState dco_decode_power_state(dynamic raw);
+@protected List<int> dco_decode_list_prim_u_8_loose(dynamic raw);
 
-  @protected
-  ProtocolCompat dco_decode_protocol_compat(dynamic raw);
+@protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  PveConsoleKind dco_decode_pve_console_kind(dynamic raw);
+@protected List<PveHeader> dco_decode_list_pve_header(dynamic raw);
 
-  @protected
-  PveConsoleTicket dco_decode_pve_console_ticket(dynamic raw);
+@protected List<(String,List<FirewalldPort>)> dco_decode_list_record_string_list_firewalld_port(dynamic raw);
 
-  @protected
-  PveError dco_decode_pve_error(dynamic raw);
+@protected List<(String,String)> dco_decode_list_record_string_string(dynamic raw);
 
-  @protected
-  PveGuestRef dco_decode_pve_guest_ref(dynamic raw);
+@protected List<(UfwChain,UfwPolicy)> dco_decode_list_record_ufw_chain_ufw_policy(dynamic raw);
 
-  @protected
-  PveHeader dco_decode_pve_header(dynamic raw);
+@protected List<ScriptSegment> dco_decode_list_script_segment(dynamic raw);
 
-  @protected
-  PveHistoryWindow dco_decode_pve_history_window(dynamic raw);
+@protected List<ServiceCommand> dco_decode_list_service_command(dynamic raw);
 
-  @protected
-  PveLogin dco_decode_pve_login(dynamic raw);
+@protected List<ServiceCommandOutput> dco_decode_list_service_command_output(dynamic raw);
 
-  @protected
-  PveTiming dco_decode_pve_timing(dynamic raw);
+@protected List<ShellFileRecord> dco_decode_list_shell_file_record(dynamic raw);
 
-  @protected
-  RdpSessionParams dco_decode_rdp_session_params(dynamic raw);
+@protected List<TmuxSessionItem> dco_decode_list_tmux_session_item(dynamic raw);
 
-  @protected
-  (String, List<FirewalldPort>) dco_decode_record_string_list_firewalld_port(
-    dynamic raw,
-  );
+@protected List<TmuxWindowItem> dco_decode_list_tmux_window_item(dynamic raw);
 
-  @protected
-  (String, String) dco_decode_record_string_string(dynamic raw);
+@protected List<UfwApp> dco_decode_list_ufw_app(dynamic raw);
 
-  @protected
-  (UfwChain, UfwPolicy) dco_decode_record_ufw_chain_ufw_policy(dynamic raw);
+@protected List<UfwAppPort> dco_decode_list_ufw_app_port(dynamic raw);
 
-  @protected
-  RedfishChassis dco_decode_redfish_chassis(dynamic raw);
+@protected List<UfwRule> dco_decode_list_ufw_rule(dynamic raw);
 
-  @protected
-  RedfishFailure dco_decode_redfish_failure(dynamic raw);
+@protected List<VirtActionKind> dco_decode_list_virt_action_kind(dynamic raw);
 
-  @protected
-  RedfishRoot dco_decode_redfish_root(dynamic raw);
+@protected List<VirtOverlay> dco_decode_list_virt_overlay(dynamic raw);
 
-  @protected
-  RedfishSystem dco_decode_redfish_system(dynamic raw);
+@protected String? dco_decode_opt_String(dynamic raw);
 
-  @protected
-  RedfishTopology dco_decode_redfish_topology(dynamic raw);
+@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
-  @protected
-  RemoteDesktopConnectionState dco_decode_remote_desktop_connection_state(
-    dynamic raw,
-  );
+@protected CertInfo? dco_decode_opt_box_autoadd_cert_info(dynamic raw);
 
-  @protected
-  RemoteDesktopEndReason dco_decode_remote_desktop_end_reason(dynamic raw);
+@protected ContainerDiskUsageItem? dco_decode_opt_box_autoadd_container_disk_usage_item(dynamic raw);
 
-  @protected
-  RemoteDesktopEvent dco_decode_remote_desktop_event(dynamic raw);
+@protected ContainerStatsItem? dco_decode_opt_box_autoadd_container_stats_item(dynamic raw);
 
-  @protected
-  ResetRequest dco_decode_reset_request(dynamic raw);
+@protected CronScheduleFields? dco_decode_opt_box_autoadd_cron_schedule_fields(dynamic raw);
 
-  @protected
-  ScriptSegment dco_decode_script_segment(dynamic raw);
+@protected CronServerClock? dco_decode_opt_box_autoadd_cron_server_clock(dynamic raw);
 
-  @protected
-  ServiceCommand dco_decode_service_command(dynamic raw);
+@protected CronWall? dco_decode_opt_box_autoadd_cron_wall(dynamic raw);
 
-  @protected
-  ServiceCommandOutput dco_decode_service_command_output(dynamic raw);
+@protected double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
 
-  @protected
-  ServiceProbe dco_decode_service_probe(dynamic raw);
+@protected FirewallAccess? dco_decode_opt_box_autoadd_firewall_access(dynamic raw);
 
-  @protected
-  ShellFileRecord dco_decode_shell_file_record(dynamic raw);
+@protected FirewallKind? dco_decode_opt_box_autoadd_firewall_kind(dynamic raw);
 
-  @protected
-  ShellFuncKind dco_decode_shell_func_kind(dynamic raw);
+@protected int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
-  @protected
-  SnapshotMemoryKind dco_decode_snapshot_memory_kind(dynamic raw);
+@protected PlatformInt64? dco_decode_opt_box_autoadd_i_64(dynamic raw);
 
-  @protected
-  SnapshotNameIssue dco_decode_snapshot_name_issue(dynamic raw);
+@protected RedfishChassis? dco_decode_opt_box_autoadd_redfish_chassis(dynamic raw);
 
-  @protected
-  SnippetFfiError dco_decode_snippet_ffi_error(dynamic raw);
+@protected RedfishSystem? dco_decode_opt_box_autoadd_redfish_system(dynamic raw);
 
-  @protected
-  TmuxSessionItem dco_decode_tmux_session_item(dynamic raw);
+@protected RedfishTopology? dco_decode_opt_box_autoadd_redfish_topology(dynamic raw);
 
-  @protected
-  TmuxSessionListingItem dco_decode_tmux_session_listing_item(dynamic raw);
+@protected RemoteDesktopEvent? dco_decode_opt_box_autoadd_remote_desktop_event(dynamic raw);
 
-  @protected
-  TmuxWindowItem dco_decode_tmux_window_item(dynamic raw);
+@protected ResetRequest? dco_decode_opt_box_autoadd_reset_request(dynamic raw);
 
-  @protected
-  int dco_decode_u_16(dynamic raw);
+@protected SnapshotNameIssue? dco_decode_opt_box_autoadd_snapshot_name_issue(dynamic raw);
 
-  @protected
-  int dco_decode_u_32(dynamic raw);
+@protected int? dco_decode_opt_box_autoadd_u_16(dynamic raw);
 
-  @protected
-  BigInt dco_decode_u_64(dynamic raw);
+@protected int? dco_decode_opt_box_autoadd_u_32(dynamic raw);
 
-  @protected
-  int dco_decode_u_8(dynamic raw);
+@protected BigInt? dco_decode_opt_box_autoadd_u_64(dynamic raw);
 
-  @protected
-  UfwAction dco_decode_ufw_action(dynamic raw);
+@protected UfwDraftIssue? dco_decode_opt_box_autoadd_ufw_draft_issue(dynamic raw);
 
-  @protected
-  UfwApp dco_decode_ufw_app(dynamic raw);
+@protected UfwLog? dco_decode_opt_box_autoadd_ufw_log(dynamic raw);
 
-  @protected
-  UfwAppPort dco_decode_ufw_app_port(dynamic raw);
+@protected UfwLogLevel? dco_decode_opt_box_autoadd_ufw_log_level(dynamic raw);
 
-  @protected
-  UfwChain dco_decode_ufw_chain(dynamic raw);
+@protected CertInfo? dco_decode_opt_box_cert_info(dynamic raw);
 
-  @protected
-  UfwChange dco_decode_ufw_change(dynamic raw);
+@protected List<String>? dco_decode_opt_list_String(dynamic raw);
 
-  @protected
-  UfwDirection dco_decode_ufw_direction(dynamic raw);
+@protected List<CustomCmd>? dco_decode_opt_list_custom_cmd(dynamic raw);
 
-  @protected
-  UfwDraftIssue dco_decode_ufw_draft_issue(dynamic raw);
+@protected List<FirewalldZone>? dco_decode_opt_list_firewalld_zone(dynamic raw);
 
-  @protected
-  UfwEndpoint dco_decode_ufw_endpoint(dynamic raw);
+@protected Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
 
-  @protected
-  UfwIpVersion dco_decode_ufw_ip_version(dynamic raw);
+@protected List<VirtActionKind>? dco_decode_opt_list_virt_action_kind(dynamic raw);
 
-  @protected
-  UfwLog dco_decode_ufw_log(dynamic raw);
+@protected Plan dco_decode_plan(dynamic raw);
 
-  @protected
-  UfwLogLevel dco_decode_ufw_log_level(dynamic raw);
+@protected PlanNote dco_decode_plan_note(dynamic raw);
 
-  @protected
-  UfwPolicy dco_decode_ufw_policy(dynamic raw);
+@protected PowerIntent dco_decode_power_intent(dynamic raw);
 
-  @protected
-  UfwRule dco_decode_ufw_rule(dynamic raw);
+@protected PowerState dco_decode_power_state(dynamic raw);
 
-  @protected
-  UfwRuleDraft dco_decode_ufw_rule_draft(dynamic raw);
+@protected ProtocolCompat dco_decode_protocol_compat(dynamic raw);
 
-  @protected
-  UfwSnapshot dco_decode_ufw_snapshot(dynamic raw);
+@protected PveConsoleKind dco_decode_pve_console_kind(dynamic raw);
 
-  @protected
-  void dco_decode_unit(dynamic raw);
+@protected PveConsoleTicket dco_decode_pve_console_ticket(dynamic raw);
 
-  @protected
-  UserFfiError dco_decode_user_ffi_error(dynamic raw);
+@protected PveError dco_decode_pve_error(dynamic raw);
 
-  @protected
-  BigInt dco_decode_usize(dynamic raw);
+@protected PveGuestRef dco_decode_pve_guest_ref(dynamic raw);
 
-  @protected
-  VirtActionKind dco_decode_virt_action_kind(dynamic raw);
+@protected PveHeader dco_decode_pve_header(dynamic raw);
 
-  @protected
-  VirtDeletePlan dco_decode_virt_delete_plan(dynamic raw);
+@protected PveHistoryWindow dco_decode_pve_history_window(dynamic raw);
 
-  @protected
-  VirtErrorKind dco_decode_virt_error_kind(dynamic raw);
+@protected PveLogin dco_decode_pve_login(dynamic raw);
 
-  @protected
-  VirtFailure dco_decode_virt_failure(dynamic raw);
+@protected PveTiming dco_decode_pve_timing(dynamic raw);
 
-  @protected
-  VirtFfiError dco_decode_virt_ffi_error(dynamic raw);
+@protected RdpSessionParams dco_decode_rdp_session_params(dynamic raw);
 
-  @protected
-  VirtOverlay dco_decode_virt_overlay(dynamic raw);
+@protected (String,List<FirewalldPort>) dco_decode_record_string_list_firewalld_port(dynamic raw);
 
-  @protected
-  VirtResourceScript dco_decode_virt_resource_script(dynamic raw);
+@protected (String,String) dco_decode_record_string_string(dynamic raw);
 
-  @protected
-  VirtUploadEntryKind dco_decode_virt_upload_entry_kind(dynamic raw);
+@protected (UfwChain,UfwPolicy) dco_decode_record_ufw_chain_ufw_policy(dynamic raw);
 
-  @protected
-  VncSessionParams dco_decode_vnc_session_params(dynamic raw);
+@protected RedfishChassis dco_decode_redfish_chassis(dynamic raw);
 
-  @protected
-  X25519KeyPair dco_decode_x_25519_key_pair(dynamic raw);
+@protected RedfishFailure dco_decode_redfish_failure(dynamic raw);
 
-  @protected
-  BmcClient
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    SseDeserializer deserializer,
-  );
+@protected RedfishRoot dco_decode_redfish_root(dynamic raw);
 
-  @protected
-  LibvirtRates
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    SseDeserializer deserializer,
-  );
+@protected RedfishSystem dco_decode_redfish_system(dynamic raw);
 
-  @protected
-  PowerWatch
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    SseDeserializer deserializer,
-  );
+@protected RedfishTopology dco_decode_redfish_topology(dynamic raw);
 
-  @protected
-  PveConsoleChannel
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    SseDeserializer deserializer,
-  );
+@protected RemoteDesktopConnectionState dco_decode_remote_desktop_connection_state(dynamic raw);
 
-  @protected
-  PveSession
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    SseDeserializer deserializer,
-  );
+@protected RemoteDesktopEndReason dco_decode_remote_desktop_end_reason(dynamic raw);
 
-  @protected
-  RemoteDesktopSessionHandle
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    SseDeserializer deserializer,
-  );
+@protected RemoteDesktopEvent dco_decode_remote_desktop_event(dynamic raw);
 
-  @protected
-  SshBlockCipher
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SseDeserializer deserializer,
-  );
+@protected ResetRequest dco_decode_reset_request(dynamic raw);
 
-  @protected
-  SshMac
-  sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SseDeserializer deserializer,
-  );
+@protected ScriptSegment dco_decode_script_segment(dynamic raw);
 
-  @protected
-  LibvirtRates
-  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    SseDeserializer deserializer,
-  );
+@protected ServiceCommand dco_decode_service_command(dynamic raw);
 
-  @protected
-  PowerWatch
-  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    SseDeserializer deserializer,
-  );
+@protected ServiceCommandOutput dco_decode_service_command_output(dynamic raw);
 
-  @protected
-  SshBlockCipher
-  sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SseDeserializer deserializer,
-  );
+@protected ServiceProbe dco_decode_service_probe(dynamic raw);
 
-  @protected
-  BmcClient
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    SseDeserializer deserializer,
-  );
+@protected ShellFileRecord dco_decode_shell_file_record(dynamic raw);
 
-  @protected
-  PveConsoleChannel
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    SseDeserializer deserializer,
-  );
+@protected ShellFuncKind dco_decode_shell_func_kind(dynamic raw);
 
-  @protected
-  PveSession
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    SseDeserializer deserializer,
-  );
+@protected SnapshotMemoryKind dco_decode_snapshot_memory_kind(dynamic raw);
 
-  @protected
-  RemoteDesktopSessionHandle
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    SseDeserializer deserializer,
-  );
+@protected SnapshotNameIssue dco_decode_snapshot_name_issue(dynamic raw);
 
-  @protected
-  SshBlockCipher
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SseDeserializer deserializer,
-  );
+@protected SnippetFfiError dco_decode_snippet_ffi_error(dynamic raw);
 
-  @protected
-  SshMac
-  sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SseDeserializer deserializer,
-  );
+@protected TmuxSessionItem dco_decode_tmux_session_item(dynamic raw);
 
-  @protected
-  Map<String, String> sse_decode_Map_String_String_None(
-    SseDeserializer deserializer,
-  );
+@protected TmuxSessionListingItem dco_decode_tmux_session_listing_item(dynamic raw);
 
-  @protected
-  Map<String, List<FirewalldPort>>
-  sse_decode_Map_String_list_firewalld_port_None(SseDeserializer deserializer);
+@protected TmuxWindowItem dco_decode_tmux_window_item(dynamic raw);
 
-  @protected
-  Map<UfwChain, UfwPolicy> sse_decode_Map_ufw_chain_ufw_policy_None(
-    SseDeserializer deserializer,
-  );
+@protected int dco_decode_u_16(dynamic raw);
 
-  @protected
-  BmcClient
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    SseDeserializer deserializer,
-  );
+@protected int dco_decode_u_32(dynamic raw);
 
-  @protected
-  LibvirtRates
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    SseDeserializer deserializer,
-  );
+@protected BigInt dco_decode_u_64(dynamic raw);
 
-  @protected
-  PowerWatch
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    SseDeserializer deserializer,
-  );
+@protected int dco_decode_u_8(dynamic raw);
 
-  @protected
-  PveConsoleChannel
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    SseDeserializer deserializer,
-  );
+@protected UfwAction dco_decode_ufw_action(dynamic raw);
 
-  @protected
-  PveSession
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    SseDeserializer deserializer,
-  );
+@protected UfwApp dco_decode_ufw_app(dynamic raw);
 
-  @protected
-  RemoteDesktopSessionHandle
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    SseDeserializer deserializer,
-  );
+@protected UfwAppPort dco_decode_ufw_app_port(dynamic raw);
 
-  @protected
-  SshBlockCipher
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SseDeserializer deserializer,
-  );
+@protected UfwChain dco_decode_ufw_chain(dynamic raw);
 
-  @protected
-  SshMac
-  sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SseDeserializer deserializer,
-  );
+@protected UfwChange dco_decode_ufw_change(dynamic raw);
 
-  @protected
-  String sse_decode_String(SseDeserializer deserializer);
+@protected UfwDirection dco_decode_ufw_direction(dynamic raw);
 
-  @protected
-  BenchPoll sse_decode_bench_poll(SseDeserializer deserializer);
+@protected UfwDraftIssue dco_decode_ufw_draft_issue(dynamic raw);
 
-  @protected
-  BmcError sse_decode_bmc_error(SseDeserializer deserializer);
+@protected UfwEndpoint dco_decode_ufw_endpoint(dynamic raw);
 
-  @protected
-  BmcOutcome sse_decode_bmc_outcome(SseDeserializer deserializer);
+@protected UfwIpVersion dco_decode_ufw_ip_version(dynamic raw);
 
-  @protected
-  BmcReading sse_decode_bmc_reading(SseDeserializer deserializer);
+@protected UfwLog dco_decode_ufw_log(dynamic raw);
 
-  @protected
-  BmcSensors sse_decode_bmc_sensors(SseDeserializer deserializer);
+@protected UfwLogLevel dco_decode_ufw_log_level(dynamic raw);
 
-  @protected
-  BmcSnapshot sse_decode_bmc_snapshot(SseDeserializer deserializer);
+@protected UfwPolicy dco_decode_ufw_policy(dynamic raw);
 
-  @protected
-  bool sse_decode_bool(SseDeserializer deserializer);
+@protected UfwRule dco_decode_ufw_rule(dynamic raw);
 
-  @protected
-  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+@protected UfwRuleDraft dco_decode_ufw_rule_draft(dynamic raw);
 
-  @protected
-  CertInfo sse_decode_box_autoadd_cert_info(SseDeserializer deserializer);
+@protected UfwSnapshot dco_decode_ufw_snapshot(dynamic raw);
 
-  @protected
-  ContainerDiskUsageItem sse_decode_box_autoadd_container_disk_usage_item(
-    SseDeserializer deserializer,
-  );
+@protected void dco_decode_unit(dynamic raw);
 
-  @protected
-  ContainerStatsItem sse_decode_box_autoadd_container_stats_item(
-    SseDeserializer deserializer,
-  );
+@protected UserFfiError dco_decode_user_ffi_error(dynamic raw);
 
-  @protected
-  CronScheduleFields sse_decode_box_autoadd_cron_schedule_fields(
-    SseDeserializer deserializer,
-  );
+@protected BigInt dco_decode_usize(dynamic raw);
 
-  @protected
-  CronServerClock sse_decode_box_autoadd_cron_server_clock(
-    SseDeserializer deserializer,
-  );
+@protected VirtActionKind dco_decode_virt_action_kind(dynamic raw);
 
-  @protected
-  CronWall sse_decode_box_autoadd_cron_wall(SseDeserializer deserializer);
+@protected VirtDeletePlan dco_decode_virt_delete_plan(dynamic raw);
 
-  @protected
-  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
+@protected VirtErrorKind dco_decode_virt_error_kind(dynamic raw);
 
-  @protected
-  FirewallAccess sse_decode_box_autoadd_firewall_access(
-    SseDeserializer deserializer,
-  );
+@protected VirtFailure dco_decode_virt_failure(dynamic raw);
 
-  @protected
-  FirewallKind sse_decode_box_autoadd_firewall_kind(
-    SseDeserializer deserializer,
-  );
+@protected VirtFfiError dco_decode_virt_ffi_error(dynamic raw);
 
-  @protected
-  FirewallProbeResult sse_decode_box_autoadd_firewall_probe_result(
-    SseDeserializer deserializer,
-  );
+@protected VirtOverlay dco_decode_virt_overlay(dynamic raw);
 
-  @protected
-  FirewalldChange sse_decode_box_autoadd_firewalld_change(
-    SseDeserializer deserializer,
-  );
+@protected VirtResourceScript dco_decode_virt_resource_script(dynamic raw);
 
-  @protected
-  FirewalldPort sse_decode_box_autoadd_firewalld_port(
-    SseDeserializer deserializer,
-  );
+@protected VirtUploadEntryKind dco_decode_virt_upload_entry_kind(dynamic raw);
 
-  @protected
-  FirewalldSnapshot sse_decode_box_autoadd_firewalld_snapshot(
-    SseDeserializer deserializer,
-  );
+@protected VncSessionParams dco_decode_vnc_session_params(dynamic raw);
 
-  @protected
-  int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
+@protected X25519KeyPair dco_decode_x_25519_key_pair(dynamic raw);
 
-  @protected
-  PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
+@protected BmcClient sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(SseDeserializer deserializer);
 
-  @protected
-  LibvirtPoolRef sse_decode_box_autoadd_libvirt_pool_ref(
-    SseDeserializer deserializer,
-  );
+@protected LibvirtRates sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(SseDeserializer deserializer);
 
-  @protected
-  Plan sse_decode_box_autoadd_plan(SseDeserializer deserializer);
+@protected PowerWatch sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(SseDeserializer deserializer);
 
-  @protected
-  PveConsoleTicket sse_decode_box_autoadd_pve_console_ticket(
-    SseDeserializer deserializer,
-  );
+@protected PveConsoleChannel sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(SseDeserializer deserializer);
 
-  @protected
-  PveGuestRef sse_decode_box_autoadd_pve_guest_ref(
-    SseDeserializer deserializer,
-  );
+@protected PveSession sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(SseDeserializer deserializer);
 
-  @protected
-  PveLogin sse_decode_box_autoadd_pve_login(SseDeserializer deserializer);
+@protected RemoteDesktopSessionHandle sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(SseDeserializer deserializer);
 
-  @protected
-  PveTiming sse_decode_box_autoadd_pve_timing(SseDeserializer deserializer);
+@protected SshBlockCipher sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SseDeserializer deserializer);
 
-  @protected
-  RdpSessionParams sse_decode_box_autoadd_rdp_session_params(
-    SseDeserializer deserializer,
-  );
+@protected SshMac sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SseDeserializer deserializer);
 
-  @protected
-  RedfishChassis sse_decode_box_autoadd_redfish_chassis(
-    SseDeserializer deserializer,
-  );
+@protected LibvirtRates sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(SseDeserializer deserializer);
 
-  @protected
-  RedfishSystem sse_decode_box_autoadd_redfish_system(
-    SseDeserializer deserializer,
-  );
+@protected PowerWatch sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(SseDeserializer deserializer);
 
-  @protected
-  RedfishTopology sse_decode_box_autoadd_redfish_topology(
-    SseDeserializer deserializer,
-  );
+@protected SshBlockCipher sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SseDeserializer deserializer);
 
-  @protected
-  RemoteDesktopEvent sse_decode_box_autoadd_remote_desktop_event(
-    SseDeserializer deserializer,
-  );
+@protected BmcClient sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(SseDeserializer deserializer);
 
-  @protected
-  ResetRequest sse_decode_box_autoadd_reset_request(
-    SseDeserializer deserializer,
-  );
+@protected PveConsoleChannel sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(SseDeserializer deserializer);
 
-  @protected
-  SnapshotNameIssue sse_decode_box_autoadd_snapshot_name_issue(
-    SseDeserializer deserializer,
-  );
+@protected PveSession sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_box_autoadd_u_16(SseDeserializer deserializer);
+@protected RemoteDesktopSessionHandle sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
+@protected SshBlockCipher sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SseDeserializer deserializer);
 
-  @protected
-  BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
+@protected SshMac sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SseDeserializer deserializer);
 
-  @protected
-  UfwChange sse_decode_box_autoadd_ufw_change(SseDeserializer deserializer);
+@protected Map<String, String> sse_decode_Map_String_String_None(SseDeserializer deserializer);
 
-  @protected
-  UfwDraftIssue sse_decode_box_autoadd_ufw_draft_issue(
-    SseDeserializer deserializer,
-  );
+@protected Map<String, List<FirewalldPort>> sse_decode_Map_String_list_firewalld_port_None(SseDeserializer deserializer);
 
-  @protected
-  UfwLog sse_decode_box_autoadd_ufw_log(SseDeserializer deserializer);
+@protected Map<UfwChain, UfwPolicy> sse_decode_Map_ufw_chain_ufw_policy_None(SseDeserializer deserializer);
 
-  @protected
-  UfwLogLevel sse_decode_box_autoadd_ufw_log_level(
-    SseDeserializer deserializer,
-  );
+@protected BmcClient sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(SseDeserializer deserializer);
 
-  @protected
-  UfwRuleDraft sse_decode_box_autoadd_ufw_rule_draft(
-    SseDeserializer deserializer,
-  );
+@protected LibvirtRates sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(SseDeserializer deserializer);
 
-  @protected
-  UfwSnapshot sse_decode_box_autoadd_ufw_snapshot(SseDeserializer deserializer);
+@protected PowerWatch sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(SseDeserializer deserializer);
 
-  @protected
-  VncSessionParams sse_decode_box_autoadd_vnc_session_params(
-    SseDeserializer deserializer,
-  );
+@protected PveConsoleChannel sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(SseDeserializer deserializer);
 
-  @protected
-  CertInfo sse_decode_box_cert_info(SseDeserializer deserializer);
+@protected PveSession sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(SseDeserializer deserializer);
 
-  @protected
-  CappedRead sse_decode_capped_read(SseDeserializer deserializer);
+@protected RemoteDesktopSessionHandle sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(SseDeserializer deserializer);
 
-  @protected
-  CertInfo sse_decode_cert_info(SseDeserializer deserializer);
+@protected SshBlockCipher sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SseDeserializer deserializer);
 
-  @protected
-  ChangeError sse_decode_change_error(SseDeserializer deserializer);
+@protected SshMac sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SseDeserializer deserializer);
 
-  @protected
-  CommandSpec sse_decode_command_spec(SseDeserializer deserializer);
+@protected String sse_decode_String(SseDeserializer deserializer);
 
-  @protected
-  ContainerDiskUsageItem sse_decode_container_disk_usage_item(
-    SseDeserializer deserializer,
-  );
+@protected BenchPoll sse_decode_bench_poll(SseDeserializer deserializer);
 
-  @protected
-  ContainerImageItem sse_decode_container_image_item(
-    SseDeserializer deserializer,
-  );
+@protected BmcError sse_decode_bmc_error(SseDeserializer deserializer);
 
-  @protected
-  ContainerItem sse_decode_container_item(SseDeserializer deserializer);
+@protected BmcOutcome sse_decode_bmc_outcome(SseDeserializer deserializer);
 
-  @protected
-  ContainerStatsItem sse_decode_container_stats_item(
-    SseDeserializer deserializer,
-  );
+@protected BmcReading sse_decode_bmc_reading(SseDeserializer deserializer);
 
-  @protected
-  CronDocumentData sse_decode_cron_document_data(SseDeserializer deserializer);
+@protected BmcSensors sse_decode_bmc_sensors(SseDeserializer deserializer);
 
-  @protected
-  CronEditError sse_decode_cron_edit_error(SseDeserializer deserializer);
+@protected BmcSnapshot sse_decode_bmc_snapshot(SseDeserializer deserializer);
 
-  @protected
-  CronFfiError sse_decode_cron_ffi_error(SseDeserializer deserializer);
+@protected bool sse_decode_bool(SseDeserializer deserializer);
 
-  @protected
-  CronJobLine sse_decode_cron_job_line(SseDeserializer deserializer);
+@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
-  @protected
-  CronListing sse_decode_cron_listing(SseDeserializer deserializer);
+@protected CertInfo sse_decode_box_autoadd_cert_info(SseDeserializer deserializer);
 
-  @protected
-  CronScheduleFields sse_decode_cron_schedule_fields(
-    SseDeserializer deserializer,
-  );
+@protected ContainerDiskUsageItem sse_decode_box_autoadd_container_disk_usage_item(SseDeserializer deserializer);
 
-  @protected
-  CronServerClock sse_decode_cron_server_clock(SseDeserializer deserializer);
+@protected ContainerStatsItem sse_decode_box_autoadd_container_stats_item(SseDeserializer deserializer);
 
-  @protected
-  CronWall sse_decode_cron_wall(SseDeserializer deserializer);
+@protected CronScheduleFields sse_decode_box_autoadd_cron_schedule_fields(SseDeserializer deserializer);
 
-  @protected
-  CustomCmd sse_decode_custom_cmd(SseDeserializer deserializer);
+@protected CronServerClock sse_decode_box_autoadd_cron_server_clock(SseDeserializer deserializer);
 
-  @protected
-  EcdsaSignature sse_decode_ecdsa_signature(SseDeserializer deserializer);
+@protected CronWall sse_decode_box_autoadd_cron_wall(SseDeserializer deserializer);
 
-  @protected
-  Effect sse_decode_effect(SseDeserializer deserializer);
+@protected double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
 
-  @protected
-  double sse_decode_f_64(SseDeserializer deserializer);
+@protected FirewallAccess sse_decode_box_autoadd_firewall_access(SseDeserializer deserializer);
 
-  @protected
-  FilesStatMarkers sse_decode_files_stat_markers(SseDeserializer deserializer);
+@protected FirewallKind sse_decode_box_autoadd_firewall_kind(SseDeserializer deserializer);
 
-  @protected
-  FirewallAccess sse_decode_firewall_access(SseDeserializer deserializer);
+@protected FirewallProbeResult sse_decode_box_autoadd_firewall_probe_result(SseDeserializer deserializer);
 
-  @protected
-  FirewallAccessVia sse_decode_firewall_access_via(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldChange sse_decode_box_autoadd_firewalld_change(SseDeserializer deserializer);
 
-  @protected
-  FirewallKind sse_decode_firewall_kind(SseDeserializer deserializer);
+@protected FirewalldPort sse_decode_box_autoadd_firewalld_port(SseDeserializer deserializer);
 
-  @protected
-  FirewallProbeResult sse_decode_firewall_probe_result(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldSnapshot sse_decode_box_autoadd_firewalld_snapshot(SseDeserializer deserializer);
 
-  @protected
-  FirewallReach sse_decode_firewall_reach(SseDeserializer deserializer);
+@protected int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
-  @protected
-  FirewalldChange sse_decode_firewalld_change(SseDeserializer deserializer);
+@protected PlatformInt64 sse_decode_box_autoadd_i_64(SseDeserializer deserializer);
 
-  @protected
-  FirewalldInputIssue sse_decode_firewalld_input_issue(
-    SseDeserializer deserializer,
-  );
+@protected LibvirtPoolRef sse_decode_box_autoadd_libvirt_pool_ref(SseDeserializer deserializer);
 
-  @protected
-  FirewalldItem sse_decode_firewalld_item(SseDeserializer deserializer);
+@protected Plan sse_decode_box_autoadd_plan(SseDeserializer deserializer);
 
-  @protected
-  FirewalldPolicy sse_decode_firewalld_policy(SseDeserializer deserializer);
+@protected PveConsoleTicket sse_decode_box_autoadd_pve_console_ticket(SseDeserializer deserializer);
 
-  @protected
-  FirewalldPort sse_decode_firewalld_port(SseDeserializer deserializer);
+@protected PveGuestRef sse_decode_box_autoadd_pve_guest_ref(SseDeserializer deserializer);
 
-  @protected
-  FirewalldRichRule sse_decode_firewalld_rich_rule(
-    SseDeserializer deserializer,
-  );
+@protected PveLogin sse_decode_box_autoadd_pve_login(SseDeserializer deserializer);
 
-  @protected
-  FirewalldSnapshot sse_decode_firewalld_snapshot(SseDeserializer deserializer);
+@protected PveTiming sse_decode_box_autoadd_pve_timing(SseDeserializer deserializer);
 
-  @protected
-  FirewalldTarget sse_decode_firewalld_target(SseDeserializer deserializer);
+@protected RdpSessionParams sse_decode_box_autoadd_rdp_session_params(SseDeserializer deserializer);
 
-  @protected
-  FirewalldZone sse_decode_firewalld_zone(SseDeserializer deserializer);
+@protected RedfishChassis sse_decode_box_autoadd_redfish_chassis(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_i_16(SseDeserializer deserializer);
+@protected RedfishSystem sse_decode_box_autoadd_redfish_system(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
+@protected RedfishTopology sse_decode_box_autoadd_redfish_topology(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+@protected RemoteDesktopEvent sse_decode_box_autoadd_remote_desktop_event(SseDeserializer deserializer);
 
-  @protected
-  LibvirtPoolRef sse_decode_libvirt_pool_ref(SseDeserializer deserializer);
+@protected ResetRequest sse_decode_box_autoadd_reset_request(SseDeserializer deserializer);
 
-  @protected
-  List<String> sse_decode_list_String(SseDeserializer deserializer);
+@protected SnapshotNameIssue sse_decode_box_autoadd_snapshot_name_issue(SseDeserializer deserializer);
 
-  @protected
-  List<BmcReading> sse_decode_list_bmc_reading(SseDeserializer deserializer);
+@protected int sse_decode_box_autoadd_u_16(SseDeserializer deserializer);
 
-  @protected
-  List<CommandSpec> sse_decode_list_command_spec(SseDeserializer deserializer);
+@protected int sse_decode_box_autoadd_u_32(SseDeserializer deserializer);
 
-  @protected
-  List<ContainerImageItem> sse_decode_list_container_image_item(
-    SseDeserializer deserializer,
-  );
+@protected BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
 
-  @protected
-  List<ContainerItem> sse_decode_list_container_item(
-    SseDeserializer deserializer,
-  );
+@protected UfwChange sse_decode_box_autoadd_ufw_change(SseDeserializer deserializer);
 
-  @protected
-  List<CronJobLine> sse_decode_list_cron_job_line(SseDeserializer deserializer);
+@protected UfwDraftIssue sse_decode_box_autoadd_ufw_draft_issue(SseDeserializer deserializer);
 
-  @protected
-  List<CustomCmd> sse_decode_list_custom_cmd(SseDeserializer deserializer);
+@protected UfwLog sse_decode_box_autoadd_ufw_log(SseDeserializer deserializer);
 
-  @protected
-  List<Effect> sse_decode_list_effect(SseDeserializer deserializer);
+@protected UfwLogLevel sse_decode_box_autoadd_ufw_log_level(SseDeserializer deserializer);
 
-  @protected
-  List<FirewallAccess> sse_decode_list_firewall_access(
-    SseDeserializer deserializer,
-  );
+@protected UfwRuleDraft sse_decode_box_autoadd_ufw_rule_draft(SseDeserializer deserializer);
 
-  @protected
-  List<FirewalldPolicy> sse_decode_list_firewalld_policy(
-    SseDeserializer deserializer,
-  );
+@protected UfwSnapshot sse_decode_box_autoadd_ufw_snapshot(SseDeserializer deserializer);
 
-  @protected
-  List<FirewalldPort> sse_decode_list_firewalld_port(
-    SseDeserializer deserializer,
-  );
+@protected VncSessionParams sse_decode_box_autoadd_vnc_session_params(SseDeserializer deserializer);
 
-  @protected
-  List<FirewalldRichRule> sse_decode_list_firewalld_rich_rule(
-    SseDeserializer deserializer,
-  );
+@protected CertInfo sse_decode_box_cert_info(SseDeserializer deserializer);
 
-  @protected
-  List<FirewalldZone> sse_decode_list_firewalld_zone(
-    SseDeserializer deserializer,
-  );
+@protected CappedRead sse_decode_capped_read(SseDeserializer deserializer);
 
-  @protected
-  List<LibvirtPoolRef> sse_decode_list_libvirt_pool_ref(
-    SseDeserializer deserializer,
-  );
+@protected CertInfo sse_decode_cert_info(SseDeserializer deserializer);
 
-  @protected
-  List<PlanNote> sse_decode_list_plan_note(SseDeserializer deserializer);
+@protected ChangeError sse_decode_change_error(SseDeserializer deserializer);
 
-  @protected
-  Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
+@protected CommandSpec sse_decode_command_spec(SseDeserializer deserializer);
 
-  @protected
-  Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
+@protected ContainerDiskUsageItem sse_decode_container_disk_usage_item(SseDeserializer deserializer);
 
-  @protected
-  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
+@protected ContainerImageItem sse_decode_container_image_item(SseDeserializer deserializer);
 
-  @protected
-  Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
+@protected ContainerItem sse_decode_container_item(SseDeserializer deserializer);
 
-  @protected
-  List<PveHeader> sse_decode_list_pve_header(SseDeserializer deserializer);
+@protected ContainerStatsItem sse_decode_container_stats_item(SseDeserializer deserializer);
 
-  @protected
-  List<(String, List<FirewalldPort>)>
-  sse_decode_list_record_string_list_firewalld_port(
-    SseDeserializer deserializer,
-  );
+@protected CronDocumentData sse_decode_cron_document_data(SseDeserializer deserializer);
 
-  @protected
-  List<(String, String)> sse_decode_list_record_string_string(
-    SseDeserializer deserializer,
-  );
+@protected CronEditError sse_decode_cron_edit_error(SseDeserializer deserializer);
 
-  @protected
-  List<(UfwChain, UfwPolicy)> sse_decode_list_record_ufw_chain_ufw_policy(
-    SseDeserializer deserializer,
-  );
+@protected CronFfiError sse_decode_cron_ffi_error(SseDeserializer deserializer);
 
-  @protected
-  List<ScriptSegment> sse_decode_list_script_segment(
-    SseDeserializer deserializer,
-  );
+@protected CronJobLine sse_decode_cron_job_line(SseDeserializer deserializer);
 
-  @protected
-  List<ServiceCommand> sse_decode_list_service_command(
-    SseDeserializer deserializer,
-  );
+@protected CronListing sse_decode_cron_listing(SseDeserializer deserializer);
 
-  @protected
-  List<ServiceCommandOutput> sse_decode_list_service_command_output(
-    SseDeserializer deserializer,
-  );
+@protected CronScheduleFields sse_decode_cron_schedule_fields(SseDeserializer deserializer);
 
-  @protected
-  List<ShellFileRecord> sse_decode_list_shell_file_record(
-    SseDeserializer deserializer,
-  );
+@protected CronServerClock sse_decode_cron_server_clock(SseDeserializer deserializer);
 
-  @protected
-  List<TmuxSessionItem> sse_decode_list_tmux_session_item(
-    SseDeserializer deserializer,
-  );
+@protected CronWall sse_decode_cron_wall(SseDeserializer deserializer);
 
-  @protected
-  List<TmuxWindowItem> sse_decode_list_tmux_window_item(
-    SseDeserializer deserializer,
-  );
+@protected CustomCmd sse_decode_custom_cmd(SseDeserializer deserializer);
 
-  @protected
-  List<UfwApp> sse_decode_list_ufw_app(SseDeserializer deserializer);
+@protected EcdsaSignature sse_decode_ecdsa_signature(SseDeserializer deserializer);
 
-  @protected
-  List<UfwAppPort> sse_decode_list_ufw_app_port(SseDeserializer deserializer);
+@protected Effect sse_decode_effect(SseDeserializer deserializer);
 
-  @protected
-  List<UfwRule> sse_decode_list_ufw_rule(SseDeserializer deserializer);
+@protected double sse_decode_f_64(SseDeserializer deserializer);
 
-  @protected
-  List<VirtActionKind> sse_decode_list_virt_action_kind(
-    SseDeserializer deserializer,
-  );
+@protected FilesStatMarkers sse_decode_files_stat_markers(SseDeserializer deserializer);
 
-  @protected
-  List<VirtOverlay> sse_decode_list_virt_overlay(SseDeserializer deserializer);
+@protected FirewallAccess sse_decode_firewall_access(SseDeserializer deserializer);
 
-  @protected
-  String? sse_decode_opt_String(SseDeserializer deserializer);
+@protected FirewallAccessVia sse_decode_firewall_access_via(SseDeserializer deserializer);
 
-  @protected
-  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+@protected FirewallKind sse_decode_firewall_kind(SseDeserializer deserializer);
 
-  @protected
-  CertInfo? sse_decode_opt_box_autoadd_cert_info(SseDeserializer deserializer);
+@protected FirewallProbeResult sse_decode_firewall_probe_result(SseDeserializer deserializer);
 
-  @protected
-  ContainerDiskUsageItem? sse_decode_opt_box_autoadd_container_disk_usage_item(
-    SseDeserializer deserializer,
-  );
+@protected FirewallReach sse_decode_firewall_reach(SseDeserializer deserializer);
 
-  @protected
-  ContainerStatsItem? sse_decode_opt_box_autoadd_container_stats_item(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldChange sse_decode_firewalld_change(SseDeserializer deserializer);
 
-  @protected
-  CronScheduleFields? sse_decode_opt_box_autoadd_cron_schedule_fields(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldInputIssue sse_decode_firewalld_input_issue(SseDeserializer deserializer);
 
-  @protected
-  CronServerClock? sse_decode_opt_box_autoadd_cron_server_clock(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldItem sse_decode_firewalld_item(SseDeserializer deserializer);
 
-  @protected
-  CronWall? sse_decode_opt_box_autoadd_cron_wall(SseDeserializer deserializer);
+@protected FirewalldPolicy sse_decode_firewalld_policy(SseDeserializer deserializer);
 
-  @protected
-  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
+@protected FirewalldPort sse_decode_firewalld_port(SseDeserializer deserializer);
 
-  @protected
-  FirewallAccess? sse_decode_opt_box_autoadd_firewall_access(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldRichRule sse_decode_firewalld_rich_rule(SseDeserializer deserializer);
 
-  @protected
-  FirewallKind? sse_decode_opt_box_autoadd_firewall_kind(
-    SseDeserializer deserializer,
-  );
+@protected FirewalldSnapshot sse_decode_firewalld_snapshot(SseDeserializer deserializer);
 
-  @protected
-  int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
+@protected FirewalldTarget sse_decode_firewalld_target(SseDeserializer deserializer);
 
-  @protected
-  PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
+@protected FirewalldZone sse_decode_firewalld_zone(SseDeserializer deserializer);
 
-  @protected
-  RedfishChassis? sse_decode_opt_box_autoadd_redfish_chassis(
-    SseDeserializer deserializer,
-  );
+@protected int sse_decode_i_16(SseDeserializer deserializer);
 
-  @protected
-  RedfishSystem? sse_decode_opt_box_autoadd_redfish_system(
-    SseDeserializer deserializer,
-  );
+@protected int sse_decode_i_32(SseDeserializer deserializer);
 
-  @protected
-  RedfishTopology? sse_decode_opt_box_autoadd_redfish_topology(
-    SseDeserializer deserializer,
-  );
+@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
 
-  @protected
-  RemoteDesktopEvent? sse_decode_opt_box_autoadd_remote_desktop_event(
-    SseDeserializer deserializer,
-  );
+@protected LibvirtPoolRef sse_decode_libvirt_pool_ref(SseDeserializer deserializer);
 
-  @protected
-  ResetRequest? sse_decode_opt_box_autoadd_reset_request(
-    SseDeserializer deserializer,
-  );
+@protected List<String> sse_decode_list_String(SseDeserializer deserializer);
 
-  @protected
-  SnapshotNameIssue? sse_decode_opt_box_autoadd_snapshot_name_issue(
-    SseDeserializer deserializer,
-  );
+@protected List<BmcReading> sse_decode_list_bmc_reading(SseDeserializer deserializer);
 
-  @protected
-  int? sse_decode_opt_box_autoadd_u_16(SseDeserializer deserializer);
+@protected List<CommandSpec> sse_decode_list_command_spec(SseDeserializer deserializer);
 
-  @protected
-  int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
+@protected List<ContainerImageItem> sse_decode_list_container_image_item(SseDeserializer deserializer);
 
-  @protected
-  BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
+@protected List<ContainerItem> sse_decode_list_container_item(SseDeserializer deserializer);
 
-  @protected
-  UfwDraftIssue? sse_decode_opt_box_autoadd_ufw_draft_issue(
-    SseDeserializer deserializer,
-  );
+@protected List<CronJobLine> sse_decode_list_cron_job_line(SseDeserializer deserializer);
 
-  @protected
-  UfwLog? sse_decode_opt_box_autoadd_ufw_log(SseDeserializer deserializer);
+@protected List<CustomCmd> sse_decode_list_custom_cmd(SseDeserializer deserializer);
 
-  @protected
-  UfwLogLevel? sse_decode_opt_box_autoadd_ufw_log_level(
-    SseDeserializer deserializer,
-  );
+@protected List<Effect> sse_decode_list_effect(SseDeserializer deserializer);
 
-  @protected
-  CertInfo? sse_decode_opt_box_cert_info(SseDeserializer deserializer);
+@protected List<FirewallAccess> sse_decode_list_firewall_access(SseDeserializer deserializer);
 
-  @protected
-  List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
+@protected List<FirewalldPolicy> sse_decode_list_firewalld_policy(SseDeserializer deserializer);
 
-  @protected
-  List<CustomCmd>? sse_decode_opt_list_custom_cmd(SseDeserializer deserializer);
+@protected List<FirewalldPort> sse_decode_list_firewalld_port(SseDeserializer deserializer);
 
-  @protected
-  List<FirewalldZone>? sse_decode_opt_list_firewalld_zone(
-    SseDeserializer deserializer,
-  );
+@protected List<FirewalldRichRule> sse_decode_list_firewalld_rich_rule(SseDeserializer deserializer);
 
-  @protected
-  Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+@protected List<FirewalldZone> sse_decode_list_firewalld_zone(SseDeserializer deserializer);
 
-  @protected
-  List<VirtActionKind>? sse_decode_opt_list_virt_action_kind(
-    SseDeserializer deserializer,
-  );
+@protected List<LibvirtPoolRef> sse_decode_list_libvirt_pool_ref(SseDeserializer deserializer);
 
-  @protected
-  Plan sse_decode_plan(SseDeserializer deserializer);
+@protected List<PlanNote> sse_decode_list_plan_note(SseDeserializer deserializer);
 
-  @protected
-  PlanNote sse_decode_plan_note(SseDeserializer deserializer);
+@protected Int32List sse_decode_list_prim_i_32_strict(SseDeserializer deserializer);
 
-  @protected
-  PowerIntent sse_decode_power_intent(SseDeserializer deserializer);
+@protected Uint32List sse_decode_list_prim_u_32_strict(SseDeserializer deserializer);
 
-  @protected
-  PowerState sse_decode_power_state(SseDeserializer deserializer);
+@protected List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer);
 
-  @protected
-  ProtocolCompat sse_decode_protocol_compat(SseDeserializer deserializer);
+@protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
-  @protected
-  PveConsoleKind sse_decode_pve_console_kind(SseDeserializer deserializer);
+@protected List<PveHeader> sse_decode_list_pve_header(SseDeserializer deserializer);
 
-  @protected
-  PveConsoleTicket sse_decode_pve_console_ticket(SseDeserializer deserializer);
+@protected List<(String,List<FirewalldPort>)> sse_decode_list_record_string_list_firewalld_port(SseDeserializer deserializer);
 
-  @protected
-  PveError sse_decode_pve_error(SseDeserializer deserializer);
+@protected List<(String,String)> sse_decode_list_record_string_string(SseDeserializer deserializer);
 
-  @protected
-  PveGuestRef sse_decode_pve_guest_ref(SseDeserializer deserializer);
+@protected List<(UfwChain,UfwPolicy)> sse_decode_list_record_ufw_chain_ufw_policy(SseDeserializer deserializer);
 
-  @protected
-  PveHeader sse_decode_pve_header(SseDeserializer deserializer);
+@protected List<ScriptSegment> sse_decode_list_script_segment(SseDeserializer deserializer);
 
-  @protected
-  PveHistoryWindow sse_decode_pve_history_window(SseDeserializer deserializer);
+@protected List<ServiceCommand> sse_decode_list_service_command(SseDeserializer deserializer);
 
-  @protected
-  PveLogin sse_decode_pve_login(SseDeserializer deserializer);
+@protected List<ServiceCommandOutput> sse_decode_list_service_command_output(SseDeserializer deserializer);
 
-  @protected
-  PveTiming sse_decode_pve_timing(SseDeserializer deserializer);
+@protected List<ShellFileRecord> sse_decode_list_shell_file_record(SseDeserializer deserializer);
 
-  @protected
-  RdpSessionParams sse_decode_rdp_session_params(SseDeserializer deserializer);
+@protected List<TmuxSessionItem> sse_decode_list_tmux_session_item(SseDeserializer deserializer);
 
-  @protected
-  (String, List<FirewalldPort>) sse_decode_record_string_list_firewalld_port(
-    SseDeserializer deserializer,
-  );
+@protected List<TmuxWindowItem> sse_decode_list_tmux_window_item(SseDeserializer deserializer);
 
-  @protected
-  (String, String) sse_decode_record_string_string(
-    SseDeserializer deserializer,
-  );
+@protected List<UfwApp> sse_decode_list_ufw_app(SseDeserializer deserializer);
 
-  @protected
-  (UfwChain, UfwPolicy) sse_decode_record_ufw_chain_ufw_policy(
-    SseDeserializer deserializer,
-  );
+@protected List<UfwAppPort> sse_decode_list_ufw_app_port(SseDeserializer deserializer);
 
-  @protected
-  RedfishChassis sse_decode_redfish_chassis(SseDeserializer deserializer);
+@protected List<UfwRule> sse_decode_list_ufw_rule(SseDeserializer deserializer);
 
-  @protected
-  RedfishFailure sse_decode_redfish_failure(SseDeserializer deserializer);
+@protected List<VirtActionKind> sse_decode_list_virt_action_kind(SseDeserializer deserializer);
 
-  @protected
-  RedfishRoot sse_decode_redfish_root(SseDeserializer deserializer);
+@protected List<VirtOverlay> sse_decode_list_virt_overlay(SseDeserializer deserializer);
 
-  @protected
-  RedfishSystem sse_decode_redfish_system(SseDeserializer deserializer);
+@protected String? sse_decode_opt_String(SseDeserializer deserializer);
 
-  @protected
-  RedfishTopology sse_decode_redfish_topology(SseDeserializer deserializer);
+@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
-  @protected
-  RemoteDesktopConnectionState sse_decode_remote_desktop_connection_state(
-    SseDeserializer deserializer,
-  );
+@protected CertInfo? sse_decode_opt_box_autoadd_cert_info(SseDeserializer deserializer);
 
-  @protected
-  RemoteDesktopEndReason sse_decode_remote_desktop_end_reason(
-    SseDeserializer deserializer,
-  );
+@protected ContainerDiskUsageItem? sse_decode_opt_box_autoadd_container_disk_usage_item(SseDeserializer deserializer);
 
-  @protected
-  RemoteDesktopEvent sse_decode_remote_desktop_event(
-    SseDeserializer deserializer,
-  );
+@protected ContainerStatsItem? sse_decode_opt_box_autoadd_container_stats_item(SseDeserializer deserializer);
 
-  @protected
-  ResetRequest sse_decode_reset_request(SseDeserializer deserializer);
+@protected CronScheduleFields? sse_decode_opt_box_autoadd_cron_schedule_fields(SseDeserializer deserializer);
 
-  @protected
-  ScriptSegment sse_decode_script_segment(SseDeserializer deserializer);
+@protected CronServerClock? sse_decode_opt_box_autoadd_cron_server_clock(SseDeserializer deserializer);
 
-  @protected
-  ServiceCommand sse_decode_service_command(SseDeserializer deserializer);
+@protected CronWall? sse_decode_opt_box_autoadd_cron_wall(SseDeserializer deserializer);
 
-  @protected
-  ServiceCommandOutput sse_decode_service_command_output(
-    SseDeserializer deserializer,
-  );
+@protected double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
 
-  @protected
-  ServiceProbe sse_decode_service_probe(SseDeserializer deserializer);
+@protected FirewallAccess? sse_decode_opt_box_autoadd_firewall_access(SseDeserializer deserializer);
 
-  @protected
-  ShellFileRecord sse_decode_shell_file_record(SseDeserializer deserializer);
+@protected FirewallKind? sse_decode_opt_box_autoadd_firewall_kind(SseDeserializer deserializer);
 
-  @protected
-  ShellFuncKind sse_decode_shell_func_kind(SseDeserializer deserializer);
+@protected int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
 
-  @protected
-  SnapshotMemoryKind sse_decode_snapshot_memory_kind(
-    SseDeserializer deserializer,
-  );
+@protected PlatformInt64? sse_decode_opt_box_autoadd_i_64(SseDeserializer deserializer);
 
-  @protected
-  SnapshotNameIssue sse_decode_snapshot_name_issue(
-    SseDeserializer deserializer,
-  );
+@protected RedfishChassis? sse_decode_opt_box_autoadd_redfish_chassis(SseDeserializer deserializer);
 
-  @protected
-  SnippetFfiError sse_decode_snippet_ffi_error(SseDeserializer deserializer);
+@protected RedfishSystem? sse_decode_opt_box_autoadd_redfish_system(SseDeserializer deserializer);
 
-  @protected
-  TmuxSessionItem sse_decode_tmux_session_item(SseDeserializer deserializer);
+@protected RedfishTopology? sse_decode_opt_box_autoadd_redfish_topology(SseDeserializer deserializer);
 
-  @protected
-  TmuxSessionListingItem sse_decode_tmux_session_listing_item(
-    SseDeserializer deserializer,
-  );
+@protected RemoteDesktopEvent? sse_decode_opt_box_autoadd_remote_desktop_event(SseDeserializer deserializer);
 
-  @protected
-  TmuxWindowItem sse_decode_tmux_window_item(SseDeserializer deserializer);
+@protected ResetRequest? sse_decode_opt_box_autoadd_reset_request(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_u_16(SseDeserializer deserializer);
+@protected SnapshotNameIssue? sse_decode_opt_box_autoadd_snapshot_name_issue(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_u_32(SseDeserializer deserializer);
+@protected int? sse_decode_opt_box_autoadd_u_16(SseDeserializer deserializer);
 
-  @protected
-  BigInt sse_decode_u_64(SseDeserializer deserializer);
+@protected int? sse_decode_opt_box_autoadd_u_32(SseDeserializer deserializer);
 
-  @protected
-  int sse_decode_u_8(SseDeserializer deserializer);
+@protected BigInt? sse_decode_opt_box_autoadd_u_64(SseDeserializer deserializer);
 
-  @protected
-  UfwAction sse_decode_ufw_action(SseDeserializer deserializer);
+@protected UfwDraftIssue? sse_decode_opt_box_autoadd_ufw_draft_issue(SseDeserializer deserializer);
 
-  @protected
-  UfwApp sse_decode_ufw_app(SseDeserializer deserializer);
+@protected UfwLog? sse_decode_opt_box_autoadd_ufw_log(SseDeserializer deserializer);
 
-  @protected
-  UfwAppPort sse_decode_ufw_app_port(SseDeserializer deserializer);
+@protected UfwLogLevel? sse_decode_opt_box_autoadd_ufw_log_level(SseDeserializer deserializer);
 
-  @protected
-  UfwChain sse_decode_ufw_chain(SseDeserializer deserializer);
+@protected CertInfo? sse_decode_opt_box_cert_info(SseDeserializer deserializer);
 
-  @protected
-  UfwChange sse_decode_ufw_change(SseDeserializer deserializer);
+@protected List<String>? sse_decode_opt_list_String(SseDeserializer deserializer);
 
-  @protected
-  UfwDirection sse_decode_ufw_direction(SseDeserializer deserializer);
+@protected List<CustomCmd>? sse_decode_opt_list_custom_cmd(SseDeserializer deserializer);
 
-  @protected
-  UfwDraftIssue sse_decode_ufw_draft_issue(SseDeserializer deserializer);
+@protected List<FirewalldZone>? sse_decode_opt_list_firewalld_zone(SseDeserializer deserializer);
 
-  @protected
-  UfwEndpoint sse_decode_ufw_endpoint(SseDeserializer deserializer);
+@protected Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
 
-  @protected
-  UfwIpVersion sse_decode_ufw_ip_version(SseDeserializer deserializer);
+@protected List<VirtActionKind>? sse_decode_opt_list_virt_action_kind(SseDeserializer deserializer);
 
-  @protected
-  UfwLog sse_decode_ufw_log(SseDeserializer deserializer);
+@protected Plan sse_decode_plan(SseDeserializer deserializer);
 
-  @protected
-  UfwLogLevel sse_decode_ufw_log_level(SseDeserializer deserializer);
+@protected PlanNote sse_decode_plan_note(SseDeserializer deserializer);
 
-  @protected
-  UfwPolicy sse_decode_ufw_policy(SseDeserializer deserializer);
+@protected PowerIntent sse_decode_power_intent(SseDeserializer deserializer);
 
-  @protected
-  UfwRule sse_decode_ufw_rule(SseDeserializer deserializer);
+@protected PowerState sse_decode_power_state(SseDeserializer deserializer);
 
-  @protected
-  UfwRuleDraft sse_decode_ufw_rule_draft(SseDeserializer deserializer);
+@protected ProtocolCompat sse_decode_protocol_compat(SseDeserializer deserializer);
 
-  @protected
-  UfwSnapshot sse_decode_ufw_snapshot(SseDeserializer deserializer);
+@protected PveConsoleKind sse_decode_pve_console_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_decode_unit(SseDeserializer deserializer);
+@protected PveConsoleTicket sse_decode_pve_console_ticket(SseDeserializer deserializer);
 
-  @protected
-  UserFfiError sse_decode_user_ffi_error(SseDeserializer deserializer);
+@protected PveError sse_decode_pve_error(SseDeserializer deserializer);
 
-  @protected
-  BigInt sse_decode_usize(SseDeserializer deserializer);
+@protected PveGuestRef sse_decode_pve_guest_ref(SseDeserializer deserializer);
 
-  @protected
-  VirtActionKind sse_decode_virt_action_kind(SseDeserializer deserializer);
+@protected PveHeader sse_decode_pve_header(SseDeserializer deserializer);
 
-  @protected
-  VirtDeletePlan sse_decode_virt_delete_plan(SseDeserializer deserializer);
+@protected PveHistoryWindow sse_decode_pve_history_window(SseDeserializer deserializer);
 
-  @protected
-  VirtErrorKind sse_decode_virt_error_kind(SseDeserializer deserializer);
+@protected PveLogin sse_decode_pve_login(SseDeserializer deserializer);
 
-  @protected
-  VirtFailure sse_decode_virt_failure(SseDeserializer deserializer);
+@protected PveTiming sse_decode_pve_timing(SseDeserializer deserializer);
 
-  @protected
-  VirtFfiError sse_decode_virt_ffi_error(SseDeserializer deserializer);
+@protected RdpSessionParams sse_decode_rdp_session_params(SseDeserializer deserializer);
 
-  @protected
-  VirtOverlay sse_decode_virt_overlay(SseDeserializer deserializer);
+@protected (String,List<FirewalldPort>) sse_decode_record_string_list_firewalld_port(SseDeserializer deserializer);
 
-  @protected
-  VirtResourceScript sse_decode_virt_resource_script(
-    SseDeserializer deserializer,
-  );
+@protected (String,String) sse_decode_record_string_string(SseDeserializer deserializer);
 
-  @protected
-  VirtUploadEntryKind sse_decode_virt_upload_entry_kind(
-    SseDeserializer deserializer,
-  );
+@protected (UfwChain,UfwPolicy) sse_decode_record_ufw_chain_ufw_policy(SseDeserializer deserializer);
 
-  @protected
-  VncSessionParams sse_decode_vnc_session_params(SseDeserializer deserializer);
+@protected RedfishChassis sse_decode_redfish_chassis(SseDeserializer deserializer);
 
-  @protected
-  X25519KeyPair sse_decode_x_25519_key_pair(SseDeserializer deserializer);
+@protected RedfishFailure sse_decode_redfish_failure(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    BmcClient self,
-    SseSerializer serializer,
-  );
+@protected RedfishRoot sse_decode_redfish_root(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    LibvirtRates self,
-    SseSerializer serializer,
-  );
+@protected RedfishSystem sse_decode_redfish_system(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    PowerWatch self,
-    SseSerializer serializer,
-  );
+@protected RedfishTopology sse_decode_redfish_topology(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    PveConsoleChannel self,
-    SseSerializer serializer,
-  );
+@protected RemoteDesktopConnectionState sse_decode_remote_desktop_connection_state(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    PveSession self,
-    SseSerializer serializer,
-  );
+@protected RemoteDesktopEndReason sse_decode_remote_desktop_end_reason(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    RemoteDesktopSessionHandle self,
-    SseSerializer serializer,
-  );
+@protected RemoteDesktopEvent sse_decode_remote_desktop_event(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SshBlockCipher self,
-    SseSerializer serializer,
-  );
+@protected ResetRequest sse_decode_reset_request(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SshMac self,
-    SseSerializer serializer,
-  );
+@protected ScriptSegment sse_decode_script_segment(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    LibvirtRates self,
-    SseSerializer serializer,
-  );
+@protected ServiceCommand sse_decode_service_command(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    PowerWatch self,
-    SseSerializer serializer,
-  );
+@protected ServiceCommandOutput sse_decode_service_command_output(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SshBlockCipher self,
-    SseSerializer serializer,
-  );
+@protected ServiceProbe sse_decode_service_probe(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    BmcClient self,
-    SseSerializer serializer,
-  );
+@protected ShellFileRecord sse_decode_shell_file_record(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    PveConsoleChannel self,
-    SseSerializer serializer,
-  );
+@protected ShellFuncKind sse_decode_shell_func_kind(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    PveSession self,
-    SseSerializer serializer,
-  );
+@protected SnapshotMemoryKind sse_decode_snapshot_memory_kind(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    RemoteDesktopSessionHandle self,
-    SseSerializer serializer,
-  );
+@protected SnapshotNameIssue sse_decode_snapshot_name_issue(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SshBlockCipher self,
-    SseSerializer serializer,
-  );
+@protected SnippetFfiError sse_decode_snippet_ffi_error(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SshMac self,
-    SseSerializer serializer,
-  );
+@protected TmuxSessionItem sse_decode_tmux_session_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_Map_String_String_None(
-    Map<String, String> self,
-    SseSerializer serializer,
-  );
+@protected TmuxSessionListingItem sse_decode_tmux_session_listing_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_Map_String_list_firewalld_port_None(
-    Map<String, List<FirewalldPort>> self,
-    SseSerializer serializer,
-  );
+@protected TmuxWindowItem sse_decode_tmux_window_item(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_Map_ufw_chain_ufw_policy_None(
-    Map<UfwChain, UfwPolicy> self,
-    SseSerializer serializer,
-  );
+@protected int sse_decode_u_16(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    BmcClient self,
-    SseSerializer serializer,
-  );
+@protected int sse_decode_u_32(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    LibvirtRates self,
-    SseSerializer serializer,
-  );
+@protected BigInt sse_decode_u_64(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    PowerWatch self,
-    SseSerializer serializer,
-  );
+@protected int sse_decode_u_8(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    PveConsoleChannel self,
-    SseSerializer serializer,
-  );
+@protected UfwAction sse_decode_ufw_action(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    PveSession self,
-    SseSerializer serializer,
-  );
+@protected UfwApp sse_decode_ufw_app(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    RemoteDesktopSessionHandle self,
-    SseSerializer serializer,
-  );
+@protected UfwAppPort sse_decode_ufw_app_port(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    SshBlockCipher self,
-    SseSerializer serializer,
-  );
+@protected UfwChain sse_decode_ufw_chain(SseDeserializer deserializer);
 
-  @protected
-  void
-  sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    SshMac self,
-    SseSerializer serializer,
-  );
+@protected UfwChange sse_decode_ufw_change(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_String(String self, SseSerializer serializer);
+@protected UfwDirection sse_decode_ufw_direction(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bench_poll(BenchPoll self, SseSerializer serializer);
+@protected UfwDraftIssue sse_decode_ufw_draft_issue(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bmc_error(BmcError self, SseSerializer serializer);
+@protected UfwEndpoint sse_decode_ufw_endpoint(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bmc_outcome(BmcOutcome self, SseSerializer serializer);
+@protected UfwIpVersion sse_decode_ufw_ip_version(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bmc_reading(BmcReading self, SseSerializer serializer);
+@protected UfwLog sse_decode_ufw_log(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bmc_sensors(BmcSensors self, SseSerializer serializer);
+@protected UfwLogLevel sse_decode_ufw_log_level(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bmc_snapshot(BmcSnapshot self, SseSerializer serializer);
+@protected UfwPolicy sse_decode_ufw_policy(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer);
+@protected UfwRule sse_decode_ufw_rule(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+@protected UfwRuleDraft sse_decode_ufw_rule_draft(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_cert_info(
-    CertInfo self,
-    SseSerializer serializer,
-  );
+@protected UfwSnapshot sse_decode_ufw_snapshot(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_container_disk_usage_item(
-    ContainerDiskUsageItem self,
-    SseSerializer serializer,
-  );
+@protected void sse_decode_unit(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_container_stats_item(
-    ContainerStatsItem self,
-    SseSerializer serializer,
-  );
+@protected UserFfiError sse_decode_user_ffi_error(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_cron_schedule_fields(
-    CronScheduleFields self,
-    SseSerializer serializer,
-  );
+@protected BigInt sse_decode_usize(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_cron_server_clock(
-    CronServerClock self,
-    SseSerializer serializer,
-  );
+@protected VirtActionKind sse_decode_virt_action_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_cron_wall(
-    CronWall self,
-    SseSerializer serializer,
-  );
+@protected VirtDeletePlan sse_decode_virt_delete_plan(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
+@protected VirtErrorKind sse_decode_virt_error_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewall_access(
-    FirewallAccess self,
-    SseSerializer serializer,
-  );
+@protected VirtFailure sse_decode_virt_failure(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewall_kind(
-    FirewallKind self,
-    SseSerializer serializer,
-  );
+@protected VirtFfiError sse_decode_virt_ffi_error(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewall_probe_result(
-    FirewallProbeResult self,
-    SseSerializer serializer,
-  );
+@protected VirtOverlay sse_decode_virt_overlay(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewalld_change(
-    FirewalldChange self,
-    SseSerializer serializer,
-  );
+@protected VirtResourceScript sse_decode_virt_resource_script(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewalld_port(
-    FirewalldPort self,
-    SseSerializer serializer,
-  );
+@protected VirtUploadEntryKind sse_decode_virt_upload_entry_kind(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_firewalld_snapshot(
-    FirewalldSnapshot self,
-    SseSerializer serializer,
-  );
+@protected VncSessionParams sse_decode_vnc_session_params(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
+@protected X25519KeyPair sse_decode_x_25519_key_pair(SseDeserializer deserializer);
 
-  @protected
-  void sse_encode_box_autoadd_i_64(
-    PlatformInt64 self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(BmcClient self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_libvirt_pool_ref(
-    LibvirtPoolRef self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(LibvirtRates self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_plan(Plan self, SseSerializer serializer);
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(PowerWatch self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_pve_console_ticket(
-    PveConsoleTicket self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(PveConsoleChannel self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_pve_guest_ref(
-    PveGuestRef self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(PveSession self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_pve_login(
-    PveLogin self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(RemoteDesktopSessionHandle self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_pve_timing(
-    PveTiming self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SshBlockCipher self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_rdp_session_params(
-    RdpSessionParams self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SshMac self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_redfish_chassis(
-    RedfishChassis self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(LibvirtRates self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_redfish_system(
-    RedfishSystem self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(PowerWatch self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_redfish_topology(
-    RedfishTopology self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SshBlockCipher self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_remote_desktop_event(
-    RemoteDesktopEvent self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(BmcClient self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_reset_request(
-    ResetRequest self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(PveConsoleChannel self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_snapshot_name_issue(
-    SnapshotNameIssue self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(PveSession self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_u_16(int self, SseSerializer serializer);
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(RemoteDesktopSessionHandle self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SshBlockCipher self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
+@protected void sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SshMac self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_change(
-    UfwChange self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Map_String_String_None(Map<String, String> self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_draft_issue(
-    UfwDraftIssue self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_Map_String_list_firewalld_port_None(Map<String, List<FirewalldPort>> self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_log(UfwLog self, SseSerializer serializer);
+@protected void sse_encode_Map_ufw_chain_ufw_policy_None(Map<UfwChain, UfwPolicy> self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_log_level(
-    UfwLogLevel self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(BmcClient self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_rule_draft(
-    UfwRuleDraft self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(LibvirtRates self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_ufw_snapshot(
-    UfwSnapshot self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(PowerWatch self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_autoadd_vnc_session_params(
-    VncSessionParams self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(PveConsoleChannel self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_box_cert_info(CertInfo self, SseSerializer serializer);
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(PveSession self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_capped_read(CappedRead self, SseSerializer serializer);
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(RemoteDesktopSessionHandle self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cert_info(CertInfo self, SseSerializer serializer);
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(SshBlockCipher self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_change_error(ChangeError self, SseSerializer serializer);
+@protected void sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(SshMac self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_command_spec(CommandSpec self, SseSerializer serializer);
+@protected void sse_encode_String(String self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_container_disk_usage_item(
-    ContainerDiskUsageItem self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_bench_poll(BenchPoll self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_container_image_item(
-    ContainerImageItem self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_bmc_error(BmcError self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_container_item(ContainerItem self, SseSerializer serializer);
+@protected void sse_encode_bmc_outcome(BmcOutcome self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_container_stats_item(
-    ContainerStatsItem self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_bmc_reading(BmcReading self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_document_data(
-    CronDocumentData self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_bmc_sensors(BmcSensors self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_edit_error(CronEditError self, SseSerializer serializer);
+@protected void sse_encode_bmc_snapshot(BmcSnapshot self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_ffi_error(CronFfiError self, SseSerializer serializer);
+@protected void sse_encode_bool(bool self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_job_line(CronJobLine self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_listing(CronListing self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_cert_info(CertInfo self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_schedule_fields(
-    CronScheduleFields self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_container_disk_usage_item(ContainerDiskUsageItem self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_server_clock(
-    CronServerClock self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_container_stats_item(ContainerStatsItem self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_cron_wall(CronWall self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_cron_schedule_fields(CronScheduleFields self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_custom_cmd(CustomCmd self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_cron_server_clock(CronServerClock self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_ecdsa_signature(
-    EcdsaSignature self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_cron_wall(CronWall self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_effect(Effect self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_f_64(double self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_firewall_access(FirewallAccess self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_files_stat_markers(
-    FilesStatMarkers self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_firewall_kind(FirewallKind self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewall_access(
-    FirewallAccess self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_firewall_probe_result(FirewallProbeResult self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewall_access_via(
-    FirewallAccessVia self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_firewalld_change(FirewalldChange self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewall_kind(FirewallKind self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_firewalld_port(FirewalldPort self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewall_probe_result(
-    FirewallProbeResult self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_firewalld_snapshot(FirewalldSnapshot self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewall_reach(FirewallReach self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_change(
-    FirewalldChange self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_i_64(PlatformInt64 self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_input_issue(
-    FirewalldInputIssue self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_libvirt_pool_ref(LibvirtPoolRef self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_item(FirewalldItem self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_plan(Plan self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_policy(
-    FirewalldPolicy self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_pve_console_ticket(PveConsoleTicket self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_port(FirewalldPort self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_pve_guest_ref(PveGuestRef self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_rich_rule(
-    FirewalldRichRule self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_pve_login(PveLogin self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_snapshot(
-    FirewalldSnapshot self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_pve_timing(PveTiming self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_target(
-    FirewalldTarget self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_rdp_session_params(RdpSessionParams self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_firewalld_zone(FirewalldZone self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_redfish_chassis(RedfishChassis self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_i_16(int self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_redfish_system(RedfishSystem self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_redfish_topology(RedfishTopology self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_remote_desktop_event(RemoteDesktopEvent self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_libvirt_pool_ref(
-    LibvirtPoolRef self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_reset_request(ResetRequest self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_String(List<String> self, SseSerializer serializer);
+@protected void sse_encode_box_autoadd_snapshot_name_issue(SnapshotNameIssue self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_bmc_reading(
-    List<BmcReading> self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_u_16(int self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_command_spec(
-    List<CommandSpec> self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_u_32(int self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_container_image_item(
-    List<ContainerImageItem> self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_container_item(
-    List<ContainerItem> self,
-    SseSerializer serializer,
-  );
+@protected void sse_encode_box_autoadd_ufw_change(UfwChange self, SseSerializer serializer);
 
-  @protected
-  void sse_encode_list_cron_job_line(
-    List<CronJobLine> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_custom_cmd(
-    List<CustomCmd> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_effect(List<Effect> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_firewall_access(
-    List<FirewallAccess> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_firewalld_policy(
-    List<FirewalldPolicy> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_firewalld_port(
-    List<FirewalldPort> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_firewalld_rich_rule(
-    List<FirewalldRichRule> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_firewalld_zone(
-    List<FirewalldZone> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_libvirt_pool_ref(
-    List<LibvirtPoolRef> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_plan_note(List<PlanNote> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_prim_i_32_strict(
-    Int32List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_u_32_strict(
-    Uint32List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_prim_u_8_strict(
-    Uint8List self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_pve_header(
-    List<PveHeader> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_string_list_firewalld_port(
-    List<(String, List<FirewalldPort>)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_string_string(
-    List<(String, String)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_record_ufw_chain_ufw_policy(
-    List<(UfwChain, UfwPolicy)> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_script_segment(
-    List<ScriptSegment> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_service_command(
-    List<ServiceCommand> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_service_command_output(
-    List<ServiceCommandOutput> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_shell_file_record(
-    List<ShellFileRecord> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_tmux_session_item(
-    List<TmuxSessionItem> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_tmux_window_item(
-    List<TmuxWindowItem> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_ufw_app(List<UfwApp> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_ufw_app_port(
-    List<UfwAppPort> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_ufw_rule(List<UfwRule> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_virt_action_kind(
-    List<VirtActionKind> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_list_virt_overlay(
-    List<VirtOverlay> self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_String(String? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_cert_info(
-    CertInfo? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_container_disk_usage_item(
-    ContainerDiskUsageItem? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_container_stats_item(
-    ContainerStatsItem? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_cron_schedule_fields(
-    CronScheduleFields? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_cron_server_clock(
-    CronServerClock? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_cron_wall(
-    CronWall? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_firewall_access(
-    FirewallAccess? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_firewall_kind(
-    FirewallKind? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_i_64(
-    PlatformInt64? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_redfish_chassis(
-    RedfishChassis? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_redfish_system(
-    RedfishSystem? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_redfish_topology(
-    RedfishTopology? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_remote_desktop_event(
-    RemoteDesktopEvent? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_reset_request(
-    ResetRequest? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_snapshot_name_issue(
-    SnapshotNameIssue? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_u_16(int? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_box_autoadd_ufw_draft_issue(
-    UfwDraftIssue? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_ufw_log(
-    UfwLog? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_autoadd_ufw_log_level(
-    UfwLogLevel? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_box_cert_info(CertInfo? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_opt_list_custom_cmd(
-    List<CustomCmd>? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_list_firewalld_zone(
-    List<FirewalldZone>? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_list_prim_u_8_strict(
-    Uint8List? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_opt_list_virt_action_kind(
-    List<VirtActionKind>? self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_plan(Plan self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_plan_note(PlanNote self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_power_intent(PowerIntent self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_power_state(PowerState self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_protocol_compat(
-    ProtocolCompat self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_pve_console_kind(
-    PveConsoleKind self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_pve_console_ticket(
-    PveConsoleTicket self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_pve_error(PveError self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_pve_guest_ref(PveGuestRef self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_pve_header(PveHeader self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_pve_history_window(
-    PveHistoryWindow self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_pve_login(PveLogin self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_pve_timing(PveTiming self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_rdp_session_params(
-    RdpSessionParams self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_string_list_firewalld_port(
-    (String, List<FirewalldPort>) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_string_string(
-    (String, String) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_record_ufw_chain_ufw_policy(
-    (UfwChain, UfwPolicy) self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_redfish_chassis(
-    RedfishChassis self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_redfish_failure(
-    RedfishFailure self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_redfish_root(RedfishRoot self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_redfish_system(RedfishSystem self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_redfish_topology(
-    RedfishTopology self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_remote_desktop_connection_state(
-    RemoteDesktopConnectionState self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_remote_desktop_end_reason(
-    RemoteDesktopEndReason self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_remote_desktop_event(
-    RemoteDesktopEvent self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_reset_request(ResetRequest self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_script_segment(ScriptSegment self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_service_command(
-    ServiceCommand self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_service_command_output(
-    ServiceCommandOutput self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_service_probe(ServiceProbe self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_shell_file_record(
-    ShellFileRecord self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_shell_func_kind(ShellFuncKind self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_snapshot_memory_kind(
-    SnapshotMemoryKind self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_snapshot_name_issue(
-    SnapshotNameIssue self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_snippet_ffi_error(
-    SnippetFfiError self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_tmux_session_item(
-    TmuxSessionItem self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_tmux_session_listing_item(
-    TmuxSessionListingItem self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_tmux_window_item(
-    TmuxWindowItem self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_u_16(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_u_32(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_u_64(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_u_8(int self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_action(UfwAction self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_app(UfwApp self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_app_port(UfwAppPort self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_chain(UfwChain self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_change(UfwChange self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_direction(UfwDirection self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_draft_issue(UfwDraftIssue self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_endpoint(UfwEndpoint self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_ip_version(UfwIpVersion self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_log(UfwLog self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_log_level(UfwLogLevel self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_policy(UfwPolicy self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_rule(UfwRule self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_rule_draft(UfwRuleDraft self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_ufw_snapshot(UfwSnapshot self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_unit(void self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_user_ffi_error(UserFfiError self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_usize(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_virt_action_kind(
-    VirtActionKind self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_virt_delete_plan(
-    VirtDeletePlan self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_virt_error_kind(VirtErrorKind self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_virt_failure(VirtFailure self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_virt_ffi_error(VirtFfiError self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_virt_overlay(VirtOverlay self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_virt_resource_script(
-    VirtResourceScript self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_virt_upload_entry_kind(
-    VirtUploadEntryKind self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_vnc_session_params(
-    VncSessionParams self,
-    SseSerializer serializer,
-  );
-
-  @protected
-  void sse_encode_x_25519_key_pair(
-    X25519KeyPair self,
-    SseSerializer serializer,
-  );
-}
+@protected void sse_encode_box_autoadd_ufw_draft_issue(UfwDraftIssue self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_ufw_log(UfwLog self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_ufw_log_level(UfwLogLevel self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_ufw_rule_draft(UfwRuleDraft self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_ufw_snapshot(UfwSnapshot self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_vnc_session_params(VncSessionParams self, SseSerializer serializer);
+
+@protected void sse_encode_box_cert_info(CertInfo self, SseSerializer serializer);
+
+@protected void sse_encode_capped_read(CappedRead self, SseSerializer serializer);
+
+@protected void sse_encode_cert_info(CertInfo self, SseSerializer serializer);
+
+@protected void sse_encode_change_error(ChangeError self, SseSerializer serializer);
+
+@protected void sse_encode_command_spec(CommandSpec self, SseSerializer serializer);
+
+@protected void sse_encode_container_disk_usage_item(ContainerDiskUsageItem self, SseSerializer serializer);
+
+@protected void sse_encode_container_image_item(ContainerImageItem self, SseSerializer serializer);
+
+@protected void sse_encode_container_item(ContainerItem self, SseSerializer serializer);
+
+@protected void sse_encode_container_stats_item(ContainerStatsItem self, SseSerializer serializer);
+
+@protected void sse_encode_cron_document_data(CronDocumentData self, SseSerializer serializer);
+
+@protected void sse_encode_cron_edit_error(CronEditError self, SseSerializer serializer);
+
+@protected void sse_encode_cron_ffi_error(CronFfiError self, SseSerializer serializer);
+
+@protected void sse_encode_cron_job_line(CronJobLine self, SseSerializer serializer);
+
+@protected void sse_encode_cron_listing(CronListing self, SseSerializer serializer);
+
+@protected void sse_encode_cron_schedule_fields(CronScheduleFields self, SseSerializer serializer);
+
+@protected void sse_encode_cron_server_clock(CronServerClock self, SseSerializer serializer);
+
+@protected void sse_encode_cron_wall(CronWall self, SseSerializer serializer);
+
+@protected void sse_encode_custom_cmd(CustomCmd self, SseSerializer serializer);
+
+@protected void sse_encode_ecdsa_signature(EcdsaSignature self, SseSerializer serializer);
+
+@protected void sse_encode_effect(Effect self, SseSerializer serializer);
+
+@protected void sse_encode_f_64(double self, SseSerializer serializer);
+
+@protected void sse_encode_files_stat_markers(FilesStatMarkers self, SseSerializer serializer);
+
+@protected void sse_encode_firewall_access(FirewallAccess self, SseSerializer serializer);
+
+@protected void sse_encode_firewall_access_via(FirewallAccessVia self, SseSerializer serializer);
+
+@protected void sse_encode_firewall_kind(FirewallKind self, SseSerializer serializer);
+
+@protected void sse_encode_firewall_probe_result(FirewallProbeResult self, SseSerializer serializer);
+
+@protected void sse_encode_firewall_reach(FirewallReach self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_change(FirewalldChange self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_input_issue(FirewalldInputIssue self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_item(FirewalldItem self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_policy(FirewalldPolicy self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_port(FirewalldPort self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_rich_rule(FirewalldRichRule self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_snapshot(FirewalldSnapshot self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_target(FirewalldTarget self, SseSerializer serializer);
+
+@protected void sse_encode_firewalld_zone(FirewalldZone self, SseSerializer serializer);
+
+@protected void sse_encode_i_16(int self, SseSerializer serializer);
+
+@protected void sse_encode_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
+
+@protected void sse_encode_libvirt_pool_ref(LibvirtPoolRef self, SseSerializer serializer);
+
+@protected void sse_encode_list_String(List<String> self, SseSerializer serializer);
+
+@protected void sse_encode_list_bmc_reading(List<BmcReading> self, SseSerializer serializer);
+
+@protected void sse_encode_list_command_spec(List<CommandSpec> self, SseSerializer serializer);
+
+@protected void sse_encode_list_container_image_item(List<ContainerImageItem> self, SseSerializer serializer);
+
+@protected void sse_encode_list_container_item(List<ContainerItem> self, SseSerializer serializer);
+
+@protected void sse_encode_list_cron_job_line(List<CronJobLine> self, SseSerializer serializer);
+
+@protected void sse_encode_list_custom_cmd(List<CustomCmd> self, SseSerializer serializer);
+
+@protected void sse_encode_list_effect(List<Effect> self, SseSerializer serializer);
+
+@protected void sse_encode_list_firewall_access(List<FirewallAccess> self, SseSerializer serializer);
+
+@protected void sse_encode_list_firewalld_policy(List<FirewalldPolicy> self, SseSerializer serializer);
+
+@protected void sse_encode_list_firewalld_port(List<FirewalldPort> self, SseSerializer serializer);
+
+@protected void sse_encode_list_firewalld_rich_rule(List<FirewalldRichRule> self, SseSerializer serializer);
+
+@protected void sse_encode_list_firewalld_zone(List<FirewalldZone> self, SseSerializer serializer);
+
+@protected void sse_encode_list_libvirt_pool_ref(List<LibvirtPoolRef> self, SseSerializer serializer);
+
+@protected void sse_encode_list_plan_note(List<PlanNote> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_i_32_strict(Int32List self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_32_strict(Uint32List self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_loose(List<int> self, SseSerializer serializer);
+
+@protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
+
+@protected void sse_encode_list_pve_header(List<PveHeader> self, SseSerializer serializer);
+
+@protected void sse_encode_list_record_string_list_firewalld_port(List<(String,List<FirewalldPort>)> self, SseSerializer serializer);
+
+@protected void sse_encode_list_record_string_string(List<(String,String)> self, SseSerializer serializer);
+
+@protected void sse_encode_list_record_ufw_chain_ufw_policy(List<(UfwChain,UfwPolicy)> self, SseSerializer serializer);
+
+@protected void sse_encode_list_script_segment(List<ScriptSegment> self, SseSerializer serializer);
+
+@protected void sse_encode_list_service_command(List<ServiceCommand> self, SseSerializer serializer);
+
+@protected void sse_encode_list_service_command_output(List<ServiceCommandOutput> self, SseSerializer serializer);
+
+@protected void sse_encode_list_shell_file_record(List<ShellFileRecord> self, SseSerializer serializer);
+
+@protected void sse_encode_list_tmux_session_item(List<TmuxSessionItem> self, SseSerializer serializer);
+
+@protected void sse_encode_list_tmux_window_item(List<TmuxWindowItem> self, SseSerializer serializer);
+
+@protected void sse_encode_list_ufw_app(List<UfwApp> self, SseSerializer serializer);
+
+@protected void sse_encode_list_ufw_app_port(List<UfwAppPort> self, SseSerializer serializer);
+
+@protected void sse_encode_list_ufw_rule(List<UfwRule> self, SseSerializer serializer);
+
+@protected void sse_encode_list_virt_action_kind(List<VirtActionKind> self, SseSerializer serializer);
+
+@protected void sse_encode_list_virt_overlay(List<VirtOverlay> self, SseSerializer serializer);
+
+@protected void sse_encode_opt_String(String? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_cert_info(CertInfo? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_container_disk_usage_item(ContainerDiskUsageItem? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_container_stats_item(ContainerStatsItem? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_cron_schedule_fields(CronScheduleFields? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_cron_server_clock(CronServerClock? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_cron_wall(CronWall? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_firewall_access(FirewallAccess? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_firewall_kind(FirewallKind? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_64(PlatformInt64? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_redfish_chassis(RedfishChassis? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_redfish_system(RedfishSystem? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_redfish_topology(RedfishTopology? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_remote_desktop_event(RemoteDesktopEvent? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_reset_request(ResetRequest? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_snapshot_name_issue(SnapshotNameIssue? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_u_16(int? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_u_32(int? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_u_64(BigInt? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_ufw_draft_issue(UfwDraftIssue? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_ufw_log(UfwLog? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_ufw_log_level(UfwLogLevel? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_cert_info(CertInfo? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_String(List<String>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_custom_cmd(List<CustomCmd>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_firewalld_zone(List<FirewalldZone>? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_prim_u_8_strict(Uint8List? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_list_virt_action_kind(List<VirtActionKind>? self, SseSerializer serializer);
+
+@protected void sse_encode_plan(Plan self, SseSerializer serializer);
+
+@protected void sse_encode_plan_note(PlanNote self, SseSerializer serializer);
+
+@protected void sse_encode_power_intent(PowerIntent self, SseSerializer serializer);
+
+@protected void sse_encode_power_state(PowerState self, SseSerializer serializer);
+
+@protected void sse_encode_protocol_compat(ProtocolCompat self, SseSerializer serializer);
+
+@protected void sse_encode_pve_console_kind(PveConsoleKind self, SseSerializer serializer);
+
+@protected void sse_encode_pve_console_ticket(PveConsoleTicket self, SseSerializer serializer);
+
+@protected void sse_encode_pve_error(PveError self, SseSerializer serializer);
+
+@protected void sse_encode_pve_guest_ref(PveGuestRef self, SseSerializer serializer);
+
+@protected void sse_encode_pve_header(PveHeader self, SseSerializer serializer);
+
+@protected void sse_encode_pve_history_window(PveHistoryWindow self, SseSerializer serializer);
+
+@protected void sse_encode_pve_login(PveLogin self, SseSerializer serializer);
+
+@protected void sse_encode_pve_timing(PveTiming self, SseSerializer serializer);
+
+@protected void sse_encode_rdp_session_params(RdpSessionParams self, SseSerializer serializer);
+
+@protected void sse_encode_record_string_list_firewalld_port((String,List<FirewalldPort>) self, SseSerializer serializer);
+
+@protected void sse_encode_record_string_string((String,String) self, SseSerializer serializer);
+
+@protected void sse_encode_record_ufw_chain_ufw_policy((UfwChain,UfwPolicy) self, SseSerializer serializer);
+
+@protected void sse_encode_redfish_chassis(RedfishChassis self, SseSerializer serializer);
+
+@protected void sse_encode_redfish_failure(RedfishFailure self, SseSerializer serializer);
+
+@protected void sse_encode_redfish_root(RedfishRoot self, SseSerializer serializer);
+
+@protected void sse_encode_redfish_system(RedfishSystem self, SseSerializer serializer);
+
+@protected void sse_encode_redfish_topology(RedfishTopology self, SseSerializer serializer);
+
+@protected void sse_encode_remote_desktop_connection_state(RemoteDesktopConnectionState self, SseSerializer serializer);
+
+@protected void sse_encode_remote_desktop_end_reason(RemoteDesktopEndReason self, SseSerializer serializer);
+
+@protected void sse_encode_remote_desktop_event(RemoteDesktopEvent self, SseSerializer serializer);
+
+@protected void sse_encode_reset_request(ResetRequest self, SseSerializer serializer);
+
+@protected void sse_encode_script_segment(ScriptSegment self, SseSerializer serializer);
+
+@protected void sse_encode_service_command(ServiceCommand self, SseSerializer serializer);
+
+@protected void sse_encode_service_command_output(ServiceCommandOutput self, SseSerializer serializer);
+
+@protected void sse_encode_service_probe(ServiceProbe self, SseSerializer serializer);
+
+@protected void sse_encode_shell_file_record(ShellFileRecord self, SseSerializer serializer);
+
+@protected void sse_encode_shell_func_kind(ShellFuncKind self, SseSerializer serializer);
+
+@protected void sse_encode_snapshot_memory_kind(SnapshotMemoryKind self, SseSerializer serializer);
+
+@protected void sse_encode_snapshot_name_issue(SnapshotNameIssue self, SseSerializer serializer);
+
+@protected void sse_encode_snippet_ffi_error(SnippetFfiError self, SseSerializer serializer);
+
+@protected void sse_encode_tmux_session_item(TmuxSessionItem self, SseSerializer serializer);
+
+@protected void sse_encode_tmux_session_listing_item(TmuxSessionListingItem self, SseSerializer serializer);
+
+@protected void sse_encode_tmux_window_item(TmuxWindowItem self, SseSerializer serializer);
+
+@protected void sse_encode_u_16(int self, SseSerializer serializer);
+
+@protected void sse_encode_u_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_u_64(BigInt self, SseSerializer serializer);
+
+@protected void sse_encode_u_8(int self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_action(UfwAction self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_app(UfwApp self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_app_port(UfwAppPort self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_chain(UfwChain self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_change(UfwChange self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_direction(UfwDirection self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_draft_issue(UfwDraftIssue self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_endpoint(UfwEndpoint self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_ip_version(UfwIpVersion self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_log(UfwLog self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_log_level(UfwLogLevel self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_policy(UfwPolicy self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_rule(UfwRule self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_rule_draft(UfwRuleDraft self, SseSerializer serializer);
+
+@protected void sse_encode_ufw_snapshot(UfwSnapshot self, SseSerializer serializer);
+
+@protected void sse_encode_unit(void self, SseSerializer serializer);
+
+@protected void sse_encode_user_ffi_error(UserFfiError self, SseSerializer serializer);
+
+@protected void sse_encode_usize(BigInt self, SseSerializer serializer);
+
+@protected void sse_encode_virt_action_kind(VirtActionKind self, SseSerializer serializer);
+
+@protected void sse_encode_virt_delete_plan(VirtDeletePlan self, SseSerializer serializer);
+
+@protected void sse_encode_virt_error_kind(VirtErrorKind self, SseSerializer serializer);
+
+@protected void sse_encode_virt_failure(VirtFailure self, SseSerializer serializer);
+
+@protected void sse_encode_virt_ffi_error(VirtFfiError self, SseSerializer serializer);
+
+@protected void sse_encode_virt_overlay(VirtOverlay self, SseSerializer serializer);
+
+@protected void sse_encode_virt_resource_script(VirtResourceScript self, SseSerializer serializer);
+
+@protected void sse_encode_virt_upload_entry_kind(VirtUploadEntryKind self, SseSerializer serializer);
+
+@protected void sse_encode_vnc_session_params(VncSessionParams self, SseSerializer serializer);
+
+@protected void sse_encode_x_25519_key_pair(X25519KeyPair self, SseSerializer serializer);
+                }
+                
+
 
 // Section: wire_class
 
-class RustLibWire implements BaseWire {
-  factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
-      RustLibWire(lib.ffiDynamicLibrary);
 
-  /// Holds the symbol lookup function.
-  final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
-  _lookup;
+        class RustLibWire implements BaseWire {
 
-  /// The symbols are looked up in [dynamicLibrary].
-  RustLibWire(ffi.DynamicLibrary dynamicLibrary)
-    : _lookup = dynamicLibrary.lookup;
+            factory RustLibWire.fromExternalLibrary(ExternalLibrary lib) =>
+              RustLibWire(lib.ffiDynamicLibrary);
+        
+            /// Holds the symbol lookup function.
+            final ffi.Pointer<T> Function<T extends ffi.NativeType>(String symbolName)
+                _lookup;
+  
+            /// The symbols are looked up in [dynamicLibrary].
+            RustLibWire(ffi.DynamicLibrary dynamicLibrary)
+                : _lookup = dynamicLibrary.lookup;
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-      ptr,
-    );
-  }
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClient =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBmcClientPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRates =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLibvirtRatesPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatch =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPowerWatchPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel(
-      ptr,
-    );
-  }
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
+                ptr,
+              );
+            }
 
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannel =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveConsoleChannelPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac');
+            late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac = _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+            void rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
+              ffi.Pointer<ffi.Void> ptr,
+            ) {
+              return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
+                ptr,
+              );
+            }
 
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSession =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerPveSessionPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandle =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerRemoteDesktopSessionHandlePtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipher =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshBlockCipherPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac',
-      );
-  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac =
-      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-
-  void
-  rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-    ffi.Pointer<ffi.Void> ptr,
-  ) {
-    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac(
-      ptr,
-    );
-  }
-
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr =
-      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
-        'frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac',
-      );
-  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac =
-      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr
-          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
-}
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>('frbgen_server_box_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac');
+            late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMac = _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSshMacPtr.asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+            
+        }
+        

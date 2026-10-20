@@ -462,6 +462,7 @@ class _VirtConsolesState extends ConsumerState<_VirtConsoles> {
     };
     final via = switch (spi?.transport) {
       ServerTransport.ssh => 'SSH',
+    ServerTransport.adb => 'ADB',
       ServerTransport.monitorHttp => 'monitor',
       ServerTransport.local => 'localhost',
       null => null,

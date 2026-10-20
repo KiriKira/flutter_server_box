@@ -1243,6 +1243,82 @@ class $ServersTable extends Servers with TableInfo<$ServersTable, ServerRow> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _adbHostMeta = const VerificationMeta(
+    'adbHost',
+  );
+  @override
+  late final GeneratedColumn<String> adbHost = GeneratedColumn<String>(
+    'adb_host',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _adbPortMeta = const VerificationMeta(
+    'adbPort',
+  );
+  @override
+  late final GeneratedColumn<int> adbPort = GeneratedColumn<int>(
+    'adb_port',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _adbLocalMeta = const VerificationMeta(
+    'adbLocal',
+  );
+  @override
+  late final GeneratedColumn<bool> adbLocal = GeneratedColumn<bool>(
+    'adb_local',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("adb_local" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _adbTlsMeta = const VerificationMeta('adbTls');
+  @override
+  late final GeneratedColumn<bool> adbTls = GeneratedColumn<bool>(
+    'adb_tls',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("adb_tls" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _adbEnabledMeta = const VerificationMeta(
+    'adbEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> adbEnabled = GeneratedColumn<bool>(
+    'adb_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("adb_enabled" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _adbGuidMeta = const VerificationMeta(
+    'adbGuid',
+  );
+  @override
+  late final GeneratedColumn<String> adbGuid = GeneratedColumn<String>(
+    'adb_guid',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     updatedAt,
@@ -1284,6 +1360,12 @@ class $ServersTable extends Servers with TableInfo<$ServersTable, ServerRow> {
     geoLat,
     geoLon,
     diskCountsNetwork,
+    adbHost,
+    adbPort,
+    adbLocal,
+    adbTls,
+    adbEnabled,
+    adbGuid,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1580,6 +1662,42 @@ class $ServersTable extends Servers with TableInfo<$ServersTable, ServerRow> {
         ),
       );
     }
+    if (data.containsKey('adb_host')) {
+      context.handle(
+        _adbHostMeta,
+        adbHost.isAcceptableOrUnknown(data['adb_host']!, _adbHostMeta),
+      );
+    }
+    if (data.containsKey('adb_port')) {
+      context.handle(
+        _adbPortMeta,
+        adbPort.isAcceptableOrUnknown(data['adb_port']!, _adbPortMeta),
+      );
+    }
+    if (data.containsKey('adb_local')) {
+      context.handle(
+        _adbLocalMeta,
+        adbLocal.isAcceptableOrUnknown(data['adb_local']!, _adbLocalMeta),
+      );
+    }
+    if (data.containsKey('adb_tls')) {
+      context.handle(
+        _adbTlsMeta,
+        adbTls.isAcceptableOrUnknown(data['adb_tls']!, _adbTlsMeta),
+      );
+    }
+    if (data.containsKey('adb_enabled')) {
+      context.handle(
+        _adbEnabledMeta,
+        adbEnabled.isAcceptableOrUnknown(data['adb_enabled']!, _adbEnabledMeta),
+      );
+    }
+    if (data.containsKey('adb_guid')) {
+      context.handle(
+        _adbGuidMeta,
+        adbGuid.isAcceptableOrUnknown(data['adb_guid']!, _adbGuidMeta),
+      );
+    }
     return context;
   }
 
@@ -1745,6 +1863,30 @@ class $ServersTable extends Servers with TableInfo<$ServersTable, ServerRow> {
         DriftSqlType.bool,
         data['${effectivePrefix}disk_counts_network'],
       )!,
+      adbHost: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}adb_host'],
+      ),
+      adbPort: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}adb_port'],
+      ),
+      adbLocal: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}adb_local'],
+      )!,
+      adbTls: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}adb_tls'],
+      )!,
+      adbEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}adb_enabled'],
+      )!,
+      adbGuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}adb_guid'],
+      ),
     );
   }
 
@@ -1859,6 +2001,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
   /// Last, where `ALTER TABLE ... ADD COLUMN` puts it on an install that was
   /// already past v32, so both have one shape.
   final bool diskCountsNetwork;
+  final String? adbHost;
+  final int? adbPort;
+  final bool adbLocal;
+  final bool adbTls;
+  final bool adbEnabled;
+  final String? adbGuid;
   const ServerRow({
     required this.updatedAt,
     required this.rev,
@@ -1899,6 +2047,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
     this.geoLat,
     this.geoLon,
     required this.diskCountsNetwork,
+    this.adbHost,
+    this.adbPort,
+    required this.adbLocal,
+    required this.adbTls,
+    required this.adbEnabled,
+    this.adbGuid,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2000,6 +2154,18 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
       map['geo_lon'] = Variable<double>(geoLon);
     }
     map['disk_counts_network'] = Variable<bool>(diskCountsNetwork);
+    if (!nullToAbsent || adbHost != null) {
+      map['adb_host'] = Variable<String>(adbHost);
+    }
+    if (!nullToAbsent || adbPort != null) {
+      map['adb_port'] = Variable<int>(adbPort);
+    }
+    map['adb_local'] = Variable<bool>(adbLocal);
+    map['adb_tls'] = Variable<bool>(adbTls);
+    map['adb_enabled'] = Variable<bool>(adbEnabled);
+    if (!nullToAbsent || adbGuid != null) {
+      map['adb_guid'] = Variable<String>(adbGuid);
+    }
     return map;
   }
 
@@ -2100,6 +2266,18 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
           ? const Value.absent()
           : Value(geoLon),
       diskCountsNetwork: Value(diskCountsNetwork),
+      adbHost: adbHost == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adbHost),
+      adbPort: adbPort == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adbPort),
+      adbLocal: Value(adbLocal),
+      adbTls: Value(adbTls),
+      adbEnabled: Value(adbEnabled),
+      adbGuid: adbGuid == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adbGuid),
     );
   }
 
@@ -2154,6 +2332,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
       geoLat: serializer.fromJson<double?>(json['geoLat']),
       geoLon: serializer.fromJson<double?>(json['geoLon']),
       diskCountsNetwork: serializer.fromJson<bool>(json['diskCountsNetwork']),
+      adbHost: serializer.fromJson<String?>(json['adbHost']),
+      adbPort: serializer.fromJson<int?>(json['adbPort']),
+      adbLocal: serializer.fromJson<bool>(json['adbLocal']),
+      adbTls: serializer.fromJson<bool>(json['adbTls']),
+      adbEnabled: serializer.fromJson<bool>(json['adbEnabled']),
+      adbGuid: serializer.fromJson<String?>(json['adbGuid']),
     );
   }
   @override
@@ -2201,6 +2385,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
       'geoLat': serializer.toJson<double?>(geoLat),
       'geoLon': serializer.toJson<double?>(geoLon),
       'diskCountsNetwork': serializer.toJson<bool>(diskCountsNetwork),
+      'adbHost': serializer.toJson<String?>(adbHost),
+      'adbPort': serializer.toJson<int?>(adbPort),
+      'adbLocal': serializer.toJson<bool>(adbLocal),
+      'adbTls': serializer.toJson<bool>(adbTls),
+      'adbEnabled': serializer.toJson<bool>(adbEnabled),
+      'adbGuid': serializer.toJson<String?>(adbGuid),
     };
   }
 
@@ -2244,6 +2434,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
     Value<double?> geoLat = const Value.absent(),
     Value<double?> geoLon = const Value.absent(),
     bool? diskCountsNetwork,
+    Value<String?> adbHost = const Value.absent(),
+    Value<int?> adbPort = const Value.absent(),
+    bool? adbLocal,
+    bool? adbTls,
+    bool? adbEnabled,
+    Value<String?> adbGuid = const Value.absent(),
   }) => ServerRow(
     updatedAt: updatedAt ?? this.updatedAt,
     rev: rev ?? this.rev,
@@ -2299,6 +2495,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
     geoLat: geoLat.present ? geoLat.value : this.geoLat,
     geoLon: geoLon.present ? geoLon.value : this.geoLon,
     diskCountsNetwork: diskCountsNetwork ?? this.diskCountsNetwork,
+    adbHost: adbHost.present ? adbHost.value : this.adbHost,
+    adbPort: adbPort.present ? adbPort.value : this.adbPort,
+    adbLocal: adbLocal ?? this.adbLocal,
+    adbTls: adbTls ?? this.adbTls,
+    adbEnabled: adbEnabled ?? this.adbEnabled,
+    adbGuid: adbGuid.present ? adbGuid.value : this.adbGuid,
   );
   ServerRow copyWithCompanion(ServersCompanion data) {
     return ServerRow(
@@ -2379,6 +2581,14 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
       diskCountsNetwork: data.diskCountsNetwork.present
           ? data.diskCountsNetwork.value
           : this.diskCountsNetwork,
+      adbHost: data.adbHost.present ? data.adbHost.value : this.adbHost,
+      adbPort: data.adbPort.present ? data.adbPort.value : this.adbPort,
+      adbLocal: data.adbLocal.present ? data.adbLocal.value : this.adbLocal,
+      adbTls: data.adbTls.present ? data.adbTls.value : this.adbTls,
+      adbEnabled: data.adbEnabled.present
+          ? data.adbEnabled.value
+          : this.adbEnabled,
+      adbGuid: data.adbGuid.present ? data.adbGuid.value : this.adbGuid,
     );
   }
 
@@ -2423,7 +2633,13 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
           ..write('scriptDir: $scriptDir, ')
           ..write('geoLat: $geoLat, ')
           ..write('geoLon: $geoLon, ')
-          ..write('diskCountsNetwork: $diskCountsNetwork')
+          ..write('diskCountsNetwork: $diskCountsNetwork, ')
+          ..write('adbHost: $adbHost, ')
+          ..write('adbPort: $adbPort, ')
+          ..write('adbLocal: $adbLocal, ')
+          ..write('adbTls: $adbTls, ')
+          ..write('adbEnabled: $adbEnabled, ')
+          ..write('adbGuid: $adbGuid')
           ..write(')'))
         .toString();
   }
@@ -2469,6 +2685,12 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
     geoLat,
     geoLon,
     diskCountsNetwork,
+    adbHost,
+    adbPort,
+    adbLocal,
+    adbTls,
+    adbEnabled,
+    adbGuid,
   ]);
   @override
   bool operator ==(Object other) =>
@@ -2512,7 +2734,13 @@ class ServerRow extends DataClass implements Insertable<ServerRow> {
           other.scriptDir == this.scriptDir &&
           other.geoLat == this.geoLat &&
           other.geoLon == this.geoLon &&
-          other.diskCountsNetwork == this.diskCountsNetwork);
+          other.diskCountsNetwork == this.diskCountsNetwork &&
+          other.adbHost == this.adbHost &&
+          other.adbPort == this.adbPort &&
+          other.adbLocal == this.adbLocal &&
+          other.adbTls == this.adbTls &&
+          other.adbEnabled == this.adbEnabled &&
+          other.adbGuid == this.adbGuid);
 }
 
 class ServersCompanion extends UpdateCompanion<ServerRow> {
@@ -2555,6 +2783,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
   final Value<double?> geoLat;
   final Value<double?> geoLon;
   final Value<bool> diskCountsNetwork;
+  final Value<String?> adbHost;
+  final Value<int?> adbPort;
+  final Value<bool> adbLocal;
+  final Value<bool> adbTls;
+  final Value<bool> adbEnabled;
+  final Value<String?> adbGuid;
   const ServersCompanion({
     this.updatedAt = const Value.absent(),
     this.rev = const Value.absent(),
@@ -2595,6 +2829,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
     this.geoLat = const Value.absent(),
     this.geoLon = const Value.absent(),
     this.diskCountsNetwork = const Value.absent(),
+    this.adbHost = const Value.absent(),
+    this.adbPort = const Value.absent(),
+    this.adbLocal = const Value.absent(),
+    this.adbTls = const Value.absent(),
+    this.adbEnabled = const Value.absent(),
+    this.adbGuid = const Value.absent(),
   });
   ServersCompanion.insert({
     this.updatedAt = const Value.absent(),
@@ -2636,6 +2876,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
     this.geoLat = const Value.absent(),
     this.geoLon = const Value.absent(),
     this.diskCountsNetwork = const Value.absent(),
+    this.adbHost = const Value.absent(),
+    this.adbPort = const Value.absent(),
+    this.adbLocal = const Value.absent(),
+    this.adbTls = const Value.absent(),
+    this.adbEnabled = const Value.absent(),
+    this.adbGuid = const Value.absent(),
   }) : id = Value(id),
        name = Value(name);
   static Insertable<ServerRow> custom({
@@ -2678,6 +2924,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
     Expression<double>? geoLat,
     Expression<double>? geoLon,
     Expression<bool>? diskCountsNetwork,
+    Expression<String>? adbHost,
+    Expression<int>? adbPort,
+    Expression<bool>? adbLocal,
+    Expression<bool>? adbTls,
+    Expression<bool>? adbEnabled,
+    Expression<String>? adbGuid,
   }) {
     return RawValuesInsertable({
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -2721,6 +2973,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
       if (geoLat != null) 'geo_lat': geoLat,
       if (geoLon != null) 'geo_lon': geoLon,
       if (diskCountsNetwork != null) 'disk_counts_network': diskCountsNetwork,
+      if (adbHost != null) 'adb_host': adbHost,
+      if (adbPort != null) 'adb_port': adbPort,
+      if (adbLocal != null) 'adb_local': adbLocal,
+      if (adbTls != null) 'adb_tls': adbTls,
+      if (adbEnabled != null) 'adb_enabled': adbEnabled,
+      if (adbGuid != null) 'adb_guid': adbGuid,
     });
   }
 
@@ -2764,6 +3022,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
     Value<double?>? geoLat,
     Value<double?>? geoLon,
     Value<bool>? diskCountsNetwork,
+    Value<String?>? adbHost,
+    Value<int?>? adbPort,
+    Value<bool>? adbLocal,
+    Value<bool>? adbTls,
+    Value<bool>? adbEnabled,
+    Value<String?>? adbGuid,
   }) {
     return ServersCompanion(
       updatedAt: updatedAt ?? this.updatedAt,
@@ -2806,6 +3070,12 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
       geoLat: geoLat ?? this.geoLat,
       geoLon: geoLon ?? this.geoLon,
       diskCountsNetwork: diskCountsNetwork ?? this.diskCountsNetwork,
+      adbHost: adbHost ?? this.adbHost,
+      adbPort: adbPort ?? this.adbPort,
+      adbLocal: adbLocal ?? this.adbLocal,
+      adbTls: adbTls ?? this.adbTls,
+      adbEnabled: adbEnabled ?? this.adbEnabled,
+      adbGuid: adbGuid ?? this.adbGuid,
     );
   }
 
@@ -2933,6 +3203,24 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
     if (diskCountsNetwork.present) {
       map['disk_counts_network'] = Variable<bool>(diskCountsNetwork.value);
     }
+    if (adbHost.present) {
+      map['adb_host'] = Variable<String>(adbHost.value);
+    }
+    if (adbPort.present) {
+      map['adb_port'] = Variable<int>(adbPort.value);
+    }
+    if (adbLocal.present) {
+      map['adb_local'] = Variable<bool>(adbLocal.value);
+    }
+    if (adbTls.present) {
+      map['adb_tls'] = Variable<bool>(adbTls.value);
+    }
+    if (adbEnabled.present) {
+      map['adb_enabled'] = Variable<bool>(adbEnabled.value);
+    }
+    if (adbGuid.present) {
+      map['adb_guid'] = Variable<String>(adbGuid.value);
+    }
     return map;
   }
 
@@ -2977,7 +3265,13 @@ class ServersCompanion extends UpdateCompanion<ServerRow> {
           ..write('scriptDir: $scriptDir, ')
           ..write('geoLat: $geoLat, ')
           ..write('geoLon: $geoLon, ')
-          ..write('diskCountsNetwork: $diskCountsNetwork')
+          ..write('diskCountsNetwork: $diskCountsNetwork, ')
+          ..write('adbHost: $adbHost, ')
+          ..write('adbPort: $adbPort, ')
+          ..write('adbLocal: $adbLocal, ')
+          ..write('adbTls: $adbTls, ')
+          ..write('adbEnabled: $adbEnabled, ')
+          ..write('adbGuid: $adbGuid')
           ..write(')'))
         .toString();
   }
@@ -10286,6 +10580,12 @@ typedef $$ServersTableCreateCompanionBuilder =
       Value<double?> geoLat,
       Value<double?> geoLon,
       Value<bool> diskCountsNetwork,
+      Value<String?> adbHost,
+      Value<int?> adbPort,
+      Value<bool> adbLocal,
+      Value<bool> adbTls,
+      Value<bool> adbEnabled,
+      Value<String?> adbGuid,
     });
 typedef $$ServersTableUpdateCompanionBuilder =
     ServersCompanion Function({
@@ -10328,6 +10628,12 @@ typedef $$ServersTableUpdateCompanionBuilder =
       Value<double?> geoLat,
       Value<double?> geoLon,
       Value<bool> diskCountsNetwork,
+      Value<String?> adbHost,
+      Value<int?> adbPort,
+      Value<bool> adbLocal,
+      Value<bool> adbTls,
+      Value<bool> adbEnabled,
+      Value<String?> adbGuid,
     });
 
 final class $$ServersTableReferences
@@ -10828,6 +11134,36 @@ class $$ServersTableFilterComposer extends Composer<_$AppDb, $ServersTable> {
 
   ColumnFilters<bool> get diskCountsNetwork => $composableBuilder(
     column: $table.diskCountsNetwork,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get adbHost => $composableBuilder(
+    column: $table.adbHost,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get adbPort => $composableBuilder(
+    column: $table.adbPort,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get adbLocal => $composableBuilder(
+    column: $table.adbLocal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get adbTls => $composableBuilder(
+    column: $table.adbTls,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get adbEnabled => $composableBuilder(
+    column: $table.adbEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get adbGuid => $composableBuilder(
+    column: $table.adbGuid,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11422,6 +11758,36 @@ class $$ServersTableOrderingComposer extends Composer<_$AppDb, $ServersTable> {
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get adbHost => $composableBuilder(
+    column: $table.adbHost,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get adbPort => $composableBuilder(
+    column: $table.adbPort,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get adbLocal => $composableBuilder(
+    column: $table.adbLocal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get adbTls => $composableBuilder(
+    column: $table.adbTls,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get adbEnabled => $composableBuilder(
+    column: $table.adbEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get adbGuid => $composableBuilder(
+    column: $table.adbGuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$PrivateKeysTableOrderingComposer get sshKeyId {
     final $$PrivateKeysTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -11626,6 +11992,26 @@ class $$ServersTableAnnotationComposer
     column: $table.diskCountsNetwork,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get adbHost =>
+      $composableBuilder(column: $table.adbHost, builder: (column) => column);
+
+  GeneratedColumn<int> get adbPort =>
+      $composableBuilder(column: $table.adbPort, builder: (column) => column);
+
+  GeneratedColumn<bool> get adbLocal =>
+      $composableBuilder(column: $table.adbLocal, builder: (column) => column);
+
+  GeneratedColumn<bool> get adbTls =>
+      $composableBuilder(column: $table.adbTls, builder: (column) => column);
+
+  GeneratedColumn<bool> get adbEnabled => $composableBuilder(
+    column: $table.adbEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get adbGuid =>
+      $composableBuilder(column: $table.adbGuid, builder: (column) => column);
 
   $$PrivateKeysTableAnnotationComposer get sshKeyId {
     final $$PrivateKeysTableAnnotationComposer composer = $composerBuilder(
@@ -12111,6 +12497,12 @@ class $$ServersTableTableManager
                 Value<double?> geoLat = const Value.absent(),
                 Value<double?> geoLon = const Value.absent(),
                 Value<bool> diskCountsNetwork = const Value.absent(),
+                Value<String?> adbHost = const Value.absent(),
+                Value<int?> adbPort = const Value.absent(),
+                Value<bool> adbLocal = const Value.absent(),
+                Value<bool> adbTls = const Value.absent(),
+                Value<bool> adbEnabled = const Value.absent(),
+                Value<String?> adbGuid = const Value.absent(),
               }) => ServersCompanion(
                 updatedAt: updatedAt,
                 rev: rev,
@@ -12151,6 +12543,12 @@ class $$ServersTableTableManager
                 geoLat: geoLat,
                 geoLon: geoLon,
                 diskCountsNetwork: diskCountsNetwork,
+                adbHost: adbHost,
+                adbPort: adbPort,
+                adbLocal: adbLocal,
+                adbTls: adbTls,
+                adbEnabled: adbEnabled,
+                adbGuid: adbGuid,
               ),
           createCompanionCallback:
               ({
@@ -12193,6 +12591,12 @@ class $$ServersTableTableManager
                 Value<double?> geoLat = const Value.absent(),
                 Value<double?> geoLon = const Value.absent(),
                 Value<bool> diskCountsNetwork = const Value.absent(),
+                Value<String?> adbHost = const Value.absent(),
+                Value<int?> adbPort = const Value.absent(),
+                Value<bool> adbLocal = const Value.absent(),
+                Value<bool> adbTls = const Value.absent(),
+                Value<bool> adbEnabled = const Value.absent(),
+                Value<String?> adbGuid = const Value.absent(),
               }) => ServersCompanion.insert(
                 updatedAt: updatedAt,
                 rev: rev,
@@ -12233,6 +12637,12 @@ class $$ServersTableTableManager
                 geoLat: geoLat,
                 geoLon: geoLon,
                 diskCountsNetwork: diskCountsNetwork,
+                adbHost: adbHost,
+                adbPort: adbPort,
+                adbLocal: adbLocal,
+                adbTls: adbTls,
+                adbEnabled: adbEnabled,
+                adbGuid: adbGuid,
               ),
           withReferenceMapper: (p0) => p0
               .map(

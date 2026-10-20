@@ -16,6 +16,10 @@ _Spi _$SpiFromJson(Map<String, dynamic> json) => _Spi(
       : MonitorHttpCredential.fromJson(
           json['monitorHttp'] as Map<String, dynamic>,
         ),
+  adb: json['adb'] == null
+      ? null
+      : AdbCredential.fromJson(json['adb'] as Map<String, dynamic>),
+  adbEnabled: json['adbEnabled'] as bool? ?? false,
   sshEnabled: json['sshEnabled'] as bool? ?? true,
   monitorEnabled: json['monitorEnabled'] as bool? ?? true,
   local: json['local'] as bool? ?? false,
@@ -52,6 +56,8 @@ Map<String, dynamic> _$SpiToJson(_Spi instance) => <String, dynamic>{
   'name': instance.name,
   'ssh': ?instance.ssh,
   'monitorHttp': ?instance.monitorHttp,
+  'adb': ?instance.adb,
+  'adbEnabled': instance.adbEnabled,
   'sshEnabled': instance.sshEnabled,
   'monitorEnabled': instance.monitorEnabled,
   'local': instance.local,
@@ -70,6 +76,7 @@ Map<String, dynamic> _$SpiToJson(_Spi instance) => <String, dynamic>{
 const _$ServerTransportEnumMap = {
   ServerTransport.ssh: 'ssh',
   ServerTransport.monitorHttp: 'monitorHttp',
+  ServerTransport.adb: 'adb',
   ServerTransport.local: 'local',
 };
 

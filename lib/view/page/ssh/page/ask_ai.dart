@@ -39,9 +39,9 @@ extension _AskAi on SSHPageState {
     // app-wide Agent is what reaches it, through `LocalTarget`.
     if (spi == null) return;
     _releaseAgentHost = TerminalHosts.register(
-      spi.id,
+      spi.adbOn == null ? spi.id : '${spi.id}/adb',
       TerminalHost(
-        serverName: spi.name,
+        serverName: spi.adbOn == null ? spi.name : '${spi.name} (Android ADB)',
         run: _runAiCommand,
         insert: _insertAiCommand,
         // Read per call, not captured: by the next turn the screen has moved
@@ -76,7 +76,7 @@ extension _AskAi on SSHPageState {
     final spi = widget.args.spi;
     if (spi == null) return;
 
-    final scope = AgentScope.terminal(spi.id);
+    final scope = AgentScope.terminal(spi.adbOn == null ? spi.id : '${spi.id}/adb');
     if (selection != null && selection.isNotEmpty) {
       AgentChats.startNew(scope);
       Composer.draftScope = scope;
@@ -153,9 +153,16 @@ extension _AskAi on SSHPageState {
     AskAiCommand proposal, {
     Future<void>? cancel,
   }) async {
+    final backend = _sess.backend;
     final client = _client;
-    if (client == null || client.isClosed) {
-      throw StateError('SSH client is not connected.');
+    final ServerExec exec;
+    if (backend is AdbShellBackend && !backend.isClosed) {
+      exec = AdbExec(backend.connection);
+    } else if (client != null && !client.isClosed) {
+      final serverId = widget.args.spi?.id;
+      exec = SshExec(client, sudoPassword: serverId == null ? null : () => SudoPassword.known(serverId));
+    } else {
+      throw StateError('Terminal connection is not ready.');
     }
 
     final startedAt = DateTime.now();
@@ -177,13 +184,7 @@ extension _AskAi on SSHPageState {
     });
 
     try {
-      final serverId = widget.args.spi?.id;
-      final result = await SshExec(
-        client,
-        sudoPassword: serverId == null
-            ? null
-            : () => SudoPassword.known(serverId),
-      ).run(proposal.command, cancel: stop.future);
+      final result = await exec.run(proposal.command, cancel: stop.future);
       // Told to the user as well: a stop ends the reply before this result
       // exists, so the model may never read it.
       if (result.mayStillRun) Toast.show(l10n.agentCommandMayStillRun);
@@ -283,7 +284,7 @@ class _AskAiPanel extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'SSH Agent',
+                            'ServerBox Agent',
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                             ),

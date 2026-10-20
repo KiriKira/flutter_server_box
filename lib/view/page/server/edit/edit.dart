@@ -18,6 +18,7 @@ import 'package:server_box/core/utils/ssh_config.dart';
 import 'package:server_box/core/utils/sudo_password.dart';
 import 'package:server_box/data/model/app/feature.dart';
 import 'package:server_box/data/model/app/scripts/cmd_types.dart';
+import 'package:server_box/data/model/server/adb_credential.dart';
 import 'package:server_box/data/model/server/bmc_cfg.dart';
 import 'package:server_box/data/model/server/bmc_credential.dart';
 import 'package:server_box/data/model/server/custom.dart';
@@ -36,6 +37,7 @@ import 'package:server_box/data/res/store.dart';
 import 'package:server_box/data/res/url.dart';
 import 'package:server_box/data/store/entity_store.dart';
 import 'package:server_box/src/rust/api/bmc.dart';
+import 'package:server_box/view/page/adb/connection_fields.dart';
 import 'package:server_box/view/page/bmc_credential/edit.dart';
 import 'package:server_box/view/page/private_key/edit.dart';
 import 'package:server_box/view/page/server/custom_cmds.dart';
@@ -191,6 +193,8 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage>
   /// status without a shell open, sshd for the things the agent has no
   /// endpoint for — so what is left of the old exclusivity is
   /// [_preferMonitorHttp], which orders them rather than excluding either.
+  final _useAdb = ValueNotifier(false);
+  AdbCredential _adb = const AdbCredential();
   final _useSsh = ValueNotifier(true);
   final _useMonitorHttp = ValueNotifier(false);
 
@@ -302,6 +306,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage>
     _jumpServers.dispose();
     _monitorIgnoreCert.dispose();
     _monitorAllowInsecure.dispose();
+    _useAdb.dispose();
     _useSsh.dispose();
     _useMonitorHttp.dispose();
     _preferMonitorHttp.dispose();
@@ -405,7 +410,7 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage>
               //
               // None of them for this device: nothing is dialled.
               ListenableBuilder(
-                listenable: Listenable.merge([_preferMonitorHttp, _local]),
+                listenable: Listenable.merge([_preferMonitorHttp, _local, _useAdb]),
                 builder: (_, _) => _local.value
                     ? UIs.placeholder
                     : Column(
@@ -413,7 +418,9 @@ class _ServerEditPageState extends ConsumerState<ServerEditPage>
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           for (final method in _methodOrder)
+                            if (method != _Method.adb || _useAdb.value || spi?.adb != null)
                             _buildMethodSection(method, switch (method) {
+                              _Method.adb => AdbConnectionFields(id: _serverId, value: _adb, onChanged: (value) => _adb = value),
                               _Method.monitorHttp => _buildMonitorHttpFields(),
                               _Method.ssh => Column(
                                 mainAxisSize: MainAxisSize.min,

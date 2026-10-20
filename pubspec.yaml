@@ -259,4 +259,4 @@ flutter_native_splash:
 # line, so the name it publishes assets under cannot drift from the name the
 # build gave them.
 fl_build:
-  appName: ServerBox
+  appName: KiriBox

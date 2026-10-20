@@ -30,6 +30,7 @@ import 'package:server_box/data/res/chart_palette.dart';
 import 'package:server_box/data/res/store.dart';
 import 'package:server_box/data/res/url.dart';
 import 'package:server_box/src/rust/api/bmc.dart';
+import 'package:server_box/view/page/adb/tools.dart';
 import 'package:server_box/view/page/server/card/chart_hero.dart';
 import 'package:server_box/view/page/server/card/metric.dart';
 import 'package:server_box/view/page/server/card/name_hero.dart';
@@ -365,6 +366,7 @@ class _ServerDetailPageState extends ConsumerState<ServerDetailPage>
     // A layer each, so a poll paints the ones that changed rather than all of
     // them — see `_buildMetricRow`.
     final cards = <Widget>[
+      if (si.status.android case final device?) AdbDeviceCard(device: device),
       for (final entry in _cardBuildMap.entries)
         if (!_cardsOff.contains(entry.key.name))
           if (entry.value(si) case final card?) RepaintBoundary(child: card),

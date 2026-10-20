@@ -143,6 +143,7 @@ String _transportName(ServerState si) {
   return switch (si.spi.transport) {
     ServerTransport.monitorHttp => 'monitor',
     ServerTransport.ssh => 'SSH',
+    ServerTransport.adb => 'ADB',
     ServerTransport.local => 'localhost',
   };
 }

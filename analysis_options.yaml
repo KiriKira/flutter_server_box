@@ -12,6 +12,8 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
   exclude:
     - "**/*.g.dart"
+    # FRB bindings are generated; their correctness is checked by compilation.
+    - lib/src/rust/**
     # protoc's output, regenerated from `third_party/proto` and not edited.
     # It imports its own siblings by relative path, which this project's
     # `always_use_package_imports` forbids and the generator will not change.

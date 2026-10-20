@@ -1,12 +1,12 @@
 ---
 name: serverbox-help
-description: Help with using the ServerBox app itself — adding a server over SSH or through the ServerBox Monitor agent, why a button or feature is missing for a server, installing and configuring the Monitor agent on a server (permissions, TLS, alert rules), home-screen widgets, push alerts and the watch app, backups, the terminal, and the Agent's own settings (providers, tools, MCP servers, skills). Use it whenever the user asks how to do something in ServerBox, why something in the app is unavailable or failing, or wants the Monitor agent set up — including questions that never name the app, such as "why is there no terminal button", "how do I get alerts when CPU is high", or "can I see this on my watch".
+description: Help with using the ServerBox app itself — adding an Android phone over ADB, a server over SSH or through the ServerBox Monitor agent, why a button or feature is missing for a server, installing and configuring the Monitor agent on a server (permissions, TLS, alert rules), home-screen widgets, push alerts and the watch app, backups, the terminal, and the Agent's own settings (providers, tools, MCP servers, skills). Use it whenever the user asks how to do something in ServerBox, why something in the app is unavailable or failing, or wants the Monitor agent set up — including questions that never name the app, such as "why is there no terminal button", "how do I get alerts when CPU is high", or "can I see this on my watch".
 ---
 
 # ServerBox help
 
 ServerBox is the app this conversation is in. It manages Linux, BSD, macOS and
-Windows servers: status and charts, a terminal, a file browser, containers,
+Windows servers and Android devices over ADB: status and charts, a terminal, a file browser, containers,
 processes, systemd, snippets. It runs on iOS, Android, macOS, Linux, Windows
 and watchOS.
 
@@ -33,6 +33,25 @@ first, and the other stays available.
 Recommend SSH unless there is a reason not to. The agent is the answer when the
 SSH port cannot be reached from the phone, when charts should already be filled
 in on open, or for alerts, widgets and the watch.
+
+## Android phones over ADB
+
+ADB is a peer connection method in the device editor. For an Android phone,
+choose ADB and Wireless debugging; the pairing port and connection port differ.
+On an Android client, local pairing uses the notification's six-digit code input.
+Keep pairing codes in that UI, never in conversation. The host key stays on the
+client, so another installation needs its own pairing.
+
+Use Android shell commands and `android_device` for apps, APK installation,
+bounded logcat, screenshots and root requests. App operations currently target
+Android user 0. Root is optional and granted by the target's existing root
+manager; lack of it does not block ordinary monitoring. Do not suggest apt,
+systemctl, Docker or sudo for an ADB target. Local ADB is a different environment
+from the app's local shell. An ADB terminal's agent acts only on that connection.
+Device files use ADB sync, not SFTP. Some metrics are unavailable under Android's
+permissions; show the missing reading rather than calling it zero.
+
+<https://serverbox.lollipopkit.com/docs/advanced/adb/> explains the setup and limits.
 
 ## "The button is missing"
 

@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:server_box/core/extension/context/locale.dart' as app_locale;
 import 'package:server_box/core/utils/local_server.dart';
+import 'package:server_box/data/model/server/adb_credential.dart';
 import 'package:server_box/data/model/server/monitor_http_credential.dart';
 import 'package:server_box/data/model/server/server_private_info.dart';
 import 'package:server_box/data/model/server/ssh_credential.dart';
@@ -126,6 +127,22 @@ void main() {
       find.descendant(of: sshRow.first, matching: find.text('2')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('ADB is a peer method and saves without inventing SSH fields', (tester) async {
+    final persisted = await pumpEditor(tester, const Spi(name: 'phone', id: 'phone',
+      adbEnabled: true, adb: AdbCredential(host: '192.168.1.20', port: 37123)));
+    expect(find.text('Monitor HTTP'), findsOneWidget);
+    expect(find.text('SSH'), findsWidgets);
+    expect(find.text('ADB'), findsWidgets);
+    await tester.tap(find.widgetWithText(FilledButton, libL10n.save));
+    await settle(tester);
+    final saved = persisted();
+    expect(saved, isNotNull);
+    expect(saved!.adb?.host, '192.168.1.20');
+    expect(saved.adb?.port, 37123);
+    expect(saved.ssh, isNull);
+    expect(saved.transport, ServerTransport.adb);
   });
 
   testWidgets('switching a method off keeps its configuration', (tester) async {

@@ -40,6 +40,8 @@ sealed class ServerConnectCredential {
         return monitor == null
             ? null
             : ServerConnectCredentialMonitorHttp(spi: spi, monitor: monitor);
+      case ServerTransport.adb:
+        return spi.adbOn == null ? null : ServerConnectCredentialAdb(spi: spi);
       case ServerTransport.local:
         return spi.local ? ServerConnectCredentialLocal(spi: spi) : null;
     }
@@ -69,4 +71,9 @@ final class ServerConnectCredentialLocal extends ServerConnectCredential {
   final Spi spi;
 
   const ServerConnectCredentialLocal({required this.spi});
+}
+
+final class ServerConnectCredentialAdb extends ServerConnectCredential {
+  const ServerConnectCredentialAdb({required this.spi});
+  final Spi spi;
 }

@@ -475,7 +475,7 @@ extension _Init on SSHPageState {
     // against one. A terminal on this device has neither.
     final spi = widget.args.spi;
     final snippets = ref.read(snippetProvider.select((p) => p.snippets));
-    if (spi != null) {
+    if (spi != null && spi.adbOn == null) {
       for (final snippet in snippets) {
         if (snippet.autoRunOn?.contains(spi.id) == true) {
           if (!current()) return;

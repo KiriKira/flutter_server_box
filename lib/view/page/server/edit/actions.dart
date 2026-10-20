@@ -554,6 +554,8 @@ extension _Actions on _ServerEditPageState {
     // methods rather than turning them off.
     final useSsh = _useSsh.value && !local;
     final useMonitorHttp = _useMonitorHttp.value && !local;
+    final useAdb = _useAdb.value && !local;
+    if (useAdb && !_adb.isValid) { Toast.error(l10n.invalidHostFormat); return; }
     final keyIdx = _keyIdx.value;
     // `-1` is not an index into anything. It is what the key-auth switch
     // writes when it is turned on before a key is picked, and it stands for
@@ -740,6 +742,7 @@ extension _Actions on _ServerEditPageState {
           ? _nameController.text
           : local
           ? Platform.localHostname
+          : useAdb ? (_adb.localDevice ? l10n.adbDevice : _adb.host)
           : (ssh?.ip ?? monitorHttp?.addr ?? ''),
       ssh: ssh,
       tags: _tags.value.isEmpty ? null : _tags.value.toList(),
@@ -759,6 +762,8 @@ extension _Actions on _ServerEditPageState {
           : null,
       sshEnabled: _useSsh.value,
       monitorEnabled: _useMonitorHttp.value,
+      adb: _useAdb.value || this.spi?.adb != null ? _adb : null,
+      adbEnabled: _useAdb.value,
       local: local,
       envs: _env.value.isEmpty ? null : _env.value,
       id: _serverId,
@@ -1042,6 +1047,8 @@ extension _Utils on _ServerEditPageState {
     // and `transport` all answer "nothing is dialled" for one, and what the
     // form shows is what turning that off would bring back.
     final dialled = spi.copyWith(local: false);
+    _adb = spi.adb ?? const AdbCredential();
+    _useAdb.value = dialled.adbOn != null;
     _local.value = spi.local;
     _useSsh.value = dialled.sshOn != null;
     _useMonitorHttp.value = dialled.monitorOn != null;
