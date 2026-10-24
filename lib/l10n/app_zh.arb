@@ -1724,5 +1724,14 @@
   "adbConfirm": "要在当前显示的 Android 设备上执行此操作吗？",
   "adbTemperature": "电池温度",
   "adbIdentity": "执行身份",
-  "adbRootDisable": "停用 root 增强"
+  "adbRootDisable": "停用 root 增强",
+  "adbScreen": "屏幕控制",
+  "adbScreenPreparing": "正在准备屏幕控制…",
+  "adbScreenConnecting": "正在等待第一帧画面…",
+  "adbScreenPaused": "屏幕控制已在后台暂停",
+  "adbScreenFailed": "屏幕控制失败",
+  "adbScreenChanged": "设备连接配置已改变，请从 Android 工具页重新打开屏幕控制。",
+  "adbScreenBack": "返回",
+  "adbScreenHome": "主页",
+  "adbScreenRecent": "最近任务"
 }

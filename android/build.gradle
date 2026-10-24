@@ -13,7 +13,7 @@ subprojects {
 
 subprojects { subproject ->
   // Only works on com.android.application(the main app module)
-  if (subproject.plugins.hasPlugin('com.android.application')) {
+  if (subproject.path == ':app' && subproject.plugins.hasPlugin('com.android.application')) {
     subproject.afterEvaluate {
       android.buildTypes.matching { it.name == 'profile' }.all { buildType ->
         buildType.applicationIdSuffix = ".profile"
@@ -28,7 +28,7 @@ subprojects { subproject ->
 }
 
 subprojects {
-    project.evaluationDependsOn(':app')
+    if (project.path != ':scrcpyServer') project.evaluationDependsOn(':app')
 }
 
 // `wakelock_plus`' pigeon output carries no `package` declaration, so its

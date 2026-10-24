@@ -7830,5 +7830,14 @@
   "adbConfirm": "Run this action on the displayed Android device?",
   "adbTemperature": "Battery temperature",
   "adbIdentity": "Execution identity",
-  "adbRootDisable": "Disable root enhancement"
+  "adbRootDisable": "Disable root enhancement",
+  "adbScreen": "Screen control",
+  "adbScreenPreparing": "Preparing screen control…",
+  "adbScreenConnecting": "Waiting for the first video frame…",
+  "adbScreenPaused": "Screen control paused in background",
+  "adbScreenFailed": "Screen control failed",
+  "adbScreenChanged": "The device configuration changed. Reopen screen control from Android tools.",
+  "adbScreenBack": "Back",
+  "adbScreenHome": "Home",
+  "adbScreenRecent": "Recent apps"
 }

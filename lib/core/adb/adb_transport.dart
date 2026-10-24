@@ -107,6 +107,17 @@ class AdbConnection {
   String? _serial;
   final _streams = <AdbStream>{};
 
+  /// Keep the native connection handle private; screen sessions borrow it.
+  Future<int> startScreen(String session) async {
+    if (!Platform.isAndroid || closed) throw StateError('Android ADB connection required');
+    final result = await AdbService.channel.invokeMapMethod<String, dynamic>('screenStart', {'id': _nativeId, 'session': session});
+    if (closed) {
+      await AdbService.channel.invokeMethod<void>('screenStop', {'session': session});
+      throw StateError('ADB connection closed');
+    }
+    return result!['texture'] as int;
+  }
+
   Future<void> connect() async {
     if (Platform.isAndroid) {
       await AdbService.channel.invokeMethod<void>('connect', {'id': _nativeId, ...credential.toJson()});

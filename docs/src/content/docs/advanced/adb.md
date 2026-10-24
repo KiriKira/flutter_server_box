@@ -64,9 +64,28 @@ its in-memory grant. ServerBox does not install root or restart adbd as root.
 - Read a bounded recent logcat snapshot and export its output; save a screenshot;
   reboot the target phone.
 
-Split APK bundles, AAB installation, USB, screen control and root-only file
+Split APK bundles, AAB installation, USB and root-only file
 browsing are not included. Desktop clients use the installed adb server; ServerBox
 closes its own service streams and does not kill that shared server.
+
+## Screen control (Android client)
+
+For another phone, open **Android tools → Screen control**. The pinned scrcpy 5.0.1
+server is built from source into KiriBox, uploaded temporarily and run through
+`app_process` over the existing ADB connection. No target app installation, root,
+WebRTC or relay server is needed. Users can provide their own VPN connectivity.
+
+The screen supports taps, long presses, drags, multiple fingers and remote
+Back/Home/Recent apps buttons. Type by tapping the target phone's own on-screen
+keyboard and candidates. The controller's keyboard is not opened. Audio, clipboard
+sync, desktop/browser viewers and mirroring the controller itself are not included.
+
+Defaults are H.264, a maximum dimension of 1280, up to 60 fps and 8 Mbps. The viewer
+fits the picture without forwarding touches from letterboxing and follows target
+rotation. Backgrounding stops the screen session; returning recreates it. Errors
+offer retry. Exiting cleans up only this session, leaving terminal and monitoring
+connections alive. Some manufacturers require an additional debugging security
+setting to permit shell input injection.
 
 ## AI agent
 

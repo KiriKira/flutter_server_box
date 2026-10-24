@@ -6202,4 +6202,32 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get adbRootDisable => 'Disable root enhancement';
+
+  @override
+  String get adbScreen => 'Screen control';
+
+  @override
+  String get adbScreenPreparing => 'Preparing screen control…';
+
+  @override
+  String get adbScreenConnecting => 'Waiting for the first video frame…';
+
+  @override
+  String get adbScreenPaused => 'Screen control paused in background';
+
+  @override
+  String get adbScreenFailed => 'Screen control failed';
+
+  @override
+  String get adbScreenChanged =>
+      'The device configuration changed. Reopen screen control from Android tools.';
+
+  @override
+  String get adbScreenBack => 'Back';
+
+  @override
+  String get adbScreenHome => 'Home';
+
+  @override
+  String get adbScreenRecent => 'Recent apps';
 }

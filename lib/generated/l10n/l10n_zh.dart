@@ -5730,6 +5730,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adbRootDisable => '停用 root 增强';
+
+  @override
+  String get adbScreen => '屏幕控制';
+
+  @override
+  String get adbScreenPreparing => '正在准备屏幕控制…';
+
+  @override
+  String get adbScreenConnecting => '正在等待第一帧画面…';
+
+  @override
+  String get adbScreenPaused => '屏幕控制已在后台暂停';
+
+  @override
+  String get adbScreenFailed => '屏幕控制失败';
+
+  @override
+  String get adbScreenChanged => '设备连接配置已改变，请从 Android 工具页重新打开屏幕控制。';
+
+  @override
+  String get adbScreenBack => '返回';
+
+  @override
+  String get adbScreenHome => '主页';
+
+  @override
+  String get adbScreenRecent => '最近任务';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

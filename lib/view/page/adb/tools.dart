@@ -14,6 +14,7 @@ import 'package:server_box/core/extension/context/locale.dart';
 import 'package:server_box/data/model/file/file_backend.dart';
 import 'package:server_box/data/model/server/server_private_info.dart';
 import 'package:server_box/data/provider/server/single.dart';
+import 'package:server_box/view/page/adb/screen.dart';
 
 class AdbToolsPage extends ConsumerStatefulWidget {
   const AdbToolsPage({super.key, required this.spi});
@@ -78,6 +79,8 @@ class _AdbToolsPageState extends ConsumerState<AdbToolsPage> {
     final device = ref.watch(serverProvider(widget.spi.id)).status.android;
     final actions = <(String, IconData, VoidCallback)>[
       (l10n.adbInstall, Icons.install_mobile, _install),
+      if (Platform.isAndroid && widget.spi.adbOn?.localDevice == false)
+        (l10n.adbScreen, Icons.phonelink, () => AdbScreenPage.open(context, widget.spi)),
       (l10n.adbFiles, Icons.folder_open, () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => AdbFilesPage(spi: widget.spi)))),
       (l10n.adbLogcat, Icons.notes, () => _run((ops) async => (await ops.action('logcat', cancel: _cancel?.future)).stdout)),
       (l10n.adbScreenshot, Icons.screenshot, () => _run((ops) async {

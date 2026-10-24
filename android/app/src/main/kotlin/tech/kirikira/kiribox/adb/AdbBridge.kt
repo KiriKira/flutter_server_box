@@ -11,6 +11,7 @@ import android.provider.Settings
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.view.TextureRegistry
 import io.github.muntashirakon.adb.AdbStream
 import java.net.InetAddress
 import java.net.NetworkInterface
@@ -21,17 +22,19 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
-/** Native owns authenticated ADB connections; Dart owns service protocols. */
-class AdbBridge(private val context: Context, messenger: BinaryMessenger, private val requestNotifications: () -> Boolean = { true }) : MethodChannel.MethodCallHandler {
+/** Native owns ADB and screen media; Dart owns shell/sync service protocols. */
+class AdbBridge(private val context: Context, messenger: BinaryMessenger, textures: TextureRegistry, private val requestNotifications: () -> Boolean = { true }) : MethodChannel.MethodCallHandler {
     private val main = Handler(Looper.getMainLooper())
     private val workers = Executors.newCachedThreadPool()
     private val connections = ConcurrentHashMap<String, DeviceAdbManager>()
     private val streams = ConcurrentHashMap<String, Pair<String, AdbStream>>()
     private val sequence = AtomicLong()
+    private val screen = ScrcpyBridge(context, messenger, textures) { connections[it] }
 
     init { MethodChannel(messenger, "tech.lolli.toolbox/adb").setMethodCallHandler(this) }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        if (call.method.startsWith("screen")) { screen.handle(call, result); return }
         if (call.method == "discover") {
             discover(context, call.argument<Boolean>("local") == true, call.argument<Boolean>("pairing") == true) {
                 result.success(it)
@@ -111,6 +114,7 @@ class AdbBridge(private val context: Context, messenger: BinaryMessenger, privat
                     }
                     "disconnect" -> {
                         val id = required(call, "id")
+                        screen.disconnect(id)
                         streams.entries.filter { it.value.first == id }.forEach { (key, value) ->
                             streams.remove(key); runCatching { value.second.close() }
                         }
@@ -151,6 +155,13 @@ class AdbBridge(private val context: Context, messenger: BinaryMessenger, privat
     }
 
     private fun required(call: MethodCall, key: String): String = call.argument<String>(key) ?: error("Missing $key")
+
+    fun close() {
+        screen.close()
+        streams.values.forEach { runCatching { it.second.close() } }; streams.clear()
+        connections.values.forEach { runCatching { it.close() } }; connections.clear()
+        workers.shutdownNow()
+    }
 
     companion object {
         private val main = Handler(Looper.getMainLooper())

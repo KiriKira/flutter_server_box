@@ -53,6 +53,20 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
         "reboot" => "reboot".into(),
         "identity" => "id".into(),
         "guid" => "getprop persist.adb.wifi.guid".into(),
+        "scrcpy_start" | "scrcpy_stop" => {
+            if argument.len() != 8 || !argument.bytes().all(|b| b.is_ascii_hexdigit()) {
+                return Err("Invalid scrcpy session ID".into());
+            }
+            let scid = u32::from_str_radix(argument, 16).map_err(|_| "Invalid scrcpy session ID")?;
+            if scid == 0 || scid > i32::MAX as u32 { return Err("Invalid scrcpy session ID".into()); }
+            let path = format!("/data/local/tmp/serverbox-scrcpy-{argument}.jar");
+            let name = format!("kiribox-scrcpy-{argument}");
+            if action == "scrcpy_start" {
+                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=false cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
+            } else {
+                format!("for p in $(pidof {}); do kill \"$p\" 2>/dev/null || true; done; rm -f -- {}", quote(&name), quote(&path))
+            }
+        }
         _ => return Err("Unknown Android action".into()),
     };
     Ok(if root { format!("if [ \"$(id -u)\" = 0 ]; then sh -c {}; else su -c {}; fi", quote(&cmd), quote(&cmd)) } else { cmd })
@@ -185,5 +199,35 @@ mod tests {
         assert_eq!(parsed["device"]["model"], "Pixel");
         assert_eq!(parse_apps("package:/data/app/a=b/base.apk=com.example.app versionCode:42\n")[0]["package"], "com.example.app");
         assert!(parse_status("")["device"]["battery_percent"].is_null());
+    }
+
+    #[test]
+    fn scrcpy_commands_reject_untrusted_session_names() {
+        for value in ["", "00000000", "80000000", "ffffffff", "1234", "12345678;id", "1234567'", "../file"] {
+            assert!(command("scrcpy_start", value, false).is_err(), "{value}");
+            assert!(command("scrcpy_stop", value, false).is_err(), "{value}");
+        }
+        let start = command("scrcpy_start", "01234567", false).unwrap();
+        assert!(start.contains("com.genymobile.scrcpy.Server 5.0.1 scid=01234567"));
+        assert!(start.contains("audio=false") && start.contains("clipboard_autosync=false"));
+        assert!(start.contains("--nice-name='kiribox-scrcpy-01234567'"));
+        let stop = command("scrcpy_stop", "01234567", false).unwrap();
+        assert!(stop.contains("pidof 'kiribox-scrcpy-01234567'"));
+        assert!(!stop.contains("pkill") && !stop.contains("killall"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn scrcpy_launch_exports_classpath_and_passes_exact_arguments() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("app_process");
+        std::fs::write(&path, "#!/bin/sh\nprintf '%s\\n' \"$CLASSPATH\" \"$@\"\n").unwrap();
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let output = std::process::Command::new("/bin/sh").arg("-c")
+            .arg(command("scrcpy_start", "01234567", false).unwrap()).env("PATH", dir.path()).output().unwrap();
+        assert!(output.status.success());
+        let text = String::from_utf8(output.stdout).unwrap();
+        assert!(text.starts_with("/data/local/tmp/serverbox-scrcpy-01234567.jar\n/\n--nice-name=kiribox-scrcpy-01234567\ncom.genymobile.scrcpy.Server\n5.0.1\n"));
     }
 }

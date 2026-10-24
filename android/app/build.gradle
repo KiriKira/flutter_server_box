@@ -225,6 +225,27 @@ flutter {
     source '../..'
 }
 
+// The dex APK is used as an app_process classpath, never installed as an app.
+def scrcpyAssets = layout.buildDirectory.dir('generated/scrcpyAssets')
+def prepareScrcpyServer = tasks.register('prepareScrcpyServer', Sync) {
+    dependsOn ':scrcpyServer:assembleRelease'
+    from(project(':scrcpyServer').layout.buildDirectory.file('outputs/apk/release/scrcpyServer-release-unsigned.apk'))
+    from(rootProject.file('../third_party/scrcpy/LICENSE')) {
+        rename { 'scrcpy-LICENSE.txt' }
+    }
+    into scrcpyAssets
+    rename 'scrcpyServer-release-unsigned.apk', 'kiribox-scrcpy-server.jar'
+    doLast {
+        if (!new File(destinationDir, 'kiribox-scrcpy-server.jar').exists()) {
+            throw new GradleException('The pinned scrcpy server was not built')
+        }
+    }
+}
+android.sourceSets.main.assets.srcDir(scrcpyAssets)
+tasks.configureEach {
+    if (name.startsWith('merge') && name.endsWith('Assets')) dependsOn prepareScrcpyServer
+}
+
 dependencies {
     implementation('com.github.MuntashirAkon:libadb-android:3.1.1') {
         exclude group: 'org.bouncycastle', module: 'bcprov-jdk15to18'

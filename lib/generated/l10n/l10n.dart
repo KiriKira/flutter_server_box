@@ -10484,6 +10484,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Disable root enhancement'**
   String get adbRootDisable;
+
+  /// No description provided for @adbScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen control'**
+  String get adbScreen;
+
+  /// No description provided for @adbScreenPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing screen control…'**
+  String get adbScreenPreparing;
+
+  /// No description provided for @adbScreenConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the first video frame…'**
+  String get adbScreenConnecting;
+
+  /// No description provided for @adbScreenPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen control paused in background'**
+  String get adbScreenPaused;
+
+  /// No description provided for @adbScreenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Screen control failed'**
+  String get adbScreenFailed;
+
+  /// No description provided for @adbScreenChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'The device configuration changed. Reopen screen control from Android tools.'**
+  String get adbScreenChanged;
+
+  /// No description provided for @adbScreenBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get adbScreenBack;
+
+  /// No description provided for @adbScreenHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get adbScreenHome;
+
+  /// No description provided for @adbScreenRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent apps'**
+  String get adbScreenRecent;
 }
 
 class _AppLocalizationsDelegate

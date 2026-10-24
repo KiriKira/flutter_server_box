@@ -184,12 +184,13 @@ jobs:
             printf 'KiriBox %s，版本编号对齐上游 ServerBox v%s，基于本仓库当前 ADB 实现构建。\n\n' "$version" "$version"
             printf '%s\n' '- 支持 Wireless ADB、本机配对、Android 状态和可选 root 增强。' \
               '- 提供 ADB 终端、APK 安装、应用管理、文件传输、日志和截图。' \
+              '- Android 工具页提供屏幕控制：scrcpy 直连画面、多指触摸和系统导航键；不传音频，直接使用目标手机输入法。' \
               '- 本地 AI agent 可通过 ADB 管理手机。' \
               '- 附件包含 ARM64 和 x86-64 APK，均使用同一持久化签名。'
             if [[ "$RAN_ADB_TESTS" == true ]]; then
               printf '%s\n' '- ADB 模拟器测试已通过。'
             else
-              printf '%s\n' '- 本次未运行 ADB 模拟器测试。'
+              printf '%s\n' '- 本次未运行 ADB 模拟器测试，屏幕控制尚未完成真机验收。'
             fi
             printf '\n签名证书 SHA-256：`%s`\n' "$(cat android/kiribox-signing-sha256.txt)"
             printf '\nAndroid 安装包 ID：`tech.kirikira.kiribox`。已从编译后的 APK manifest 验证，可与原版 ServerBox 独立安装。\n'

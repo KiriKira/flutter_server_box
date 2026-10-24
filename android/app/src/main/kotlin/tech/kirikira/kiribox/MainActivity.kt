@@ -23,6 +23,7 @@ import tech.kirikira.kiribox.widget.HomeWidget
 import tech.kirikira.kiribox.widget.WidgetStore
 
 class MainActivity: FlutterFragmentActivity() {
+    private var adbBridge: tech.kirikira.kiribox.adb.AdbBridge? = null
     private lateinit var channel: MethodChannel
     private val ACTION_UPDATE_SESSIONS get() = "${packageName}.ACTION_UPDATE_SESSIONS"
     private val ACTION_DISCONNECT_SESSION get() = "${packageName}.ACTION_DISCONNECT_SESSION"
@@ -158,7 +159,7 @@ class MainActivity: FlutterFragmentActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         val binaryMessenger = flutterEngine.dartExecutor.binaryMessenger
-        tech.kirikira.kiribox.adb.AdbBridge(applicationContext, binaryMessenger) {
+        adbBridge = tech.kirikira.kiribox.adb.AdbBridge(applicationContext, binaryMessenger, flutterEngine.renderer) {
             requestNotificationPermissionOnce()
             notificationsAllowed()
         }
@@ -648,6 +649,8 @@ class MainActivity: FlutterFragmentActivity() {
     }
 
     override fun onDestroy() {
+        adbBridge?.close()
+        adbBridge = null
         super.onDestroy()
         stopAllReceiver?.let {
             try {

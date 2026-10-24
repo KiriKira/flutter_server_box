@@ -1,0 +1,44 @@
+// Build the pinned upstream source, not a downloaded/prebuilt server binary.
+plugins {
+    id 'com.android.application'
+}
+
+def upstream = rootProject.file('../third_party/scrcpy/server/src/main')
+if (!new File(upstream, 'java/com/genymobile/scrcpy/Server.java').exists()) {
+    throw new GradleException('Initialize third_party/scrcpy with git submodule update --init')
+}
+
+android {
+    namespace 'com.genymobile.scrcpy'
+    compileSdk Integer.parseInt(rootProject.file('compile-sdk-version.txt').text.trim())
+    buildToolsVersion rootProject.file('build-tools-version.txt').text.trim()
+    defaultConfig {
+        applicationId 'com.genymobile.scrcpy'
+        minSdk 21
+        targetSdk 36
+        versionCode 50001
+        versionName '5.0.1'
+    }
+    sourceSets.main {
+        java.srcDirs = [new File(upstream, 'java')]
+        aidl.srcDirs = [new File(upstream, 'aidl')]
+        manifest.srcFile new File(upstream, 'AndroidManifest.xml')
+    }
+    buildFeatures {
+        buildConfig true
+        aidl true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes.release {
+        minifyEnabled false
+        signingConfig null
+    }
+    dependenciesInfo {
+        includeInApk false
+        includeInBundle false
+    }
+    lint { disable 'UseRequiresApi' }
+}

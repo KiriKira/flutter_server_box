@@ -42,3 +42,6 @@
 	path = packages/fl_pi_llm
 	url = https://github.com/lollipopkit/fl_pi_llm
 	branch = main
+[submodule "third_party/scrcpy"]
+	path = third_party/scrcpy
+	url = https://github.com/Genymobile/scrcpy.git
