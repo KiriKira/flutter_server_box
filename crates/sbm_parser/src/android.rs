@@ -63,7 +63,7 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
             let path = format!("/data/local/tmp/serverbox-scrcpy-{argument}.jar");
             let name = format!("kiribox-scrcpy-{argument}");
             if action == "scrcpy_start" {
-                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} log_level=verbose tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=false cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
+                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} log_level=verbose tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=true cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
             } else {
                 format!("for p in $(pidof {}); do kill \"$p\" 2>/dev/null || true; done; rm -f -- {}", quote(&name), quote(&path))
             }
@@ -210,7 +210,7 @@ mod tests {
         }
         let start = command("scrcpy_start", "01234567", false).unwrap();
         assert!(start.contains("com.genymobile.scrcpy.Server 5.0.1 scid=01234567"));
-        assert!(start.contains("audio=false") && start.contains("clipboard_autosync=false"));
+        assert!(start.contains("audio=false") && start.contains("clipboard_autosync=true"));
         assert!(start.contains("--nice-name='kiribox-scrcpy-01234567'"));
         let stop = command("scrcpy_stop", "01234567", false).unwrap();
         assert!(stop.contains("pidof 'kiribox-scrcpy-01234567'"));

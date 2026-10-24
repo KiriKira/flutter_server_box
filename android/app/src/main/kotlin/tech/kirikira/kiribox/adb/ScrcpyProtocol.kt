@@ -9,9 +9,16 @@ internal object ScrcpyProtocol {
     const val VERSION = "5.0.1"
     const val MAX_PACKET = 8 * 1024 * 1024
     const val H264 = 0x68323634
+    /** Upstream's 256 KiB message limit minus each direction's clipboard header. */
+    const val CLIPBOARD_TO_DEVICE_MAX = (1 shl 18) - 14
+    const val CLIPBOARD_FROM_DEVICE_MAX = (1 shl 18) - 5
     data class Size(val width: Int, val height: Int, val revision: Int) {
         init { require(width in 1..65535 && height in 1..65535) }
     }
+    sealed interface DeviceMessage
+    data class Clipboard(val text: String) : DeviceMessage
+    data class ClipboardAck(val sequence: Long) : DeviceMessage
+    data class Uhid(val id: Int, val data: ByteArray) : DeviceMessage
     sealed interface Packet
     data class Geometry(val width: Int, val height: Int) : Packet
     data class Frame(val data: ByteArray, val pts: Long, val config: Boolean, val key: Boolean) : Packet
@@ -48,6 +55,34 @@ internal object ScrcpyProtocol {
         return ByteBuffer.allocate(14).apply {
             put(0.toByte()); put(action.toByte()); putInt(key); putInt(0); putInt(0)
         }.array()
+    }
+
+    /** SET_CLIPBOARD without an acknowledgement (sequence 0) and without pressing PASTE. */
+    fun setClipboard(text: String): ByteArray {
+        val bytes = utf8Prefix(text, CLIPBOARD_TO_DEVICE_MAX)
+        return ByteBuffer.allocate(14 + bytes.size).apply {
+            put(9.toByte()); putLong(0); put(0.toByte()); putInt(bytes.size); put(bytes)
+        }.array()
+    }
+
+    fun readDeviceMessage(input: DataInputStream): DeviceMessage = when (val type = input.readUnsignedByte()) {
+        0 -> {
+            val length = input.readInt()
+            if (length !in 0..CLIPBOARD_FROM_DEVICE_MAX) throw IOException("Invalid scrcpy clipboard length: $length")
+            Clipboard(String(ByteArray(length).also { input.readFully(it) }, Charsets.UTF_8))
+        }
+        1 -> ClipboardAck(input.readLong())
+        2 -> Uhid(input.readUnsignedShort(), ByteArray(input.readUnsignedShort()).also { input.readFully(it) })
+        else -> throw IOException("Unknown scrcpy device message: $type")
+    }
+
+    /** UTF-8 bytes of [text], cut at a code point boundary to at most [max] bytes. */
+    fun utf8Prefix(text: String, max: Int): ByteArray {
+        val bytes = text.toByteArray(Charsets.UTF_8)
+        if (bytes.size <= max) return bytes
+        var end = max
+        while (end > 0 && bytes[end].toInt() and 0xc0 == 0x80) end--
+        return bytes.copyOf(end)
     }
 
     /** Android AVC decoders require the Annex-B SPS and PPS as separate CSD. */

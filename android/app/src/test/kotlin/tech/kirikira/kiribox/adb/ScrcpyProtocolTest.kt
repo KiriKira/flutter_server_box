@@ -57,6 +57,38 @@ class ScrcpyProtocolTest {
         assertArrayEquals(hex("00 01 00000003 00000000 00000000"), ScrcpyProtocol.key(1, 3))
         assertThrows(IllegalArgumentException::class.java) { ScrcpyProtocol.key(0, 26) }
     }
+    @Test fun setClipboardUsesUpstreamLayoutWithoutAckOrPaste() {
+        assertArrayEquals(hex("09 0000000000000000 00 00000003 e4bda0"), ScrcpyProtocol.setClipboard("\u4f60"))
+        val big = ScrcpyProtocol.setClipboard("\u4f60".repeat(ScrcpyProtocol.CLIPBOARD_TO_DEVICE_MAX))
+        val length = ByteBuffer.wrap(big, 10, 4).int
+        // The 3-byte character that would cross the limit is dropped whole.
+        assertEquals(ScrcpyProtocol.CLIPBOARD_TO_DEVICE_MAX / 3 * 3, length)
+        assertEquals(14 + length, big.size)
+    }
+    @Test fun utf8PrefixNeverSplitsACodePoint() {
+        assertArrayEquals("a".toByteArray(), ScrcpyProtocol.utf8Prefix("a\u00e9", 2))
+        assertArrayEquals("a\u00e9".toByteArray(), ScrcpyProtocol.utf8Prefix("a\u00e9", 3))
+        assertArrayEquals(ByteArray(0), ScrcpyProtocol.utf8Prefix("\ud83d\ude00", 3))
+    }
+    @Test fun readsDeviceMessagesFromFragmentedStream() {
+        val text = "\u526a\u8d34\u677f".toByteArray()
+        val bytes = ByteBuffer.allocate(5 + text.size + 9 + 7)
+            .put(0.toByte()).putInt(text.size).put(text)
+            .put(1.toByte()).putLong(42)
+            .put(2.toByte()).putShort(7).putShort(2).put(1.toByte()).put(2.toByte()).array()
+        val stream = input(bytes)
+        assertEquals(ScrcpyProtocol.Clipboard("\u526a\u8d34\u677f"), ScrcpyProtocol.readDeviceMessage(stream))
+        assertEquals(ScrcpyProtocol.ClipboardAck(42), ScrcpyProtocol.readDeviceMessage(stream))
+        val uhid = ScrcpyProtocol.readDeviceMessage(stream) as ScrcpyProtocol.Uhid
+        assertEquals(7, uhid.id); assertArrayEquals(byteArrayOf(1, 2), uhid.data)
+        assertThrows(EOFException::class.java) { ScrcpyProtocol.readDeviceMessage(stream) }
+    }
+    @Test fun refusesUnknownOrOversizedDeviceMessages() {
+        assertThrows(IOException::class.java) { ScrcpyProtocol.readDeviceMessage(input(byteArrayOf(9))) }
+        assertThrows(IOException::class.java) {
+            ScrcpyProtocol.readDeviceMessage(input(ByteBuffer.allocate(5).put(0.toByte()).putInt(ScrcpyProtocol.CLIPBOARD_FROM_DEVICE_MAX + 1).array()))
+        }
+    }
     @Test fun splitsMixedAnnexBStartCodesIntoSpsAndPps() {
         val data = hex("00000001674201 00000168aabb")
         val (sps, pps) = ScrcpyProtocol.avcConfig(data)

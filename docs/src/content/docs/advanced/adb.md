@@ -77,8 +77,13 @@ WebRTC or relay server is needed. Users can provide their own VPN connectivity.
 
 The screen supports taps, long presses, drags, multiple fingers and remote
 Back/Home/Recent apps buttons. Type by tapping the target phone's own on-screen
-keyboard and candidates. The controller's keyboard is not opened. Audio, clipboard
-sync, desktop/browser viewers and mirroring the controller itself are not included.
+keyboard and candidates. The controller's keyboard is not opened. Audio,
+desktop/browser viewers and mirroring the controller itself are not included.
+
+Plain-text clipboard syncs both ways while the screen is open: text copied on the
+target appears on the controller, and text copied on the controller (including
+before opening the page) is placed on the target, ready to paste with a long press.
+Clips a password manager marks as sensitive are not sent to the target.
 
 Defaults are H.264, a maximum dimension of 1280, up to 60 fps and 8 Mbps. The viewer
 fits the picture without forwarding touches from letterboxing and follows target

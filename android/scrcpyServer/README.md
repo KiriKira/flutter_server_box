@@ -14,7 +14,12 @@ than width/height directly after the initial codec header.
 
 Video reception and AVC decoding stay in Kotlin and use a Flutter SurfaceProducer.
 Control messages use SDK touch/key injection, not UHID, so the target's software
-keyboard remains usable. Clipboard autosync and audio are explicitly disabled.
+keyboard remains usable. Audio is disabled. Plain-text clipboard syncs both ways
+(`clipboard_autosync=true`, `SET_CLIPBOARD` without paste); `ScrcpyClipboard` keeps
+the host side and skips clips marked sensitive.
+
+The decoder runs in MediaCodec asynchronous mode with `KEY_LOW_LATENCY` (and the
+Qualcomm vendor key), falling back to a plain configuration if a decoder refuses it.
 The screen session never owns the underlying ADB connection.
 
 Pure JVM wire-format tests: `ScrcpyProtocolTest`. Rust launch validation tests:

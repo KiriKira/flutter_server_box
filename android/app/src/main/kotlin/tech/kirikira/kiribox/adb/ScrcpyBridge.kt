@@ -21,6 +21,7 @@ internal class ScrcpyBridge(
     private val channel = EventChannel(messenger, "tech.kirikira.kiribox/scrcpy/events")
     private var sink: EventChannel.EventSink? = null
     private var current: ScrcpySession? = null
+    private val clipboard = ScrcpyClipboard(context)
     init { channel.setStreamHandler(this) }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink) { sink = events }
@@ -43,7 +44,7 @@ internal class ScrcpyBridge(
                     val manager = connection(connectionId) ?: error("ADB disconnected")
                     current?.stop()
                     val producer = textures.createSurfaceProducer()
-                    val session = ScrcpySession(id, connectionId, manager, producer, main) { event ->
+                    val session = ScrcpySession(id, connectionId, manager, producer, main, clipboard) { event ->
                         if (current?.id == id) sink?.success(event)
                     }
                     current = session

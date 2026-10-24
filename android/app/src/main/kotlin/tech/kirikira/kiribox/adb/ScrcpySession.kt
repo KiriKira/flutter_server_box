@@ -1,16 +1,22 @@
 package tech.kirikira.kiribox.adb
 
+import android.content.ClipboardManager
 import android.media.MediaCodec
 import android.media.MediaFormat
+import android.os.Build
 import android.os.Handler
+import android.os.HandlerThread
+import android.view.Surface
 import io.flutter.view.TextureRegistry
 import io.github.muntashirakon.adb.AdbStream
 import java.io.DataInputStream
+import java.io.EOFException
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.ArrayDeque
 import java.util.concurrent.Executors
 import java.util.concurrent.FutureTask
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -21,6 +27,7 @@ internal class ScrcpySession(
     private val manager: DeviceAdbManager,
     private val producer: TextureRegistry.SurfaceProducer,
     private val main: Handler,
+    private val clipboard: ScrcpyClipboard,
     private val emit: (Map<String, Any>) -> Unit,
 ) {
     val closed = AtomicBoolean(false)
@@ -28,6 +35,7 @@ internal class ScrcpySession(
     @Volatile private var video: AdbStream? = null
     @Volatile private var control: AdbStream? = null
     @Volatile private var size: ScrcpyProtocol.Size? = null
+    @Volatile private var activeCodec: MediaCodec? = null
     private val frames = ArrayDeque<VideoFrame>()
     private val frameLock = Object()
     private var queuedBytes = 0
@@ -35,15 +43,24 @@ internal class ScrcpySession(
     private val inputLock = Object()
     private val pointers = mutableMapOf<Long, Touch>() // control-writer thread only
     private val workers = Executors.newCachedThreadPool()
+    private val callbacks = HandlerThread("scrcpy-decoder-$id").also { it.start() }
+    private val hostClipboard = ClipboardManager.OnPrimaryClipChangedListener { pushHostClipboard() }
 
     private data class VideoFrame(val packet: ScrcpyProtocol.Frame, val size: ScrcpyProtocol.Size, val config: ByteArray, val epoch: Int)
     private sealed interface Input
     private data class Touch(val action: Int, val pointer: Long, val x: Double, val y: Double, val revision: Int) : Input
     private data class Key(val key: Int) : Input
+    private class Clipboard(val text: String) : Input
     private data object Release : Input
     private class Finish(val done: java.util.concurrent.CountDownLatch) : Input
 
+    /** One configured codec; input indices arrive from its callback thread. */
+    private class Decoder(val codec: MediaCodec, val epoch: Int) {
+        val inputs = LinkedBlockingQueue<Int>()
+    }
+
     fun start() {
+        clipboard.addListener(hostClipboard)
         producer.setCallback(object : TextureRegistry.SurfaceProducer.Callback {
             override fun onSurfaceCleanup() { fail("surface", "Video surface was released") }
         })
@@ -82,11 +99,18 @@ internal class ScrcpySession(
         control = openSocket()
         if (closed.get()) { control?.close(); return }
         synchronized(inputLock) { inputLock.notifyAll() }
+        // The target has not seen a host clip copied before this session (or while backgrounded).
+        main.post { pushHostClipboard() }
         workers.execute { guard("control") {
-            val source = control!!.openInputStream()
-            val bytes = ByteArray(4096)
-            while (!closed.get() && source.read(bytes) >= 0) { /* Clipboard/UHID are disabled. */ }
-            if (!closed.get()) throw IOException("scrcpy control channel disconnected")
+            val source = DataInputStream(control!!.openInputStream())
+            try {
+                while (!closed.get()) {
+                    val message = ScrcpyProtocol.readDeviceMessage(source)
+                    if (message is ScrcpyProtocol.Clipboard) main.post { if (!closed.get()) clipboard.fromDevice(message.text) }
+                }
+            } catch (end: EOFException) {
+                if (!closed.get()) throw IOException("scrcpy control channel disconnected")
+            }
         } }
         input.readFully(ByteArray(64)) // device name, not a video packet
         check(input.readInt() == ScrcpyProtocol.H264) { "Unsupported scrcpy video codec" }
@@ -139,20 +163,10 @@ internal class ScrcpySession(
     }
 
     private fun decode() {
-        var codec: MediaCodec? = null
-        var epoch = -1
-        val info = MediaCodec.BufferInfo()
-        fun drain(decoder: MediaCodec) {
-            while (!closed.get()) {
-                val index = decoder.dequeueOutputBuffer(info, 0)
-                if (index >= 0) {
-                    decoder.releaseOutputBuffer(index, true)
-                    // Some codecs delay OnFrameRendered until the consumer presents.
-                    // Output already submitted to the Surface is sufficient to show it.
-                    if (firstFrame.compareAndSet(false, true)) event("streaming")
-                }
-                else if (index != MediaCodec.INFO_OUTPUT_FORMAT_CHANGED && index != MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) break
-            }
+        var decoder: Decoder? = null
+        fun discard() {
+            activeCodec = null
+            decoder?.codec?.let { runCatching { it.stop() }; runCatching { it.release() } }; decoder = null
         }
         try {
             while (!closed.get()) {
@@ -160,46 +174,84 @@ internal class ScrcpySession(
                     if (frames.isEmpty() && !closed.get()) frameLock.wait(20)
                     frames.pollFirst()?.also { queuedBytes -= it.packet.data.size }
                 }
-                if (frame == null) { codec?.let { drain(it) }; continue }
-                if (frame.size.revision != size?.revision) continue
-                if (frame.epoch != epoch) {
-                    codec?.let { runCatching { it.stop() }; it.release() }; codec = null
+                if (frame == null || frame.size.revision != size?.revision) continue
+                if (frame.epoch != decoder?.epoch) {
+                    discard()
                     val surface = onMain {
                         check(!closed.get())
                         producer.setSize(frame.size.width, frame.size.height)
                         producer.surface
                     }
-                    val csd = ScrcpyProtocol.avcConfig(frame.config)
-                    val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, frame.size.width, frame.size.height).apply {
-                        setByteBuffer("csd-0", ByteBuffer.wrap(csd.first))
-                        setByteBuffer("csd-1", ByteBuffer.wrap(csd.second))
-                        setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, ScrcpyProtocol.MAX_PACKET)
-                    }
-                    val decoder = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
-                    codec = decoder
-                    decoder.configure(format, surface, null, 0)
-                    decoder.setOnFrameRenderedListener({ _, _, _ ->
-                        if (!closed.get() && firstFrame.compareAndSet(false, true)) event("streaming")
-                    }, main)
-                    decoder.start(); epoch = frame.epoch
+                    decoder = createDecoder(frame, surface)
                 }
-                val decoder = codec ?: continue
-                var index = -1
-                while (!closed.get() && index < 0) {
-                    drain(decoder)
-                    index = decoder.dequeueInputBuffer(10000)
-                }
-                if (closed.get()) break
-                val buffer = decoder.getInputBuffer(index) ?: throw IOException("Decoder input unavailable")
+                val current = decoder ?: continue
+                var index: Int? = null
+                while (!closed.get() && index == null) index = current.inputs.poll(10, TimeUnit.MILLISECONDS)
+                if (closed.get() || index == null) break
+                val buffer = current.codec.getInputBuffer(index) ?: throw IOException("Decoder input unavailable")
                 check(buffer.capacity() >= frame.packet.data.size) { "AVC frame exceeds decoder buffer" }
                 buffer.clear(); buffer.put(frame.packet.data)
-                decoder.queueInputBuffer(index, 0, frame.packet.data.size, frame.packet.pts, 0)
-                drain(decoder)
+                current.codec.queueInputBuffer(index, 0, frame.packet.data.size, frame.packet.pts, 0)
             }
         } finally {
-            codec?.let { runCatching { it.stop() }; runCatching { it.release() } }
+            discard()
+            callbacks.quitSafely()
             main.post { producer.release() }
         }
+    }
+
+    /**
+     * Asynchronous mode renders each output buffer the moment it is ready, rather than at the next
+     * input or poll. Low-latency decoding stops decoders that otherwise hold several frames back;
+     * a decoder that refuses those keys is configured again without them.
+     */
+    private fun createDecoder(frame: VideoFrame, surface: Surface): Decoder {
+        val csd = ScrcpyProtocol.avcConfig(frame.config)
+        var failure: Exception? = null
+        for (lowLatency in listOf(true, false)) {
+            val codec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+            val decoder = Decoder(codec, frame.epoch)
+            try {
+                codec.setCallback(object : MediaCodec.Callback() {
+                    override fun onInputBufferAvailable(source: MediaCodec, index: Int) { decoder.inputs.offer(index) }
+                    override fun onOutputBufferAvailable(source: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+                        // A codec being stopped by the decode thread refuses the release; nothing to show then.
+                        if (runCatching { source.releaseOutputBuffer(index, true) }.isSuccess &&
+                            !closed.get() && firstFrame.compareAndSet(false, true)) event("streaming")
+                    }
+                    override fun onError(source: MediaCodec, error: MediaCodec.CodecException) {
+                        // A codec already replaced (rotation, new configuration) is not this session failing.
+                        if (source === activeCodec) fail("decoder", error.diagnosticInfo ?: error.message ?: "Decoder error")
+                    }
+                    override fun onOutputFormatChanged(source: MediaCodec, format: MediaFormat) {}
+                }, Handler(callbacks.looper))
+                val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, frame.size.width, frame.size.height).apply {
+                    setByteBuffer("csd-0", ByteBuffer.wrap(csd.first))
+                    setByteBuffer("csd-1", ByteBuffer.wrap(csd.second))
+                    setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, ScrcpyProtocol.MAX_PACKET)
+                    if (lowLatency) {
+                        setInteger(MediaFormat.KEY_PRIORITY, 0) // realtime
+                        if (Build.VERSION.SDK_INT >= 30) setInteger(MediaFormat.KEY_LOW_LATENCY, 1)
+                        // Qualcomm decoders predating KEY_LOW_LATENCY still reorder frames without this.
+                        if (codec.name.startsWith("OMX.qcom.") || codec.name.startsWith("c2.qti.")) {
+                            setInteger("vendor.qti-ext-dec-low-latency.enable", 1)
+                        }
+                    }
+                }
+                codec.configure(format, surface, null, 0)
+                codec.setOnFrameRenderedListener({ _, _, _ ->
+                    if (!closed.get() && firstFrame.compareAndSet(false, true)) event("streaming")
+                }, main)
+                codec.start()
+                activeCodec = codec
+                return decoder
+            } catch (error: Exception) {
+                runCatching { codec.release() }
+                if (error is InterruptedException || closed.get()) throw error
+                failure = error
+            }
+        }
+        throw failure ?: IOException("No AVC decoder")
     }
 
     fun touch(action: Int, pointer: Long, x: Double, y: Double, revision: Int) {
@@ -208,6 +260,12 @@ internal class ScrcpySession(
     }
     fun key(key: Int) { require(key in setOf(3, 4, 187)); if (!closed.get()) enqueue(Key(key)) }
     fun releasePointers() { if (!closed.get()) enqueue(Release) }
+
+    private fun pushHostClipboard() {
+        if (closed.get() || control == null) return
+        val text = clipboard.takeHostChange() ?: return
+        runCatching { enqueue(Clipboard(text)) }
+    }
 
     private fun enqueue(value: Input) {
         synchronized(inputLock) {
@@ -261,6 +319,7 @@ internal class ScrcpySession(
                 is Key -> if (!closed.get()) {
                     output.write(ScrcpyProtocol.key(0, input.key)); output.write(ScrcpyProtocol.key(1, input.key)); output.flush()
                 }
+                is Clipboard -> if (!closed.get()) { output.write(ScrcpyProtocol.setClipboard(input.text)); output.flush() }
                 Release -> release()
                 is Finish -> { try { release() } finally { input.done.countDown() }; return }
             }
@@ -278,6 +337,7 @@ internal class ScrcpySession(
     }
     fun stop(onStopped: (() -> Unit)? = null) {
         if (!closed.compareAndSet(false, true)) { onStopped?.invoke(); return }
+        main.post { clipboard.removeListener(hostClipboard) }
         workers.execute {
             // Best effort UP before closing; a broken network must not block teardown.
             val latch = java.util.concurrent.CountDownLatch(1)
@@ -286,6 +346,7 @@ internal class ScrcpySession(
             synchronized(frameLock) { frames.clear(); queuedBytes = 0; frameLock.notifyAll() }
             synchronized(inputLock) { inputs.clear(); inputLock.notifyAll() }
             workers.shutdownNow()
+            callbacks.quitSafely()
             if (onStopped != null) main.post(onStopped)
         }
     }

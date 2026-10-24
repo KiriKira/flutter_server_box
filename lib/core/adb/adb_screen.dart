@@ -31,6 +31,7 @@ class AdbScreenSession extends ChangeNotifier {
   String? inputWarning;
   int inputRequests = 0;
   int nativeAccepted = 0;
+  int coalesced = 0;
   String _log = '';
   bool _closed = false;
   bool _disposed = false;
@@ -44,7 +45,9 @@ class AdbScreenSession extends ChangeNotifier {
   final _logs = <StreamSubscription<String>>[];
   Future<void>? _starting;
   Future<void>? _closing;
-  Future<void> _inputs = Future.value();
+  final _pending = <(String, Map<String, Object>)>[];
+  bool _pumping = false;
+  Future<void> _pumped = Future.value();
 
   void _notify() { if (!_disposed) notifyListeners(); }
   void _check() {
@@ -128,15 +131,43 @@ class AdbScreenSession extends ChangeNotifier {
     unawaited(close());
   }
 
+  /// One platform call in flight; a queued move is replaced by the next move of the same
+  /// finger, so a busy platform thread delays the latest position rather than a backlog.
   Future<void> _send(String method, Map<String, Object> arguments) {
     if (method != 'screenRelease') inputRequests++;
-    final next = _inputs.then((_) async {
-      if (!_closed && _nativeStarted) {
+    if (method == 'screenTouch' && arguments['action'] == 2) {
+      for (var i = _pending.length - 1; i >= 0; i--) {
+        final (queued, previous) = _pending[i];
+        if (queued == 'screenRelease') break;
+        if (queued == 'screenTouch' && previous['pointer'] == arguments['pointer']) {
+          // Never across this finger's DOWN/UP or a geometry change.
+          if (previous['action'] == 2 && previous['revision'] == arguments['revision']) {
+            _pending[i] = (method, arguments); coalesced++;
+            return _pumped;
+          }
+          break;
+        }
+      }
+    }
+    _pending.add((method, arguments));
+    if (!_pumping) { _pumping = true; _pumped = _pump(); }
+    return _pumped;
+  }
+
+  Future<void> _pump() async {
+    try {
+      while (_pending.isNotEmpty && !_closed) {
+        final (method, arguments) = _pending.removeAt(0);
+        if (!_nativeStarted) continue;
         await AdbService.channel.invokeMethod<void>(method, {'session': id, ...arguments});
         if (method != 'screenRelease') nativeAccepted++;
       }
-    }).catchError((Object e) { if (!_closed) _fail('$e'); });
-    return _inputs = next;
+    } catch (e) {
+      _pending.clear();
+      if (!_closed) _fail('$e');
+    } finally {
+      _pumping = false;
+    }
   }
   Future<void> touch(int action, int pointer, double x, double y, int geometryRevision) => _send('screenTouch', {
     'action': action, 'pointer': pointer, 'x': x, 'y': y, 'revision': geometryRevision,
@@ -146,7 +177,7 @@ class AdbScreenSession extends ChangeNotifier {
 
   String get diagnostics => 'scrcpy 5.0.1; mode=${root ? 'root' : 'shell'}; state=${state.name}\n'
     'video=$width x $height; revision=$revision\n'
-    'input requests=$inputRequests; accepted by native queue=$nativeAccepted (not a target execution acknowledgement)\n'
+    'input requests=$inputRequests; coalesced moves=$coalesced; accepted by native queue=$nativeAccepted (not a target execution acknowledgement)\n'
     '${error ?? ''}\n$_log';
 
   Future<void> wake() async {
