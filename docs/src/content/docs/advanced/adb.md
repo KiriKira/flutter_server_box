@@ -85,10 +85,33 @@ target appears on the controller, and text copied on the controller (including
 before opening the page) is placed on the target, ready to paste with a long press.
 Clips a password manager marks as sensitive are not sent to the target.
 
-Defaults are H.264, a maximum dimension of 1280, up to 60 fps and 8 Mbps. The viewer
-fits the picture without forwarding touches from letterboxing and follows target
-rotation. Backgrounding stops the screen session; returning recreates it. Errors
-offer retry. Exiting cleans up only this session, leaving terminal and monitoring
+Video is H.264. **Picture quality** in the top-right menu picks a preset: High
+(1280 px, 60 fps, 8 Mbps), Balanced (1024 px, 30 fps, 2.5 Mbps), Smooth (720 px,
+30 fps, 1 Mbps) or Data saver (540 px, 20 fps, 0.5 Mbps). Automatic, the default,
+uses High for a LAN address and Balanced for anything else — a Tailscale address
+(`100.64.0.0/10`, `fd7a:115c:a1e0::/48`, `*.ts.net`), another VPN, a public address
+or a bare host name — and steps one preset down when video stays more than a second
+behind, remembering that for the rest of the app session. The viewer fits the
+picture without forwarding touches from letterboxing and follows target rotation.
+
+Over a remote link (Tailscale, especially through a DERP relay):
+
+- The line under the picture shows the control round trip, how far video is behind
+  (when it is), throughput and frame rate; it turns orange when the network stalls.
+- Each control write waits for the previous one's ADB acknowledgement, so touches
+  queued during a round trip are sent together, each finger at its latest position.
+  A circle under each finger appears at once, before the target answers.
+- After a stall the backlog is decoded and only the newest frame shown, and when it
+  has to be dropped a fresh key frame is requested instead of waiting up to 10 s.
+- With no ADB acknowledgement for 15 s the link counts as lost. A session that had
+  shown video then reconnects by itself up to five times (1–8 s apart), redialling
+  ADB if the old connection no longer answers.
+- Momentum scrolling (flings) is unreliable with a round trip above about 40 ms: the
+  target timestamps touches when they arrive, and Android drops a fling whose samples
+  are that far apart. Drag to scroll, or use shorter swipes.
+
+The controller's screen stays on while the page is open. Backgrounding stops the
+screen session; returning recreates it. Errors offer retry. Exiting cleans up only this session, leaving terminal and monitoring
 connections alive. Some manufacturers require an additional debugging security
 setting to permit shell input injection.
 

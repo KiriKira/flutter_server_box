@@ -65,6 +65,10 @@ class ScrcpyProtocolTest {
         assertEquals(ScrcpyProtocol.CLIPBOARD_TO_DEVICE_MAX / 3 * 3, length)
         assertEquals(14 + length, big.size)
     }
+    @Test fun resetAndPingAreUpstreamControlMessagesWithoutSideEffects() {
+        assertArrayEquals(byteArrayOf(17), ScrcpyProtocol.resetVideo()) // TYPE_RESET_VIDEO, no payload
+        assertArrayEquals(byteArrayOf(8, 0), ScrcpyProtocol.ping()) // TYPE_GET_CLIPBOARD, COPY_KEY_NONE
+    }
     @Test fun utf8PrefixNeverSplitsACodePoint() {
         assertArrayEquals("a".toByteArray(), ScrcpyProtocol.utf8Prefix("a\u00e9", 2))
         assertArrayEquals("a\u00e9".toByteArray(), ScrcpyProtocol.utf8Prefix("a\u00e9", 3))

@@ -13,11 +13,45 @@ import 'package:server_box/src/rust/api/files.dart' as files;
 
 enum AdbScreenState { preparing, connecting, streaming, failed, stopped }
 
+/// Video presets; the numbers live with the launch command (`sbm_parser::android::scrcpy_quality`).
+enum AdbScreenQuality {
+  auto, high, balanced, smooth, saver;
+
+  /// A LAN address gets [high]. Anything else — a Tailscale (100.64.0.0/10, fd7a:115c:a1e0::/48,
+  /// *.ts.net) or other VPN address, a public address, a bare host name — starts at [balanced]:
+  /// over a relay or mobile data 8 Mbps only queues seconds of video behind every touch.
+  AdbScreenQuality resolve(String host) {
+    if (this != auto) return this;
+    final name = host.trim().toLowerCase();
+    if (name == 'localhost' || name.endsWith('.local') || name.endsWith('.lan')) return high;
+    final address = InternetAddress.tryParse(name.startsWith('[') && name.endsWith(']') ? name.substring(1, name.length - 1) : name);
+    if (address == null) return balanced;
+    final b = address.rawAddress;
+    if (address.type == InternetAddressType.IPv4) {
+      final lan = b[0] == 10 || (b[0] == 172 && b[1] >= 16 && b[1] < 32) || (b[0] == 192 && b[1] == 168) ||
+        (b[0] == 169 && b[1] == 254) || b[0] == 127;
+      return lan ? high : balanced;
+    }
+    // Unique-local fc00::/7 holds Tailscale's fd7a:115c:a1e0::/48, so only link-local counts as LAN.
+    return address.isLinkLocal || address.isLoopback ? high : balanced;
+  }
+
+  /// The next preset down, or null at the bottom.
+  AdbScreenQuality? get lower => switch (this) {
+    AdbScreenQuality.auto || AdbScreenQuality.high => AdbScreenQuality.balanced,
+    AdbScreenQuality.balanced => AdbScreenQuality.smooth,
+    AdbScreenQuality.smooth => AdbScreenQuality.saver,
+    AdbScreenQuality.saver => null,
+  };
+}
+
 /// A screen borrows an ADB connection; disposing it never disconnects that device.
 class AdbScreenSession extends ChangeNotifier {
-  AdbScreenSession(this.connection, {this.root = false});
+  AdbScreenSession(this.connection, {this.root = false, this.quality = AdbScreenQuality.high})
+    : assert(quality != AdbScreenQuality.auto);
   final AdbConnection connection;
   final bool root;
+  final AdbScreenQuality quality;
   final id = (Random.secure().nextInt(0x7ffffffe) + 1).toRadixString(16).padLeft(8, '0');
   static const _events = EventChannel('tech.kirikira.kiribox/scrcpy/events');
   static AdbScreenSession? _active;
@@ -32,6 +66,19 @@ class AdbScreenSession extends ChangeNotifier {
   int inputRequests = 0;
   int nativeAccepted = 0;
   int coalesced = 0;
+  /// Whether video ever played: a later failure is then the link, worth reconnecting.
+  bool streamed = false;
+  String? failureStage;
+  /// Smoothed control round trip in ms, -1 until measured.
+  int rtt = -1;
+  /// How far video runs behind the fastest frame seen recently, in ms.
+  int lag = 0;
+  /// How long the oldest control write has waited for adbd's acknowledgement, in ms.
+  int pending = 0;
+  int kbps = 0;
+  int fps = 0;
+  /// Counts the native side's once-a-second statistics.
+  int statsTicks = 0;
   String _log = '';
   bool _closed = false;
   bool _disposed = false;
@@ -89,7 +136,7 @@ class AdbScreenSession extends ChangeNotifier {
       _check();
       state = AdbScreenState.connecting; progress = null; _notify();
       _shell = await AdbShellSession.open(connection,
-        command: android.androidCommand(action: 'scrcpy_start', argument: id, root: root));
+        command: android.androidCommand(action: 'scrcpy_start', argument: '$id:${quality.name}', root: root));
       _launched = true;
       _check();
       void log(String chunk) {
@@ -119,8 +166,13 @@ class AdbScreenSession extends ChangeNotifier {
     switch (raw['state']) {
       case 'size':
         width = raw['width'] as int; height = raw['height'] as int; revision = raw['revision'] as int;
-      case 'streaming': state = AdbScreenState.streaming;
-      case 'error': _fail('${raw['stage']}: ${raw['message']}\n$_log'); return;
+      case 'streaming': state = AdbScreenState.streaming; streamed = true;
+      case 'stats':
+        rtt = raw['rtt'] as int; lag = raw['lag'] as int; pending = raw['pending'] as int;
+        kbps = raw['kbps'] as int; fps = raw['fps'] as int; statsTicks++;
+      case 'error':
+        failureStage = raw['stage'] as String?;
+        _fail('${raw['stage']}: ${raw['message']}\n$_log'); return;
     }
     _notify();
   }
@@ -175,8 +227,9 @@ class AdbScreenSession extends ChangeNotifier {
   Future<void> key(int key) => _send('screenKey', {'key': key});
   Future<void> releasePointers() => _send('screenRelease', const {});
 
-  String get diagnostics => 'scrcpy 5.0.1; mode=${root ? 'root' : 'shell'}; state=${state.name}\n'
-    'video=$width x $height; revision=$revision\n'
+  String get diagnostics => 'scrcpy 5.0.1; mode=${root ? 'root' : 'shell'}; quality=${quality.name}; state=${state.name}\n'
+    'video=$width x $height; revision=$revision; $kbps kbps; $fps fps; lag=$lag ms\n'
+    'control rtt=${rtt < 0 ? 'unknown' : '$rtt ms'}; awaiting ack=$pending ms\n'
     'input requests=$inputRequests; coalesced moves=$coalesced; accepted by native queue=$nativeAccepted (not a target execution acknowledgement)\n'
     '${error ?? ''}\n$_log';
 

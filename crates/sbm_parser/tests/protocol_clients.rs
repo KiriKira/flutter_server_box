@@ -27,7 +27,7 @@ const CLIENTS: &[(&str, &str, &str)] = &[
         "req.setValue(sbmProtocol, forHTTPHeaderField: \"{h}\")",
     ),
     (
-        "android/app/src/main/kotlin/tech/lolli/toolbox/widget/WidgetApi.kt",
+        "android/app/src/main/kotlin/tech/kirikira/kiribox/widget/WidgetApi.kt",
         "private const val SBM_PROTOCOL = \"{p}\"",
         "setRequestProperty(\"{h}\", SBM_PROTOCOL)",
     ),

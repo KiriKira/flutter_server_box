@@ -20,6 +20,13 @@ the host side and skips clips marked sensitive.
 
 The decoder runs in MediaCodec asynchronous mode with `KEY_LOW_LATENCY` (and the
 Qualcomm vendor key), falling back to a plain configuration if a decoder refuses it.
+
+For slow or lossy links (VPN relays): quality presets live in
+`sbm_parser::android::scrcpy_quality`; the control writer batches everything queued
+while libadb waits for adbd's OKAY (`AdbWriteGate`, one WRTE in flight per stream),
+pings with a no-op `GET_CLIPBOARD` when idle and fails the session after 15 s without
+an OKAY; a video backlog is decoded with only the newest frame rendered, and an
+overflow sends `RESET_VIDEO` for a prompt key frame.
 The screen session never owns the underlying ADB connection.
 
 Pure JVM wire-format tests: `ScrcpyProtocolTest`. Rust launch validation tests:

@@ -1743,5 +1743,14 @@
   "adbScreenUnlockTip": "已请求唤醒并解除普通锁屏。若设置了 PIN、图案或密码，仍需在目标画面输入原有凭据；主页和最近任务不能解除密码锁。",
   "adbScreenInputDenied": "目标机拒绝了输入注入。请检查调试安全设置；若 shell 已获 su 授权，可切换 Root 控制。",
   "adbScreenGeometryWarning": "目标机拒绝了尺寸已过期的触摸坐标，请重连或查看控制诊断。",
-  "adbScreenInputError": "目标机输入接口报错，请打开控制诊断查看服务端消息。"
+  "adbScreenInputError": "目标机输入接口报错，请打开控制诊断查看服务端消息。",
+  "adbScreenQuality": "画质",
+  "adbScreenQualityAuto": "自动",
+  "adbScreenQualityHigh": "高清",
+  "adbScreenQualityBalanced": "均衡",
+  "adbScreenQualitySmooth": "流畅",
+  "adbScreenQualitySaver": "省流",
+  "adbScreenQualityLowered": "画面跟不上网络速度，已自动降低画质。",
+  "adbScreenReconnecting": "连接中断，正在重连",
+  "adbScreenStalled": "网络卡顿，等待目标机响应"
 }

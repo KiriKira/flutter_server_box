@@ -31,6 +31,18 @@ const STATUS: &[(&str, &str)] = &[
     ("addresses", "ip -o addr show"),
 ];
 
+/// Screen-control quality presets: (max dimension, max fps, video bit rate).
+/// Lower presets keep a remote link (VPN relay, mobile data) from queuing seconds of video.
+pub fn scrcpy_quality(name: &str) -> Result<(u32, u32, u32), String> {
+    Ok(match name {
+        "high" => (1280, 60, 8_000_000),
+        "balanced" => (1024, 30, 2_500_000),
+        "smooth" => (720, 30, 1_000_000),
+        "saver" => (540, 20, 500_000),
+        _ => return Err("Unknown scrcpy quality".into()),
+    })
+}
+
 pub fn command(action: &str, argument: &str, root: bool) -> Result<String, String> {
     if argument.contains('\0') { return Err("NUL in Android argument".into()); }
     let cmd = match action {
@@ -55,15 +67,22 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
         "guid" => "getprop persist.adb.wifi.guid".into(),
         "screen_wake" => "input keyevent 224 && wm dismiss-keyguard".into(),
         "scrcpy_start" | "scrcpy_stop" => {
-            if argument.len() != 8 || !argument.bytes().all(|b| b.is_ascii_hexdigit()) {
+            // `scrcpy_start` takes `<session>` or `<session>:<quality>`; stopping needs the session only.
+            let (session, quality) = match argument.split_once(':') {
+                Some((session, quality)) if action == "scrcpy_start" => (session, quality),
+                Some(_) => return Err("Invalid scrcpy session ID".into()),
+                None => (argument, "high"),
+            };
+            if session.len() != 8 || !session.bytes().all(|b| b.is_ascii_hexdigit()) {
                 return Err("Invalid scrcpy session ID".into());
             }
-            let scid = u32::from_str_radix(argument, 16).map_err(|_| "Invalid scrcpy session ID")?;
+            let scid = u32::from_str_radix(session, 16).map_err(|_| "Invalid scrcpy session ID")?;
             if scid == 0 || scid > i32::MAX as u32 { return Err("Invalid scrcpy session ID".into()); }
-            let path = format!("/data/local/tmp/serverbox-scrcpy-{argument}.jar");
-            let name = format!("kiribox-scrcpy-{argument}");
+            let path = format!("/data/local/tmp/serverbox-scrcpy-{session}.jar");
+            let name = format!("kiribox-scrcpy-{session}");
             if action == "scrcpy_start" {
-                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} log_level=verbose tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=true cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
+                let (max_size, max_fps, bit_rate) = scrcpy_quality(quality)?;
+                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={session} log_level=verbose tunnel_forward=true audio=false control=true video_codec=h264 max_size={max_size} max_fps={max_fps} video_bit_rate={bit_rate} clipboard_autosync=true cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
             } else {
                 format!("for p in $(pidof {}); do kill \"$p\" 2>/dev/null || true; done; rm -f -- {}", quote(&name), quote(&path))
             }
@@ -215,6 +234,21 @@ mod tests {
         let stop = command("scrcpy_stop", "01234567", false).unwrap();
         assert!(stop.contains("pidof 'kiribox-scrcpy-01234567'"));
         assert!(!stop.contains("pkill") && !stop.contains("killall"));
+    }
+
+    #[test]
+    fn scrcpy_quality_presets_reach_the_server_arguments() {
+        let default = command("scrcpy_start", "01234567", false).unwrap();
+        assert!(default.contains("max_size=1280 max_fps=60 video_bit_rate=8000000"));
+        let smooth = command("scrcpy_start", "01234567:smooth", false).unwrap();
+        assert!(smooth.contains("scid=01234567 ") && smooth.contains("max_size=720 max_fps=30 video_bit_rate=1000000"));
+        for name in ["high", "balanced", "smooth", "saver"] {
+            assert!(command("scrcpy_start", &format!("01234567:{name}"), false).is_ok(), "{name}");
+        }
+        for bad in ["01234567:", "01234567:ultra", "01234567:smooth;id", "01234567:smooth:x", ":smooth"] {
+            assert!(command("scrcpy_start", bad, false).is_err(), "{bad}");
+        }
+        assert!(command("scrcpy_stop", "01234567:smooth", false).is_err());
     }
 
     #[test]

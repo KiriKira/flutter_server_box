@@ -616,6 +616,10 @@ class SettingStore extends SqliteStore with ThemeSettings {
   /// leaving the row halfway between two keys. See [VirtKeyRowsMigration].
   late final virtKeyRows = propertyDefault('virtKeyRows', 0);
 
+  /// Android screen control's video preset, an `AdbScreenQuality` name.
+  /// `auto` picks by the target's address and lowers itself when video falls behind.
+  late final adbScreenQuality = propertyDefault('adbScreenQuality', 'auto');
+
   /// general wake lock
   late final generalWakeLock = propertyDefault('generalWakeLock', false);
 

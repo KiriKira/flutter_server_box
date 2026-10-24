@@ -6221,4 +6221,32 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get adbScreenInputError =>
       'The target input interface reported an error. Open Control diagnostics for the server message.';
+
+  @override
+  String get adbScreenQuality => 'Picture quality';
+
+  @override
+  String get adbScreenQualityAuto => 'Automatic';
+
+  @override
+  String get adbScreenQualityHigh => 'High';
+
+  @override
+  String get adbScreenQualityBalanced => 'Balanced';
+
+  @override
+  String get adbScreenQualitySmooth => 'Smooth';
+
+  @override
+  String get adbScreenQualitySaver => 'Data saver';
+
+  @override
+  String get adbScreenQualityLowered =>
+      'Video was falling behind the network, so quality was lowered automatically.';
+
+  @override
+  String get adbScreenReconnecting => 'Connection lost, reconnecting';
+
+  @override
+  String get adbScreenStalled => 'Network stalled, waiting for the target';
 }

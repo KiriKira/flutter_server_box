@@ -5789,6 +5789,33 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adbScreenInputError => '目标机输入接口报错，请打开控制诊断查看服务端消息。';
+
+  @override
+  String get adbScreenQuality => '画质';
+
+  @override
+  String get adbScreenQualityAuto => '自动';
+
+  @override
+  String get adbScreenQualityHigh => '高清';
+
+  @override
+  String get adbScreenQualityBalanced => '均衡';
+
+  @override
+  String get adbScreenQualitySmooth => '流畅';
+
+  @override
+  String get adbScreenQualitySaver => '省流';
+
+  @override
+  String get adbScreenQualityLowered => '画面跟不上网络速度，已自动降低画质。';
+
+  @override
+  String get adbScreenReconnecting => '连接中断，正在重连';
+
+  @override
+  String get adbScreenStalled => '网络卡顿，等待目标机响应';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

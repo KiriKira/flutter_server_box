@@ -10598,6 +10598,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The target input interface reported an error. Open Control diagnostics for the server message.'**
   String get adbScreenInputError;
+
+  /// No description provided for @adbScreenQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Picture quality'**
+  String get adbScreenQuality;
+
+  /// No description provided for @adbScreenQualityAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic'**
+  String get adbScreenQualityAuto;
+
+  /// No description provided for @adbScreenQualityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get adbScreenQualityHigh;
+
+  /// No description provided for @adbScreenQualityBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get adbScreenQualityBalanced;
+
+  /// No description provided for @adbScreenQualitySmooth.
+  ///
+  /// In en, this message translates to:
+  /// **'Smooth'**
+  String get adbScreenQualitySmooth;
+
+  /// No description provided for @adbScreenQualitySaver.
+  ///
+  /// In en, this message translates to:
+  /// **'Data saver'**
+  String get adbScreenQualitySaver;
+
+  /// No description provided for @adbScreenQualityLowered.
+  ///
+  /// In en, this message translates to:
+  /// **'Video was falling behind the network, so quality was lowered automatically.'**
+  String get adbScreenQualityLowered;
+
+  /// No description provided for @adbScreenReconnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection lost, reconnecting'**
+  String get adbScreenReconnecting;
+
+  /// No description provided for @adbScreenStalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Network stalled, waiting for the target'**
+  String get adbScreenStalled;
 }
 
 class _AppLocalizationsDelegate

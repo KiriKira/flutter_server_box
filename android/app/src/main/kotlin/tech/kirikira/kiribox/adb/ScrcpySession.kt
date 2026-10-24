@@ -9,6 +9,7 @@ import android.os.HandlerThread
 import android.view.Surface
 import io.flutter.view.TextureRegistry
 import io.github.muntashirakon.adb.AdbStream
+import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
 import java.io.EOFException
 import java.io.IOException
@@ -19,6 +20,7 @@ import java.util.concurrent.FutureTask
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /** Video bytes never cross a Flutter channel. Only geometry/state and input do. */
 internal class ScrcpySession(
@@ -45,6 +47,14 @@ internal class ScrcpySession(
     private val workers = Executors.newCachedThreadPool()
     private val callbacks = HandlerThread("scrcpy-decoder-$id").also { it.start() }
     private val hostClipboard = ClipboardManager.OnPrimaryClipChangedListener { pushHostClipboard() }
+    // Link health, read by the stats tick on the main thread.
+    @Volatile private var awaitingAckSince = 0L // nanoTime; 0 when adbd acknowledged every control write
+    @Volatile private var rttMs = -1L
+    @Volatile private var lagMs = 0L
+    private val videoBytes = AtomicLong()
+    private val renderedFrames = AtomicLong()
+    private var lastRenderAt = 0L // decoder callback thread only
+    private var resetRequestedAt = 0L // video thread only
 
     private data class VideoFrame(val packet: ScrcpyProtocol.Frame, val size: ScrcpyProtocol.Size, val config: ByteArray, val epoch: Int)
     private sealed interface Input
@@ -52,7 +62,15 @@ internal class ScrcpySession(
     private data class Key(val key: Int) : Input
     private class Clipboard(val text: String) : Input
     private data object Release : Input
+    private data object ResetVideo : Input
     private class Finish(val done: java.util.concurrent.CountDownLatch) : Input
+
+    private companion object {
+        const val MAX_QUEUED_FRAMES = 120
+        const val MAX_QUEUED_BYTES = 16 * 1024 * 1024
+        const val PING_INTERVAL_NS = 2_000_000_000L
+        const val DEAD_LINK_MS = 15_000L
+    }
 
     /** One configured codec; input indices arrive from its callback thread. */
     private class Decoder(val codec: MediaCodec, val epoch: Int) {
@@ -67,7 +85,33 @@ internal class ScrcpySession(
         workers.execute { guard("video") { readVideo() } }
         workers.execute { guard("decoder") { decode() } }
         workers.execute { guard("control") { writeControl() } }
-        main.postDelayed({ if (!firstFrame.get() && !closed.get()) fail("timeout", "No video frame received within 15 seconds") }, 15000)
+        main.postDelayed({ if (!firstFrame.get() && !closed.get()) fail("timeout", "No video frame received within 25 seconds") }, 25000)
+        main.postDelayed(::tick, 1000)
+    }
+
+    private var tickBytes = 0L
+    private var tickFrames = 0L
+    private var tickAt = System.nanoTime()
+
+    /** Once a second: link statistics for the viewer, and the dead-link verdict. */
+    private fun tick() {
+        if (closed.get()) return
+        val now = System.nanoTime()
+        val since = awaitingAckSince
+        val pendingMs = if (since == 0L) 0L else (now - since) / 1_000_000
+        if (firstFrame.get() && pendingMs > DEAD_LINK_MS) {
+            fail("network", "No ADB acknowledgement for ${pendingMs / 1000} s; the connection to the target was lost")
+            return
+        }
+        val seconds = ((now - tickAt) / 1e9).coerceAtLeast(0.001)
+        val bytes = videoBytes.get(); val rendered = renderedFrames.get()
+        event("stats", mapOf(
+            "rtt" to rttMs, "lag" to lagMs, "pending" to pendingMs,
+            "kbps" to ((bytes - tickBytes) * 8 / 1000 / seconds).toLong(),
+            "fps" to ((rendered - tickFrames) / seconds).toLong(),
+        ))
+        tickBytes = bytes; tickFrames = rendered; tickAt = now
+        main.postDelayed(::tick, 1000)
     }
 
     private fun guard(stage: String, action: () -> Unit) {
@@ -140,9 +184,15 @@ internal class ScrcpySession(
                     }
                     val geometry = size ?: throw IOException("Video arrived before session metadata")
                     val csd = config ?: throw IOException("Video arrived before AVC configuration")
+                    videoBytes.addAndGet(packet.data.size.toLong())
+                    measureLag(packet.pts)
                     synchronized(frameLock) {
-                        if (frames.size >= 4 || queuedBytes + packet.data.size > ScrcpyProtocol.MAX_PACKET) {
+                        // A burst after a stall is decoded in full and only its newest frame shown.
+                        // Dropping is the last resort: a key frame is requested rather than awaited,
+                        // since the encoder sends one on its own only every 10 seconds.
+                        if (frames.size >= MAX_QUEUED_FRAMES || queuedBytes + packet.data.size > MAX_QUEUED_BYTES) {
                             frames.clear(); queuedBytes = 0; waitingForKey = true; epoch++
+                            requestKeyFrame()
                         }
                         if (!waitingForKey || packet.key) {
                             waitingForKey = false
@@ -154,6 +204,30 @@ internal class ScrcpySession(
                 }
             }
         }
+    }
+
+    private var offsetMin = Long.MAX_VALUE
+    private var offsetPreviousMin = Long.MAX_VALUE
+    private var offsetBucketAt = 0L
+
+    /**
+     * Queuing delay of the newest frame: its arrival-minus-capture offset above the fastest one
+     * seen in the last 30-60 s. The clocks' fixed difference and the base round trip cancel out;
+     * the sliding window absorbs drift between the two phones' clocks.
+     */
+    private fun measureLag(pts: Long) {
+        val now = System.nanoTime() / 1000
+        val offset = now - pts
+        if (now - offsetBucketAt > 30_000_000) { offsetPreviousMin = offsetMin; offsetMin = Long.MAX_VALUE; offsetBucketAt = now }
+        if (offset < offsetMin) offsetMin = offset
+        lagMs = (offset - minOf(offsetMin, offsetPreviousMin)) / 1000
+    }
+
+    private fun requestKeyFrame() {
+        val now = System.nanoTime()
+        if (now - resetRequestedAt < 1_000_000_000L) return
+        resetRequestedAt = now
+        runCatching { enqueue(ResetVideo) }
     }
 
     private fun <T> onMain(action: () -> T): T {
@@ -215,9 +289,16 @@ internal class ScrcpySession(
                 codec.setCallback(object : MediaCodec.Callback() {
                     override fun onInputBufferAvailable(source: MediaCodec, index: Int) { decoder.inputs.offer(index) }
                     override fun onOutputBufferAvailable(source: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+                        // Catching up after a stall: skip frames a newer queued one replaces, but
+                        // still show one every 100 ms so the picture visibly moves.
+                        val now = System.nanoTime()
+                        val behind = synchronized(frameLock) { frames.isNotEmpty() }
+                        val render = !behind || now - lastRenderAt > 100_000_000L
                         // A codec being stopped by the decode thread refuses the release; nothing to show then.
-                        if (runCatching { source.releaseOutputBuffer(index, true) }.isSuccess &&
-                            !closed.get() && firstFrame.compareAndSet(false, true)) event("streaming")
+                        if (!runCatching { source.releaseOutputBuffer(index, render) }.isSuccess || !render) return
+                        lastRenderAt = now
+                        renderedFrames.incrementAndGet()
+                        if (!closed.get() && firstFrame.compareAndSet(false, true)) event("streaming")
                     }
                     override fun onError(source: MediaCodec, error: MediaCodec.CodecException) {
                         // A codec already replaced (rotation, new configuration) is not this session failing.
@@ -287,23 +368,50 @@ internal class ScrcpySession(
         }
     }
 
+    /**
+     * One control write is in flight at a time (libadb waits for adbd's OKAY), so over a slow link
+     * each write costs a round trip. Everything queued meanwhile goes out together in the next
+     * write, after that OKAY, with moves already coalesced to each finger's latest position.
+     */
     private fun writeControl() {
         while (!closed.get() && control == null) synchronized(inputLock) { inputLock.wait(100) }
-        val output = control?.openOutputStream() ?: return
+        val stream = control ?: return
+        val output = stream.openOutputStream()
+        val gate = AdbWriteGate(stream)
+        val batch = ByteArrayOutputStream()
+        var lastSendAt = System.nanoTime()
+        fun awaitAck() {
+            val since = awaitingAckSince
+            if (!gate.supported || since == 0L) return
+            while (!gate.awaitReady(1000)) if (stream.isClosed) return // the write fails and ends the session
+            val sample = (System.nanoTime() - since) / 1_000_000
+            rttMs = if (rttMs < 0) sample else (rttMs * 7 + sample) / 8
+            awaitingAckSince = 0L
+        }
+        fun send() {
+            if (batch.size() == 0) return
+            awaitAck()
+            lastSendAt = System.nanoTime()
+            if (!gate.supported) awaitingAckSince = lastSendAt // libadb blocks inside write instead
+            output.write(batch.toByteArray()); output.flush(); batch.reset()
+            awaitingAckSince = if (gate.supported) System.nanoTime() else 0L
+        }
         fun release() {
             val geometry = size
             if (geometry != null) for (pointer in pointers.values) {
-                output.write(ScrcpyProtocol.touch(1, pointer.pointer, pointer.x, pointer.y, geometry))
+                batch.write(ScrcpyProtocol.touch(1, pointer.pointer, pointer.x, pointer.y, geometry))
             }
-            pointers.clear(); output.flush()
+            pointers.clear()
         }
         while (true) {
-            val input = synchronized(inputLock) {
+            awaitAck()
+            val drained = synchronized(inputLock) {
                 // Finish must still release held fingers after closed becomes true.
-                while (inputs.isEmpty()) inputLock.wait(100)
-                inputs.pollFirst()
-            } ?: break
-            when (input) {
+                while (inputs.isEmpty() && (closed.get() || System.nanoTime() - lastSendAt < PING_INTERVAL_NS)) inputLock.wait(100)
+                ArrayList(inputs).also { inputs.clear() }
+            }
+            if (drained.isEmpty()) batch.write(ScrcpyProtocol.ping())
+            for (input in drained) when (input) {
                 is Touch -> {
                     val geometry = size ?: continue
                     if (closed.get() || input.revision != geometry.revision) continue
@@ -314,15 +422,16 @@ internal class ScrcpySession(
                         if (!pointers.containsKey(input.pointer)) continue
                         if (input.action == 1) pointers.remove(input.pointer) else pointers[input.pointer] = input
                     }
-                    output.write(ScrcpyProtocol.touch(input.action, input.pointer, input.x, input.y, geometry)); output.flush()
+                    batch.write(ScrcpyProtocol.touch(input.action, input.pointer, input.x, input.y, geometry))
                 }
-                is Key -> if (!closed.get()) {
-                    output.write(ScrcpyProtocol.key(0, input.key)); output.write(ScrcpyProtocol.key(1, input.key)); output.flush()
-                }
-                is Clipboard -> if (!closed.get()) { output.write(ScrcpyProtocol.setClipboard(input.text)); output.flush() }
+                is Key -> if (!closed.get()) { batch.write(ScrcpyProtocol.key(0, input.key)); batch.write(ScrcpyProtocol.key(1, input.key)) }
+                // Up to 256 KiB: alone in its write, so no write exceeds adbd's smallest payload limit.
+                is Clipboard -> if (!closed.get()) { send(); batch.write(ScrcpyProtocol.setClipboard(input.text)); send() }
+                ResetVideo -> if (!closed.get()) batch.write(ScrcpyProtocol.resetVideo())
                 Release -> release()
-                is Finish -> { try { release() } finally { input.done.countDown() }; return }
+                is Finish -> { try { release(); send() } finally { input.done.countDown() }; return }
             }
+            send()
         }
     }
 

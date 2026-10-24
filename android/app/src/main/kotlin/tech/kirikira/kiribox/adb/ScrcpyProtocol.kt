@@ -57,6 +57,15 @@ internal object ScrcpyProtocol {
         }.array()
     }
 
+    /** RESET_VIDEO: the server restarts its encoder, so a new key frame follows within a round trip. */
+    fun resetVideo(): ByteArray = byteArrayOf(17)
+
+    /**
+     * GET_CLIPBOARD with COPY_KEY_NONE does nothing while clipboard autosync is on; adbd's OKAY
+     * for it measures the round trip and proves the link alive when there is no input to send.
+     */
+    fun ping(): ByteArray = byteArrayOf(8, 0)
+
     /** SET_CLIPBOARD without an acknowledgement (sequence 0) and without pressing PASTE. */
     fun setClipboard(text: String): ByteArray {
         val bytes = utf8Prefix(text, CLIPBOARD_TO_DEVICE_MAX)
