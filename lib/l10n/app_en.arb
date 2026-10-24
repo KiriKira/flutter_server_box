@@ -7846,7 +7846,7 @@
   "adbScreenRootMode": "Root control (restart)",
   "adbScreenRootTip": "Root control: the target must already allow ADB shell to use su. Your existing lock-screen credential is still required.",
   "adbScreenWake": "Wake / show unlock screen",
-  "adbScreenUnlockTip": "Wake and keyguard-dismiss requested. If a PIN, pattern or password is configured, enter the existing credential on the target screen. Home and Recent apps cannot unlock a locked phone.",
+  "adbScreenUnlockTip": "Wake and keyguard-dismiss requested. The PIN, pattern or password screen is protected by the system and shows black here: use Remote unlock to enter it without seeing it. Home and Recent apps cannot unlock a locked phone.",
   "adbScreenInputDenied": "The target denied input injection. Check its debugging security options, or use Root control if shell already has su permission.",
   "adbScreenGeometryWarning": "The target rejected touch coordinates for an outdated video size. Reconnect or check Control diagnostics.",
   "adbScreenInputError": "The target input interface reported an error. Open Control diagnostics for the server message.",
@@ -7858,5 +7858,11 @@
   "adbScreenQualitySaver": "Data saver",
   "adbScreenQualityLowered": "Video was falling behind the network, so quality was lowered automatically.",
   "adbScreenReconnecting": "Connection lost, reconnecting",
-  "adbScreenStalled": "Network stalled, waiting for the target"
+  "adbScreenStalled": "Network stalled, waiting for the target",
+  "adbScreenUnlockSecret": "Remote unlock",
+  "adbScreenUnlockSecretTip": "Typed into the target lock screen over ADB, only while it is locked, and not saved.",
+  "adbScreenUnlockSent": "Unlock sent. If the picture stays black, open Control diagnostics to see whether the target is awake and unlocked.",
+  "adbScreenUnlockPin": "PIN / password",
+  "adbScreenUnlockPattern": "Pattern",
+  "adbScreenUnlockPatternTip": "Enter the dots in order as digits, numbered like a keypad: 1 2 3 on the top row, 7 8 9 at the bottom (an L is 1478). The pattern screen is protected and shows black here, so the target draws it itself, only while it is locked."
 }

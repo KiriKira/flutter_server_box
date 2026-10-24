@@ -5778,7 +5778,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adbScreenUnlockTip =>
-      '已请求唤醒并解除普通锁屏。若设置了 PIN、图案或密码，仍需在目标画面输入原有凭据；主页和最近任务不能解除密码锁。';
+      '已请求唤醒并解除普通锁屏。PIN、图案和密码界面受系统保护，在这里显示为黑屏：请用“远程解锁”在看不到画面的情况下输入。主页和最近任务不能解除密码锁。';
 
   @override
   String get adbScreenInputDenied =>
@@ -5816,6 +5816,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adbScreenStalled => '网络卡顿，等待目标机响应';
+
+  @override
+  String get adbScreenUnlockSecret => '远程解锁';
+
+  @override
+  String get adbScreenUnlockSecretTip => '通过 ADB 输入到目标机锁屏，仅在其处于锁屏时输入，不会保存。';
+
+  @override
+  String get adbScreenUnlockSent => '已发送解锁。如画面仍是黑的，请打开控制诊断查看目标机是否已亮屏并解锁。';
+
+  @override
+  String get adbScreenUnlockPin => 'PIN / 密码';
+
+  @override
+  String get adbScreenUnlockPattern => '图案';
+
+  @override
+  String get adbScreenUnlockPatternTip =>
+      '按经过的顺序输入点的编号，像拨号键盘：第一行 1 2 3，最后一行 7 8 9（L 形为 1478）。图案界面受系统保护，在这里显示为黑屏，因此由目标机自己画出图案，仅在锁屏时执行。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

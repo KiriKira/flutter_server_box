@@ -79,6 +79,8 @@ class AdbScreenSession extends ChangeNotifier {
   int fps = 0;
   /// Counts the native side's once-a-second statistics.
   int statsTicks = 0;
+  /// The controller's AVC decoder, for diagnostics.
+  String decoder = '';
   String _log = '';
   bool _closed = false;
   bool _disposed = false;
@@ -169,7 +171,7 @@ class AdbScreenSession extends ChangeNotifier {
       case 'streaming': state = AdbScreenState.streaming; streamed = true;
       case 'stats':
         rtt = raw['rtt'] as int; lag = raw['lag'] as int; pending = raw['pending'] as int;
-        kbps = raw['kbps'] as int; fps = raw['fps'] as int; statsTicks++;
+        kbps = raw['kbps'] as int; fps = raw['fps'] as int; decoder = raw['decoder'] as String? ?? ''; statsTicks++;
       case 'error':
         failureStage = raw['stage'] as String?;
         _fail('${raw['stage']}: ${raw['message']}\n$_log'); return;
@@ -228,10 +230,37 @@ class AdbScreenSession extends ChangeNotifier {
   Future<void> releasePointers() => _send('screenRelease', const {});
 
   String get diagnostics => 'scrcpy 5.0.1; mode=${root ? 'root' : 'shell'}; quality=${quality.name}; state=${state.name}\n'
-    'video=$width x $height; revision=$revision; $kbps kbps; $fps fps; lag=$lag ms\n'
+    'video=$width x $height; revision=$revision; $kbps kbps; $fps fps; lag=$lag ms; decoder=$decoder\n'
     'control rtt=${rtt < 0 ? 'unknown' : '$rtt ms'}; awaiting ack=$pending ms\n'
     'input requests=$inputRequests; coalesced moves=$coalesced; accepted by native queue=$nativeAccepted (not a target execution acknowledgement)\n'
     '${error ?? ''}\n$_log';
+
+  /// The target's display and keyguard state as its own `dumpsys` lines, or the error.
+  /// Tells "the target shows black" (asleep, locked) apart from "nothing reaches this screen".
+  Future<String> targetState() async {
+    if (!AdbService.isCurrent(connection)) return 'ADB connection changed';
+    final cancel = Completer<void>();
+    final timer = Timer(const Duration(seconds: 5), cancel.complete);
+    try {
+      final result = await AdbExec(connection).run(android.androidCommand(action: 'screen_state', argument: '', root: root), cancel: cancel.future);
+      return result.outputIncomplete ? 'timed out' : result.combined.trim();
+    } catch (e) {
+      return '$e';
+    } finally { timer.cancel(); }
+  }
+
+  /// Enters [secret] on the target's lock screen — typed, or drawn when [pattern] (keypad
+  /// digits 1-9) — refused by the target unless it is locked. Never stored or logged here;
+  /// it is briefly visible to the target's own shell processes.
+  Future<void> unlock(String secret, {bool pattern = false}) async {
+    if (!AdbService.isCurrent(connection)) throw StateError('ADB connection changed');
+    final cancel = Completer<void>();
+    final timer = Timer(const Duration(seconds: 15), cancel.complete);
+    try {
+      final result = await AdbExec(connection).run(android.androidCommand(action: pattern ? 'unlock_pattern' : 'unlock_secret', argument: secret, root: root), cancel: cancel.future);
+      if (!result.succeeded || result.outputIncomplete) throw StateError(result.combined.isEmpty ? 'Unlock request timed out or failed' : result.combined.trim());
+    } finally { timer.cancel(); }
+  }
 
   Future<void> wake() async {
     if (!AdbService.isCurrent(connection)) throw StateError('ADB connection changed');

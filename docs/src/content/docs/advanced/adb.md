@@ -115,8 +115,16 @@ screen session; returning recreates it. Errors offer retry. Exiting cleans up on
 connections alive. Some manufacturers require an additional debugging security
 setting to permit shell input injection.
 
-On the lock screen, use **Wake / show unlock screen**, then swipe or enter the
-existing device credential. Home and Recent apps cannot dismiss a secure keyguard.
+On the lock screen, use **Wake / show unlock screen**, then swipe. Android protects the
+PIN, pattern and password screen from capture (scrcpy cannot mirror it without
+modification), so it shows black here while touches still reach it. **Remote unlock**
+enters the credential without seeing it: a PIN or password is typed with `input text`;
+a pattern is given as keypad digits (1 2 3 on the top row, an L is `1478`) and drawn
+by the target through the dot centres of its pattern view, which `uiautomator` still
+reports. Either runs only while the target reports its keyguard showing, so nothing is
+typed into an unlocked app, and is not saved. Home and Recent apps cannot dismiss a
+secure keyguard. **Control diagnostics** also shows whether the target is awake and
+locked.
 If ADB shell already has `su` authorization, choose **Root control (restart)**
 from the top-right menu. This runs the screen server and wake request as root;
 it does not clear credentials or enable the separate monitoring root enhancement.

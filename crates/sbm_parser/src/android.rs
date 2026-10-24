@@ -31,6 +31,12 @@ const STATUS: &[(&str, &str)] = &[
     ("addresses", "ip -o addr show"),
 ];
 
+const KEYGUARD_FIELDS: &str = "showing|secure|occluded|screenState|interactiveState";
+
+/// Typed into an unlocked phone, a secret (and the Enter or drag after it) would land in
+/// whatever app has focus; so unlocking stops unless the keyguard is showing.
+const LOCKED_ONLY: &str = "dumpsys window policy | grep -qE '^ *showing=true' || { echo 'The target is not on its lock screen; nothing was entered.'; exit 3; }; ";
+
 /// Screen-control quality presets: (max dimension, max fps, video bit rate).
 /// Lower presets keep a remote link (VPN relay, mobile data) from queuing seconds of video.
 pub fn scrcpy_quality(name: &str) -> Result<(u32, u32, u32), String> {
@@ -66,6 +72,39 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
         "identity" => "id".into(),
         "guid" => "getprop persist.adb.wifi.guid".into(),
         "screen_wake" => "input keyevent 224 && wm dismiss-keyguard".into(),
+        // Shown as-is in screen control's diagnostics: is the target's display on, and locked?
+        // KeyguardServiceDelegate's dump (`dumpsys window policy`) has carried these for years.
+        "screen_state" => format!("dumpsys power | grep -m1 -oE 'mWakefulness=[A-Za-z]+'; dumpsys window policy | grep -E '^ *({KEYGUARD_FIELDS})=' | sed 's/^ *//'; true"),
+        // Types a lock-screen PIN or password over ADB, for a target nobody can reach by hand.
+        // Only while the keyguard is showing: typed into an unlocked phone, the secret and the
+        // Enter after it would land in whatever text field has focus.
+        "unlock_secret" => {
+            if argument.is_empty() || argument.len() > 64 || !argument.bytes().all(|b| b.is_ascii_graphic() && b != b'%') {
+                return Err("The PIN or password must be 1-64 printable ASCII characters without spaces or %".into());
+            }
+            format!("{LOCKED_ONLY}input keyevent 224; wm dismiss-keyguard; sleep 1; input text {}; input keyevent 66", quote(argument))
+        }
+        // Draws a pattern given as keypad digits (1 top-left .. 9 bottom-right). The bouncer is a
+        // secure window, black in the mirrored video, but uiautomator still reports where the
+        // pattern view is, so the dots' centres follow from its bounds whatever the device.
+        "unlock_pattern" => {
+            let mut seen = [false; 10];
+            let valid = (4..=9).contains(&argument.len()) && argument.bytes().all(|b| {
+                let d = (b as char).to_digit(10).unwrap_or(0) as usize;
+                (1..=9).contains(&d) && !std::mem::replace(&mut seen[d], true)
+            });
+            if !valid { return Err("A pattern is 4-9 different digits 1-9, numbered like a phone keypad".into()); }
+            format!("{LOCKED_ONLY}input keyevent 224; wm dismiss-keyguard; sleep 1; \
+f=${{TMPDIR:-/data/local/tmp}}/kiribox-keyguard.xml; b=; for i in 1 2 3; do uiautomator dump \"$f\" >/dev/null 2>&1; \
+b=$(grep -oE 'resource-id=\"[^\"]*lockPatternView\"[^>]*bounds=\"\\[[0-9]+,[0-9]+\\]\\[[0-9]+,[0-9]+\\]\"' \"$f\" 2>/dev/null | grep -oE '\\[[0-9]+,[0-9]+\\]\\[[0-9]+,[0-9]+\\]' | head -n 1); \
+rm -f \"$f\"; [ -n \"$b\" ] && break; sleep 1; done; \
+[ -n \"$b\" ] || {{ echo 'No pattern view on the lock screen: is the lock a pattern?'; exit 4; }}; \
+set -- $(echo \"$b\" | tr -c '0-9' ' '); x1=$1; y1=$2; x2=$3; y2=$4; a=DOWN; \
+for d in {}; do c=$(( (d - 1) % 3 )); r=$(( (d - 1) / 3 )); \
+x=$(( x1 + (2 * c + 1) * (x2 - x1) / 6 )); y=$(( y1 + (2 * r + 1) * (y2 - y1) / 6 )); \
+input motionevent $a $x $y; a=MOVE; done; input motionevent UP $x $y",
+                argument.chars().map(String::from).collect::<Vec<_>>().join(" "))
+        }
         "scrcpy_start" | "scrcpy_stop" => {
             // `scrcpy_start` takes `<session>` or `<session>:<quality>`; stopping needs the session only.
             let (session, quality) = match argument.split_once(':') {
@@ -263,6 +302,103 @@ mod tests {
         assert!(start.contains("su -c ") && start.contains("scid=01234567"));
         assert!(stop.contains("su -c ") && stop.contains("kiribox-scrcpy-01234567"));
         assert!(!stop.contains("killall"));
+    }
+
+    #[test]
+    fn unlock_secret_refuses_what_input_text_cannot_type() {
+        for bad in ["", "12 34", "100%", "pässword", &"1".repeat(65), "12\n34"] {
+            assert!(command("unlock_secret", bad, false).is_err(), "{bad:?}");
+        }
+        let unlock = command("unlock_secret", "it's;$(id)", false).unwrap();
+        assert!(unlock.contains("input text 'it'\\''s;$(id)'"));
+        assert!(command("unlock_secret", "1234", true).unwrap().contains("su -c "));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn unlock_secret_types_only_on_the_lock_screen() {
+        use std::os::unix::fs::PermissionsExt;
+        let run = |showing: bool| {
+            let dir = tempfile::tempdir().unwrap();
+            let log = dir.path().join("typed");
+            let tools = [
+                ("dumpsys", format!("#!/bin/sh\nprintf '    KeyguardServiceDelegate\\n      showing={showing}\\n      secure=true\\n'\n")),
+                ("input", format!("#!/bin/sh\necho \"$@\" >> '{}'\n", log.display())),
+                ("wm", "#!/bin/sh\ntrue\n".into()),
+                ("sleep", "#!/bin/sh\ntrue\n".into()),
+            ];
+            for (name, body) in tools {
+                let path = dir.path().join(name);
+                std::fs::write(&path, body).unwrap();
+                std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+            }
+            let path = format!("{}:/usr/bin:/bin", dir.path().display());
+            let status = std::process::Command::new("/bin/sh").arg("-c")
+                .arg(command("unlock_secret", "4321", false).unwrap()).env("PATH", path).status().unwrap();
+            (status.code(), std::fs::read_to_string(log).unwrap_or_default())
+        };
+        let (code, typed) = run(true);
+        assert_eq!(code, Some(0));
+        assert_eq!(typed, "keyevent 224\ntext 4321\nkeyevent 66\n");
+        let (code, typed) = run(false);
+        assert_eq!(code, Some(3));
+        assert!(typed.is_empty(), "typed into an unlocked phone: {typed}");
+    }
+
+    #[test]
+    fn unlock_pattern_takes_distinct_keypad_digits() {
+        for bad in ["", "123", "1234567890", "1231", "0123", "12a4", "1 23", "12345;id"] {
+            assert!(command("unlock_pattern", bad, false).is_err(), "{bad:?}");
+        }
+        assert!(command("unlock_pattern", "1478", false).unwrap().contains("for d in 1 4 7 8; do"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn unlock_pattern_draws_through_the_pattern_views_dot_centres() {
+        use std::os::unix::fs::PermissionsExt;
+        let run = |showing: bool| {
+            let dir = tempfile::tempdir().unwrap();
+            let log = dir.path().join("drawn");
+            let xml = r#"<node resource-id="com.android.systemui:id/keyguard_bouncer" bounds="[0,0][1080,2400]"><node index="0" text="" resource-id="com.android.systemui:id/lockPatternView" class="android.view.View" bounds="[100,800][1000,1700]" /></node>"#;
+            let tools = [
+                ("dumpsys", format!("#!/bin/sh\nprintf '      showing={showing}\\n'\n")),
+                ("uiautomator", format!("#!/bin/sh\nprintf '%s' '{xml}' > \"$2\"\n")),
+                ("input", format!("#!/bin/sh\necho \"$@\" >> '{}'\n", log.display())),
+                ("wm", "#!/bin/sh\ntrue\n".into()),
+                ("sleep", "#!/bin/sh\ntrue\n".into()),
+            ];
+            for (name, body) in tools {
+                let path = dir.path().join(name);
+                std::fs::write(&path, body).unwrap();
+                std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
+            }
+            let status = std::process::Command::new("/bin/sh").arg("-c").arg(command("unlock_pattern", "1478", false).unwrap())
+                .env("PATH", format!("{}:/usr/bin:/bin", dir.path().display())).env("TMPDIR", dir.path()).status().unwrap();
+            assert!(!dir.path().join("kiribox-keyguard.xml").exists(), "the dump is removed");
+            (status.code(), std::fs::read_to_string(log).unwrap_or_default())
+        };
+        let (code, drawn) = run(true);
+        assert_eq!(code, Some(0));
+        assert_eq!(drawn, "keyevent 224\nmotionevent DOWN 250 950\nmotionevent MOVE 250 1250\nmotionevent MOVE 250 1550\nmotionevent MOVE 550 1550\nmotionevent UP 550 1550\n");
+        let (code, drawn) = run(false);
+        assert_eq!(code, Some(3));
+        assert!(drawn.is_empty(), "drew on an unlocked phone: {drawn}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn screen_state_reports_wakefulness_and_keyguard_lines() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tempfile::tempdir().unwrap();
+        let dumpsys = dir.path().join("dumpsys");
+        std::fs::write(&dumpsys, "#!/bin/sh\ncase \"$1\" in\npower) echo '  mWakefulness=Asleep';;\n\
+window) printf '    KeyguardServiceDelegate\\n      showing=true\\n      secure=true\\n      screenState=SCREEN_STATE_OFF\\n      currentUser=0\\n';;\nesac\n").unwrap();
+        std::fs::set_permissions(&dumpsys, std::fs::Permissions::from_mode(0o755)).unwrap();
+        let output = std::process::Command::new("/bin/sh").arg("-c").arg(command("screen_state", "", false).unwrap())
+            .env("PATH", format!("{}:/usr/bin:/bin", dir.path().display())).output().unwrap();
+        assert!(output.status.success());
+        assert_eq!(String::from_utf8(output.stdout).unwrap(), "mWakefulness=Asleep\nshowing=true\nsecure=true\nscreenState=SCREEN_STATE_OFF\n");
     }
 
     #[cfg(unix)]

@@ -1740,7 +1740,7 @@
   "adbScreenRootMode": "Root 控制（重新连接）",
   "adbScreenRootTip": "Root 控制：目标机须已允许 ADB shell 使用 su；仍需输入原有锁屏密码。",
   "adbScreenWake": "唤醒／显示解锁界面",
-  "adbScreenUnlockTip": "已请求唤醒并解除普通锁屏。若设置了 PIN、图案或密码，仍需在目标画面输入原有凭据；主页和最近任务不能解除密码锁。",
+  "adbScreenUnlockTip": "已请求唤醒并解除普通锁屏。PIN、图案和密码界面受系统保护，在这里显示为黑屏：请用“远程解锁”在看不到画面的情况下输入。主页和最近任务不能解除密码锁。",
   "adbScreenInputDenied": "目标机拒绝了输入注入。请检查调试安全设置；若 shell 已获 su 授权，可切换 Root 控制。",
   "adbScreenGeometryWarning": "目标机拒绝了尺寸已过期的触摸坐标，请重连或查看控制诊断。",
   "adbScreenInputError": "目标机输入接口报错，请打开控制诊断查看服务端消息。",
@@ -1752,5 +1752,11 @@
   "adbScreenQualitySaver": "省流",
   "adbScreenQualityLowered": "画面跟不上网络速度，已自动降低画质。",
   "adbScreenReconnecting": "连接中断，正在重连",
-  "adbScreenStalled": "网络卡顿，等待目标机响应"
+  "adbScreenStalled": "网络卡顿，等待目标机响应",
+  "adbScreenUnlockSecret": "远程解锁",
+  "adbScreenUnlockSecretTip": "通过 ADB 输入到目标机锁屏，仅在其处于锁屏时输入，不会保存。",
+  "adbScreenUnlockSent": "已发送解锁。如画面仍是黑的，请打开控制诊断查看目标机是否已亮屏并解锁。",
+  "adbScreenUnlockPin": "PIN / 密码",
+  "adbScreenUnlockPattern": "图案",
+  "adbScreenUnlockPatternTip": "按经过的顺序输入点的编号，像拨号键盘：第一行 1 2 3，最后一行 7 8 9（L 形为 1478）。图案界面受系统保护，在这里显示为黑屏，因此由目标机自己画出图案，仅在锁屏时执行。"
 }

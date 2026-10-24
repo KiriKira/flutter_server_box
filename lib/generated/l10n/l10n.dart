@@ -10578,7 +10578,7 @@ abstract class AppLocalizations {
   /// No description provided for @adbScreenUnlockTip.
   ///
   /// In en, this message translates to:
-  /// **'Wake and keyguard-dismiss requested. If a PIN, pattern or password is configured, enter the existing credential on the target screen. Home and Recent apps cannot unlock a locked phone.'**
+  /// **'Wake and keyguard-dismiss requested. The PIN, pattern or password screen is protected by the system and shows black here: use Remote unlock to enter it without seeing it. Home and Recent apps cannot unlock a locked phone.'**
   String get adbScreenUnlockTip;
 
   /// No description provided for @adbScreenInputDenied.
@@ -10652,6 +10652,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Network stalled, waiting for the target'**
   String get adbScreenStalled;
+
+  /// No description provided for @adbScreenUnlockSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote unlock'**
+  String get adbScreenUnlockSecret;
+
+  /// No description provided for @adbScreenUnlockSecretTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Typed into the target lock screen over ADB, only while it is locked, and not saved.'**
+  String get adbScreenUnlockSecretTip;
+
+  /// No description provided for @adbScreenUnlockSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock sent. If the picture stays black, open Control diagnostics to see whether the target is awake and unlocked.'**
+  String get adbScreenUnlockSent;
+
+  /// No description provided for @adbScreenUnlockPin.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN / password'**
+  String get adbScreenUnlockPin;
+
+  /// No description provided for @adbScreenUnlockPattern.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern'**
+  String get adbScreenUnlockPattern;
+
+  /// No description provided for @adbScreenUnlockPatternTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the dots in order as digits, numbered like a keypad: 1 2 3 on the top row, 7 8 9 at the bottom (an L is 1478). The pattern screen is protected and shows black here, so the target draws it itself, only while it is locked.'**
+  String get adbScreenUnlockPatternTip;
 }
 
 class _AppLocalizationsDelegate

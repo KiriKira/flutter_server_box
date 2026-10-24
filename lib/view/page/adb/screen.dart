@@ -44,6 +44,8 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
   bool _starting = false;
   bool _root = false;
   bool _waking = false;
+  /// The lock kind last used in the unlock dialog, for this page's lifetime.
+  bool _unlockPattern = false;
   String? _wakeMessage;
   int _generation = 0;
   int _revision = 0;
@@ -217,9 +219,47 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
 
   Future<void> _diagnostics() async {
     _release();
+    final session = _session;
+    final target = await session?.targetState();
+    if (!mounted) return;
     await context.showRoundDialog<void>(title: l10n.adbScreenDiagnostics,
-      child: SingleChildScrollView(child: SelectableText(_session?.diagnostics ?? _error ?? 'No active screen session')),
+      child: SingleChildScrollView(child: SelectableText([
+        if (target != null) 'target: ${target.replaceAll('\n', '; ')}',
+        session?.diagnostics ?? _error ?? 'No active screen session',
+      ].join('\n'))),
       actions: [Btn.ok()]);
+  }
+
+  Future<void> _unlock() async {
+    final session = _session;
+    if (session == null || _waking) return;
+    _release();
+    final controller = TextEditingController();
+    final pattern = ValueNotifier(_unlockPattern);
+    final accepted = await context.showRoundDialog<bool>(title: l10n.adbScreenUnlockSecret,
+      child: ValueListenableBuilder(valueListenable: pattern, builder: (context, isPattern, _) =>
+        Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SegmentedButton<bool>(segments: [
+            ButtonSegment(value: false, label: Text(l10n.adbScreenUnlockPin)),
+            ButtonSegment(value: true, label: Text(l10n.adbScreenUnlockPattern)),
+          ], selected: {isPattern}, onSelectionChanged: (value) => pattern.value = value.first),
+          const SizedBox(height: 8),
+          Text(isPattern ? l10n.adbScreenUnlockPatternTip : l10n.adbScreenUnlockSecretTip, style: UIs.text12Grey),
+          Input(controller: controller, obscureText: true, autoFocus: true, suggestion: false, autoCorrect: false,
+            type: isPattern ? TextInputType.number : TextInputType.visiblePassword, onSubmitted: (_) => context.popDialog(true)),
+        ])),
+      actions: Btnx.cancelOk);
+    final secret = controller.text;
+    final isPattern = _unlockPattern = pattern.value;
+    controller.dispose(); pattern.dispose();
+    if (accepted != true || secret.isEmpty || !mounted || !identical(session, _session)) return;
+    setState(() { _waking = true; _wakeMessage = null; });
+    try {
+      await session.unlock(secret, pattern: isPattern);
+      if (mounted && identical(session, _session)) setState(() => _wakeMessage = l10n.adbScreenUnlockSent);
+    } catch (e) {
+      if (mounted && identical(session, _session)) setState(() => _wakeMessage = '$e');
+    } finally { if (mounted) setState(() => _waking = false); }
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -335,6 +375,8 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
           Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: [
             OutlinedButton.icon(onPressed: session != null && !_waking ? _wake : null,
               icon: const Icon(Icons.lock_open), label: Text(l10n.adbScreenWake)),
+            OutlinedButton.icon(onPressed: session != null && !_waking ? _unlock : null,
+              icon: const Icon(Icons.password), label: Text(l10n.adbScreenUnlockSecret)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(4) : null, icon: const Icon(Icons.arrow_back), label: Text(l10n.adbScreenBack)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(3) : null, icon: const Icon(Icons.home_outlined), label: Text(l10n.adbScreenHome)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(187) : null, icon: const Icon(Icons.recent_actors_outlined), label: Text(l10n.adbScreenRecent)),

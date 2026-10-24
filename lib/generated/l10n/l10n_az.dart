@@ -6152,7 +6152,7 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get adbScreenUnlockTip =>
-      'Wake and keyguard-dismiss requested. If a PIN, pattern or password is configured, enter the existing credential on the target screen. Home and Recent apps cannot unlock a locked phone.';
+      'Wake and keyguard-dismiss requested. The PIN, pattern or password screen is protected by the system and shows black here: use Remote unlock to enter it without seeing it. Home and Recent apps cannot unlock a locked phone.';
 
   @override
   String get adbScreenInputDenied =>
@@ -6193,4 +6193,25 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get adbScreenStalled => 'Network stalled, waiting for the target';
+
+  @override
+  String get adbScreenUnlockSecret => 'Remote unlock';
+
+  @override
+  String get adbScreenUnlockSecretTip =>
+      'Typed into the target lock screen over ADB, only while it is locked, and not saved.';
+
+  @override
+  String get adbScreenUnlockSent =>
+      'Unlock sent. If the picture stays black, open Control diagnostics to see whether the target is awake and unlocked.';
+
+  @override
+  String get adbScreenUnlockPin => 'PIN / password';
+
+  @override
+  String get adbScreenUnlockPattern => 'Pattern';
+
+  @override
+  String get adbScreenUnlockPatternTip =>
+      'Enter the dots in order as digits, numbered like a keypad: 1 2 3 on the top row, 7 8 9 at the bottom (an L is 1478). The pattern screen is protected and shows black here, so the target draws it itself, only while it is locked.';
 }

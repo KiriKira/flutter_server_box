@@ -54,6 +54,7 @@ internal class ScrcpySession(
     private val videoBytes = AtomicLong()
     private val renderedFrames = AtomicLong()
     private var lastRenderAt = 0L // decoder callback thread only
+    @Volatile private var decoderName = ""
     private var resetRequestedAt = 0L // video thread only
 
     private data class VideoFrame(val packet: ScrcpyProtocol.Frame, val size: ScrcpyProtocol.Size, val config: ByteArray, val epoch: Int)
@@ -106,7 +107,7 @@ internal class ScrcpySession(
         val seconds = ((now - tickAt) / 1e9).coerceAtLeast(0.001)
         val bytes = videoBytes.get(); val rendered = renderedFrames.get()
         event("stats", mapOf(
-            "rtt" to rttMs, "lag" to lagMs, "pending" to pendingMs,
+            "rtt" to rttMs, "lag" to lagMs, "pending" to pendingMs, "decoder" to decoderName,
             "kbps" to ((bytes - tickBytes) * 8 / 1000 / seconds).toLong(),
             "fps" to ((rendered - tickFrames) / seconds).toLong(),
         ))
@@ -325,6 +326,7 @@ internal class ScrcpySession(
                 }, main)
                 codec.start()
                 activeCodec = codec
+                decoderName = codec.name + if (lowLatency) " (low latency)" else ""
                 return decoder
             } catch (error: Exception) {
                 runCatching { codec.release() }
