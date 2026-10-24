@@ -114,12 +114,15 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
     final session = _session;
     final ready = session?.state == AdbScreenState.streaming && session?.texture != null;
     final error = _error ?? session?.error;
+    final gestureInsets = MediaQuery.systemGestureInsetsOf(context);
     return Scaffold(
       appBar: CustomAppBar(title: Text('${widget.spi.name} · ${l10n.adbScreen}'),
         leading: BackButton(onPressed: () => Navigator.of(context).pop())),
       body: SafeArea(child: Focus(autofocus: true, onFocusChange: (focused) { if (!focused) _release(); },
         child: Column(children: [
-          Expanded(child: ColoredBox(color: const Color(0xff000000), child: Stack(children: [
+          Expanded(child: ColoredBox(color: const Color(0xff000000), child: Padding(
+            // Keep remote edge swipes clear of the host's system-back gesture area.
+            padding: EdgeInsets.only(left: gestureInsets.left, right: gestureInsets.right), child: Stack(children: [
             Positioned.fill(child: LayoutBuilder(builder: (_, constraints) {
               if (session == null || session.texture == null || session.width == 0 || session.height == 0) return const SizedBox.expand();
               if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) return const SizedBox.shrink();
@@ -162,7 +165,7 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
                 ],
               ])),
             ))),
-          ]))),
+          ])))),
           Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Wrap(spacing: 12, alignment: WrapAlignment.center, children: [
             OutlinedButton.icon(onPressed: ready ? () => session!.key(4) : null, icon: const Icon(Icons.arrow_back), label: Text(l10n.adbScreenBack)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(3) : null, icon: const Icon(Icons.home_outlined), label: Text(l10n.adbScreenHome)),

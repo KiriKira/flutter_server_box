@@ -241,7 +241,8 @@ def prepareScrcpyServer = tasks.register('prepareScrcpyServer', Sync) {
         }
     }
 }
-android.sourceSets.main.assets.srcDir(scrcpyAssets)
+// AGP 9 SourceSet accepts concrete directories; task dependency is wired below.
+android.sourceSets.main.assets.srcDir(scrcpyAssets.get().asFile)
 tasks.configureEach {
     if (name.startsWith('merge') && name.endsWith('Assets')) dependsOn prepareScrcpyServer
 }
