@@ -10538,6 +10538,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Recent apps'**
   String get adbScreenRecent;
+
+  /// No description provided for @adbScreenDiagnostics.
+  ///
+  /// In en, this message translates to:
+  /// **'Control diagnostics'**
+  String get adbScreenDiagnostics;
+
+  /// No description provided for @adbScreenMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Control mode'**
+  String get adbScreenMode;
+
+  /// No description provided for @adbScreenShellMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard ADB control'**
+  String get adbScreenShellMode;
+
+  /// No description provided for @adbScreenRootMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Root control (restart)'**
+  String get adbScreenRootMode;
+
+  /// No description provided for @adbScreenRootTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Root control: the target must already allow ADB shell to use su. Your existing lock-screen credential is still required.'**
+  String get adbScreenRootTip;
+
+  /// No description provided for @adbScreenWake.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake / show unlock screen'**
+  String get adbScreenWake;
+
+  /// No description provided for @adbScreenUnlockTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Wake and keyguard-dismiss requested. If a PIN, pattern or password is configured, enter the existing credential on the target screen. Home and Recent apps cannot unlock a locked phone.'**
+  String get adbScreenUnlockTip;
+
+  /// No description provided for @adbScreenInputDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'The target denied input injection. Check its debugging security options, or use Root control if shell already has su permission.'**
+  String get adbScreenInputDenied;
+
+  /// No description provided for @adbScreenGeometryWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The target rejected touch coordinates for an outdated video size. Reconnect or check Control diagnostics.'**
+  String get adbScreenGeometryWarning;
+
+  /// No description provided for @adbScreenInputError.
+  ///
+  /// In en, this message translates to:
+  /// **'The target input interface reported an error. Open Control diagnostics for the server message.'**
+  String get adbScreenInputError;
 }
 
 class _AppLocalizationsDelegate

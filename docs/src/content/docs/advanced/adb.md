@@ -87,6 +87,17 @@ offer retry. Exiting cleans up only this session, leaving terminal and monitorin
 connections alive. Some manufacturers require an additional debugging security
 setting to permit shell input injection.
 
+On the lock screen, use **Wake / show unlock screen**, then swipe or enter the
+existing device credential. Home and Recent apps cannot dismiss a secure keyguard.
+If ADB shell already has `su` authorization, choose **Root control (restart)**
+from the top-right menu. This runs the screen server and wake request as root;
+it does not clear credentials or enable the separate monitoring root enhancement.
+Returning to standard control or reopening the page restores the default shell mode.
+
+**Control diagnostics** shows input requests, native queue acceptances and server
+logs. Native queue acceptance is not an acknowledgement that the target executed
+the event. Permission-denial and stale-coordinate errors are also shown on screen.
+
 ## AI agent
 
 The app-wide agent identifies phones as **Android (ADB)**. It can inspect their

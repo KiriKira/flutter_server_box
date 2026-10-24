@@ -15,8 +15,9 @@ enum AdbScreenState { preparing, connecting, streaming, failed, stopped }
 
 /// A screen borrows an ADB connection; disposing it never disconnects that device.
 class AdbScreenSession extends ChangeNotifier {
-  AdbScreenSession(this.connection);
+  AdbScreenSession(this.connection, {this.root = false});
   final AdbConnection connection;
+  final bool root;
   final id = (Random.secure().nextInt(0x7ffffffe) + 1).toRadixString(16).padLeft(8, '0');
   static const _events = EventChannel('tech.kirikira.kiribox/scrcpy/events');
   static AdbScreenSession? _active;
@@ -27,6 +28,9 @@ class AdbScreenSession extends ChangeNotifier {
   int revision = 0;
   double? progress;
   String? error;
+  String? inputWarning;
+  int inputRequests = 0;
+  int nativeAccepted = 0;
   String _log = '';
   bool _closed = false;
   bool _disposed = false;
@@ -57,6 +61,15 @@ class AdbScreenSession extends ChangeNotifier {
       _active = this;
       await previous?.close();
       _check();
+      if (root) {
+        final cancel = Completer<void>();
+        final timer = Timer(const Duration(seconds: 12), cancel.complete);
+        try {
+          final probe = await AdbExec(connection).run(android.androidCommand(action: 'root_probe', argument: '', root: false), cancel: cancel.future);
+          if (!probe.succeeded) throw StateError('ADB shell root permission was not granted. Allow su for shell on the target before retrying.\n${probe.combined}');
+        } finally { timer.cancel(); }
+        _check();
+      }
       _subscription = _events.receiveBroadcastStream().listen(_event,
         onError: (Object e) => _fail('$e'), onDone: () { if (!_closed) _fail('Screen event channel closed'); });
       final asset = await AdbService.channel.invokeMapMethod<String, dynamic>('screenAsset');
@@ -73,10 +86,19 @@ class AdbScreenSession extends ChangeNotifier {
       _check();
       state = AdbScreenState.connecting; progress = null; _notify();
       _shell = await AdbShellSession.open(connection,
-        command: android.androidCommand(action: 'scrcpy_start', argument: id, root: false));
+        command: android.androidCommand(action: 'scrcpy_start', argument: id, root: root));
       _launched = true;
       _check();
-      void log(String chunk) { _log = '$_log$chunk'; if (_log.length > 4096) _log = _log.substring(_log.length - 4096); }
+      void log(String chunk) {
+        _log = '$_log$chunk'; if (_log.length > 8192) _log = _log.substring(_log.length - 8192);
+        if (_log.contains('INJECT_EVENTS permission')) {
+          if (inputWarning == null) { inputWarning = 'input_permission'; _notify(); }
+        } else if (_log.contains('InputManager.injectInputEvent')) {
+          if (inputWarning == null) { inputWarning = 'input_api'; _notify(); }
+        } else if (_log.contains('Ignore positional event generated for size')) {
+          if (inputWarning == null) { inputWarning = 'input_geometry'; _notify(); }
+        }
+      }
       _logs.add(_shell!.stdout.cast<List<int>>().transform(const Utf8Decoder(allowMalformed: true)).listen(log, onError: (Object e) => _fail('$e')));
       _logs.add(_shell!.stderr.cast<List<int>>().transform(const Utf8Decoder(allowMalformed: true)).listen(log, onError: (Object e) => _fail('$e')));
       unawaited(_shell!.done.then((_) { if (!_closed) _fail('scrcpy server exited\n$_log'); }));
@@ -107,8 +129,12 @@ class AdbScreenSession extends ChangeNotifier {
   }
 
   Future<void> _send(String method, Map<String, Object> arguments) {
+    if (method != 'screenRelease') inputRequests++;
     final next = _inputs.then((_) async {
-      if (!_closed && _nativeStarted) await AdbService.channel.invokeMethod<void>(method, {'session': id, ...arguments});
+      if (!_closed && _nativeStarted) {
+        await AdbService.channel.invokeMethod<void>(method, {'session': id, ...arguments});
+        if (method != 'screenRelease') nativeAccepted++;
+      }
     }).catchError((Object e) { if (!_closed) _fail('$e'); });
     return _inputs = next;
   }
@@ -117,6 +143,21 @@ class AdbScreenSession extends ChangeNotifier {
   });
   Future<void> key(int key) => _send('screenKey', {'key': key});
   Future<void> releasePointers() => _send('screenRelease', const {});
+
+  String get diagnostics => 'scrcpy 5.0.1; mode=${root ? 'root' : 'shell'}; state=${state.name}\n'
+    'video=$width x $height; revision=$revision\n'
+    'input requests=$inputRequests; accepted by native queue=$nativeAccepted (not a target execution acknowledgement)\n'
+    '${error ?? ''}\n$_log';
+
+  Future<void> wake() async {
+    if (!AdbService.isCurrent(connection)) throw StateError('ADB connection changed');
+    final cancel = Completer<void>();
+    final timer = Timer(const Duration(seconds: 10), cancel.complete);
+    try {
+      final result = await AdbExec(connection).run(android.androidCommand(action: 'screen_wake', argument: '', root: root), cancel: cancel.future);
+      if (!result.succeeded || result.outputIncomplete) throw StateError(result.combined.isEmpty ? 'Wake request timed out or failed' : result.combined);
+    } finally { timer.cancel(); }
+  }
 
   Future<void> close() => _closing ??= _close();
   Future<void> _close() async {
@@ -134,7 +175,7 @@ class AdbScreenSession extends ChangeNotifier {
       final cancelled = Completer<void>();
       final timer = Timer(const Duration(seconds: 3), cancelled.complete);
       try {
-        if (_launched || _uploaded) await AdbExec(connection).run(android.androidCommand(action: 'scrcpy_stop', argument: id, root: false), cancel: cancelled.future);
+        if (_launched || _uploaded) await AdbExec(connection).run(android.androidCommand(action: 'scrcpy_stop', argument: id, root: root), cancel: cancelled.future);
         if (_staging case final path?) await AdbExec(connection).run(files.filesRemoveCommand(path: path, recursive: false, force: true), cancel: cancelled.future);
       } catch (_) {} finally { timer.cancel(); }
     }

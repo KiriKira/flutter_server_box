@@ -53,6 +53,7 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
         "reboot" => "reboot".into(),
         "identity" => "id".into(),
         "guid" => "getprop persist.adb.wifi.guid".into(),
+        "screen_wake" => "input keyevent 224 && wm dismiss-keyguard".into(),
         "scrcpy_start" | "scrcpy_stop" => {
             if argument.len() != 8 || !argument.bytes().all(|b| b.is_ascii_hexdigit()) {
                 return Err("Invalid scrcpy session ID".into());
@@ -62,7 +63,7 @@ pub fn command(action: &str, argument: &str, root: bool) -> Result<String, Strin
             let path = format!("/data/local/tmp/serverbox-scrcpy-{argument}.jar");
             let name = format!("kiribox-scrcpy-{argument}");
             if action == "scrcpy_start" {
-                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=false cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
+                format!("CLASSPATH={} exec app_process / --nice-name={} com.genymobile.scrcpy.Server 5.0.1 scid={argument} log_level=verbose tunnel_forward=true audio=false control=true video_codec=h264 max_size=1280 max_fps=60 video_bit_rate=8000000 clipboard_autosync=false cleanup=true power_on=true power_off_on_close=false", quote(&path), quote(&name))
             } else {
                 format!("for p in $(pidof {}); do kill \"$p\" 2>/dev/null || true; done; rm -f -- {}", quote(&name), quote(&path))
             }
@@ -214,6 +215,20 @@ mod tests {
         let stop = command("scrcpy_stop", "01234567", false).unwrap();
         assert!(stop.contains("pidof 'kiribox-scrcpy-01234567'"));
         assert!(!stop.contains("pkill") && !stop.contains("killall"));
+    }
+
+    #[test]
+    fn screen_root_and_wake_use_regular_keyguard_flow() {
+        let wake = command("screen_wake", "", false).unwrap();
+        assert_eq!(wake, "input keyevent 224 && wm dismiss-keyguard");
+        assert!(!wake.contains("locksettings") && !wake.contains("rm "));
+        let privileged_wake = command("screen_wake", "", true).unwrap();
+        assert!(privileged_wake.contains("su -c ") && privileged_wake.contains("input keyevent 224"));
+        let start = command("scrcpy_start", "01234567", true).unwrap();
+        let stop = command("scrcpy_stop", "01234567", true).unwrap();
+        assert!(start.contains("su -c ") && start.contains("scid=01234567"));
+        assert!(stop.contains("su -c ") && stop.contains("kiribox-scrcpy-01234567"));
+        assert!(!stop.contains("killall"));
     }
 
     #[cfg(unix)]

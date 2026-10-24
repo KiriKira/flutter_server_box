@@ -5757,6 +5757,38 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get adbScreenRecent => '最近任务';
+
+  @override
+  String get adbScreenDiagnostics => '控制诊断';
+
+  @override
+  String get adbScreenMode => '控制模式';
+
+  @override
+  String get adbScreenShellMode => '普通 ADB 控制';
+
+  @override
+  String get adbScreenRootMode => 'Root 控制（重新连接）';
+
+  @override
+  String get adbScreenRootTip => 'Root 控制：目标机须已允许 ADB shell 使用 su；仍需输入原有锁屏密码。';
+
+  @override
+  String get adbScreenWake => '唤醒／显示解锁界面';
+
+  @override
+  String get adbScreenUnlockTip =>
+      '已请求唤醒并解除普通锁屏。若设置了 PIN、图案或密码，仍需在目标画面输入原有凭据；主页和最近任务不能解除密码锁。';
+
+  @override
+  String get adbScreenInputDenied =>
+      '目标机拒绝了输入注入。请检查调试安全设置；若 shell 已获 su 授权，可切换 Root 控制。';
+
+  @override
+  String get adbScreenGeometryWarning => '目标机拒绝了尺寸已过期的触摸坐标，请重连或查看控制诊断。';
+
+  @override
+  String get adbScreenInputError => '目标机输入接口报错，请打开控制诊断查看服务端消息。';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).

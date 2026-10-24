@@ -25,6 +25,9 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
   String? _error;
   bool _paused = false;
   bool _starting = false;
+  bool _root = false;
+  bool _waking = false;
+  String? _wakeMessage;
   int _generation = 0;
   int _revision = 0;
   Future<void> _stopping = Future.value();
@@ -64,7 +67,7 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
       final exec = await ref.read(serverProvider(widget.spi.id).notifier).ensureExec();
       if (!mounted || _paused || generation != _generation) return;
       if (exec is! AdbExec) throw StateError(l10n.adbScreenChanged);
-      final session = _session = AdbScreenSession(exec.connection);
+      final session = _session = AdbScreenSession(exec.connection, root: _root);
       _revision = 0;
       session.addListener(_changed);
       await session.start();
@@ -90,6 +93,25 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
   }
   void _release() {
     _pointers.clear(); unawaited(_session?.releasePointers());
+  }
+
+  Future<void> _wake() async {
+    final session = _session;
+    if (session == null || _waking) return;
+    setState(() { _waking = true; _wakeMessage = null; });
+    try {
+      await session.wake();
+      if (mounted && identical(session, _session)) setState(() => _wakeMessage = l10n.adbScreenUnlockTip);
+    } catch (e) {
+      if (mounted && identical(session, _session)) setState(() => _wakeMessage = '$e');
+    } finally { if (mounted) setState(() => _waking = false); }
+  }
+
+  Future<void> _diagnostics() async {
+    _release();
+    await context.showRoundDialog<void>(title: l10n.adbScreenDiagnostics,
+      child: SingleChildScrollView(child: SelectableText(_session?.diagnostics ?? _error ?? 'No active screen session')),
+      actions: [Btn.ok()]);
   }
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -117,7 +139,16 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
     final gestureInsets = MediaQuery.systemGestureInsetsOf(context);
     return Scaffold(
       appBar: CustomAppBar(title: Text('${widget.spi.name} · ${l10n.adbScreen}'),
-        leading: BackButton(onPressed: () => Navigator.of(context).pop())),
+        leading: BackButton(onPressed: () => Navigator.of(context).pop()), actions: [
+          TextButton.icon(onPressed: _diagnostics, icon: const Icon(Icons.bug_report_outlined), label: Text(l10n.adbScreenDiagnostics)),
+          PopupMenuButton<bool>(enabled: !_starting, icon: Icon(_root ? Icons.admin_panel_settings : Icons.more_vert),
+            tooltip: l10n.adbScreenMode, onSelected: (root) {
+              _root = root; _wakeMessage = null; unawaited(_start());
+            }, itemBuilder: (_) => [
+              CheckedPopupMenuItem(value: false, checked: !_root, child: Text(l10n.adbScreenShellMode)),
+              CheckedPopupMenuItem(value: true, checked: _root, child: Text(l10n.adbScreenRootMode)),
+            ]),
+        ]),
       body: SafeArea(child: Focus(autofocus: true, onFocusChange: (focused) { if (!focused) _release(); },
         child: Column(children: [
           Expanded(child: ColoredBox(color: const Color(0xff000000), child: Padding(
@@ -168,7 +199,17 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
               ])),
             ))),
           ])))),
-          Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Wrap(spacing: 12, alignment: WrapAlignment.center, children: [
+          if (_root) Padding(padding: const EdgeInsets.all(4), child: Text(l10n.adbScreenRootTip, style: UIs.text12Grey)),
+          if (session?.inputWarning != null) Padding(padding: const EdgeInsets.all(8),
+            child: Text(switch (session?.inputWarning) {
+              'input_geometry' => l10n.adbScreenGeometryWarning,
+              'input_permission' => l10n.adbScreenInputDenied,
+              _ => l10n.adbScreenInputError,
+            })),
+          if (_wakeMessage case final message?) Padding(padding: const EdgeInsets.all(8), child: Text(message)),
+          Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: [
+            OutlinedButton.icon(onPressed: session != null && !_waking ? _wake : null,
+              icon: const Icon(Icons.lock_open), label: Text(l10n.adbScreenWake)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(4) : null, icon: const Icon(Icons.arrow_back), label: Text(l10n.adbScreenBack)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(3) : null, icon: const Icon(Icons.home_outlined), label: Text(l10n.adbScreenHome)),
             OutlinedButton.icon(onPressed: ready ? () => session!.key(187) : null, icon: const Icon(Icons.recent_actors_outlined), label: Text(l10n.adbScreenRecent)),

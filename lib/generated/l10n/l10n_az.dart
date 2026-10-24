@@ -6130,4 +6130,39 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get adbScreenRecent => 'Recent apps';
+
+  @override
+  String get adbScreenDiagnostics => 'Control diagnostics';
+
+  @override
+  String get adbScreenMode => 'Control mode';
+
+  @override
+  String get adbScreenShellMode => 'Standard ADB control';
+
+  @override
+  String get adbScreenRootMode => 'Root control (restart)';
+
+  @override
+  String get adbScreenRootTip =>
+      'Root control: the target must already allow ADB shell to use su. Your existing lock-screen credential is still required.';
+
+  @override
+  String get adbScreenWake => 'Wake / show unlock screen';
+
+  @override
+  String get adbScreenUnlockTip =>
+      'Wake and keyguard-dismiss requested. If a PIN, pattern or password is configured, enter the existing credential on the target screen. Home and Recent apps cannot unlock a locked phone.';
+
+  @override
+  String get adbScreenInputDenied =>
+      'The target denied input injection. Check its debugging security options, or use Root control if shell already has su permission.';
+
+  @override
+  String get adbScreenGeometryWarning =>
+      'The target rejected touch coordinates for an outdated video size. Reconnect or check Control diagnostics.';
+
+  @override
+  String get adbScreenInputError =>
+      'The target input interface reported an error. Open Control diagnostics for the server message.';
 }
