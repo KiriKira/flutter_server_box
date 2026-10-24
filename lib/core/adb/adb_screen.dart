@@ -112,8 +112,8 @@ class AdbScreenSession extends ChangeNotifier {
     }).catchError((Object e) { if (!_closed) _fail('$e'); });
     return _inputs = next;
   }
-  Future<void> touch(int action, int pointer, double x, double y) => _send('screenTouch', {
-    'action': action, 'pointer': pointer, 'x': x, 'y': y, 'revision': revision,
+  Future<void> touch(int action, int pointer, double x, double y, int geometryRevision) => _send('screenTouch', {
+    'action': action, 'pointer': pointer, 'x': x, 'y': y, 'revision': geometryRevision,
   });
   Future<void> key(int key) => _send('screenKey', {'key': key});
   Future<void> releasePointers() => _send('screenRelease', const {});

@@ -128,8 +128,10 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
               if (constraints.maxWidth <= 0 || constraints.maxHeight <= 0) return const SizedBox.shrink();
               final scale = math.min(constraints.maxWidth / session.width, constraints.maxHeight / session.height);
               final size = Size(session.width * scale, session.height * scale);
+              final geometryRevision = session.revision;
               void pointer(PointerEvent event, int action) {
-                if (!ready) return;
+                // Coordinates belong to the layout that produced this callback.
+                if (!ready || geometryRevision != session.revision) return;
                 final point = Offset((event.localPosition.dx / size.width).clamp(0.0, 1.0), (event.localPosition.dy / size.height).clamp(0.0, 1.0));
                 if (action == 0) {
                   if (_pointers.length >= 10) return;
@@ -140,14 +142,14 @@ class _AdbScreenPageState extends ConsumerState<AdbScreenPage> with WidgetsBindi
                 } else {
                   _pointers[event.pointer] = point;
                 }
-                unawaited(session.touch(action, event.pointer, point.dx, point.dy));
+                unawaited(session.touch(action, event.pointer, point.dx, point.dy, geometryRevision));
               }
               return Center(child: SizedBox(width: size.width, height: size.height,
                 child: Listener(behavior: HitTestBehavior.opaque,
                   onPointerDown: (event) => pointer(event, 0), onPointerMove: (event) => pointer(event, 2),
                   onPointerUp: (event) => pointer(event, 1), onPointerCancel: (event) {
                     final point = _pointers.remove(event.pointer);
-                    if (point != null) unawaited(session.touch(1, event.pointer, point.dx, point.dy));
+                    if (point != null) unawaited(session.touch(1, event.pointer, point.dx, point.dy, geometryRevision));
                   },
                   child: Texture(textureId: session.texture!, filterQuality: FilterQuality.low))));
             })),
